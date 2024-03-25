@@ -45,22 +45,23 @@ typedef enum{
     EOT,        // end of token stream
 }TokenKind;
 
-typedef struct {
+typedef struct Token{
     TokenKind kind;  // the token kind
     int start;  // the start char index of the token in the file
     unsigned char * string; // the token string (null terminated)
 }Token;
 
-typedef struct {
+typedef struct TokenList{
     Token token;  // the current token
     TokenList * next;  // the next token
 }TokenList;
 
-typedef struct {
+typedef struct Lexer{
     unsigned char * string;      // the input string
     int index;          // the current index
     char currentChar;   // the current char looked at in the lexer
-    TokenList tokens;   // the output token list
+    TokenList * tokens;   // the output token list
 }Lexer;
 
+void lexer_init(unsigned char * sourceString);
 #endif //LABRATORY_C_FINAL_PROJECT_LEXER_H
