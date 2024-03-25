@@ -29,12 +29,12 @@ typedef enum{
     STOP,       // STOP
     MACR,       // macr
     ENDMACR,    // endmacr
-    COMMA,      // ,
     DATA_OP,    // .data
     STRING_OP,  // .string
     ENTRY_OP,   // .entry
     EXTERN_OP,  // .extern
 
+    COMMA,      // ,
     COLON,      // :
     HASHTAG,    // #
     STAR,       // *
