@@ -39,18 +39,28 @@ typedef enum{
     HASHTAG,    // #
     STAR,       // *
 
+    IN_MACRO    // a token that represents the inside data of a macro
+
+    EOL,        //end of line
     EOT,        // end of token stream
 }TokenKind;
 
 typedef struct {
     TokenKind kind;  // the token kind
     int start;  // the start char index of the token in the file
-    char * string; // the token string (null terminated)
+    unsigned char * string; // the token string (null terminated)
 }Token;
 
 typedef struct {
     Token token;  // the current token
     TokenList * next;  // the next token
 }TokenList;
+
+typedef struct {
+    unsigned char * string;      // the input string
+    int index;          // the current index
+    char currentChar;   // the current char looked at in the lexer
+    TokenList tokens;   // the output token list
+}Lexer;
 
 #endif //LABRATORY_C_FINAL_PROJECT_LEXER_H
