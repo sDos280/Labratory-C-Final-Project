@@ -38,6 +38,19 @@ typedef enum{
     COLON,      // :
     HASHTAG,    // #
     STAR,       // *
+
+    EOT,        // end of token stream
 }TokenKind;
+
+typedef struct {
+    TokenKind kind;  // the token kind
+    int start;  // the start char index of the token in the file
+    char * string; // the token string (null terminated)
+}Token;
+
+typedef struct {
+    Token token;  // the current token
+    TokenList * next;  // the next token
+}TokenList;
 
 #endif //LABRATORY_C_FINAL_PROJECT_LEXER_H
