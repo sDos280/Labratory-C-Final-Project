@@ -5,7 +5,7 @@
 #ifndef LABRATORY_C_FINAL_PROJECT_LEXER_H
 #define LABRATORY_C_FINAL_PROJECT_LEXER_H
 
-enum TokenKind:
+typedef enum{
     COMMENT,    // ; ... \n
     REGISTER,   // r0, r1, r2, r3, r4, r5, r6, r7
     IDENTIFIER,
@@ -38,4 +38,6 @@ enum TokenKind:
     COLON,      // :
     HASHTAG,    // #
     STAR,       // *
+}TokenKind;
+
 #endif //LABRATORY_C_FINAL_PROJECT_LEXER_H
