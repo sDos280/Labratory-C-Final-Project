@@ -2,7 +2,7 @@
  * the lexer
 */
 
-#include "include/lexer.h"
+#include "../include/lexer.h"
 #include "stdbool.h"
 #include "stdlib.h"
 #include "ctype.h"

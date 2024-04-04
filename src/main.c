@@ -1,5 +1,5 @@
 #include "stdint.h"
-#include "lexer.h"
+#include "../include/lexer.h"
 
 int main(){
     lexer_init("; adasdfasdf asdf \n");
