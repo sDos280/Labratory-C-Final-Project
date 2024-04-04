@@ -1,11 +1,13 @@
-//
-// the lexer
-//
+/*
+ * the lexer
+*/
 
 #include "include/lexer.h"
 #include "stdbool.h"
 #include "stdlib.h"
 #include "ctype.h"
+#include <stdio.h>
+
 static Lexer lexer;
 
 void lexer_init(unsigned char * sourceString){
@@ -22,16 +24,16 @@ void lexer_init(unsigned char * sourceString){
 }*/
 
 static void add_token(Token token){
-    TokenList * toAdd = malloc(sizeof TokenList);
+    TokenList * toAdd = malloc(sizeof(TokenList));
     toAdd->token = token;
     toAdd->next = NULL;
 
     if (lexer.tokens == NULL){
-        // we haven't added a token yet
+        /* we haven't added a token yet */
         lexer.tokens = toAdd;
     }else{
         TokenList * last = lexer.tokens;
-        while (last.next != NULL){
+        while (last->next != NULL){
             last = last->next;
         }
         last->next = toAdd;
@@ -47,9 +49,10 @@ static void peek_drop(){
     lexer.currentChar = lexer.string[lexer.index];
 }
 
-static bool is_char_in(unsigned char * string){
-    // (string should be null terminated)
-    for (int i = 0; string[i] != EOF; i++){
+static bool is_char_in(char * string){
+    /* (string should be null terminated) */
+    int i;
+    for (i = 0; string[i] != EOF; i++){
         if (lexer.currentChar == string[i]) return true;
     }
 
@@ -58,14 +61,6 @@ static bool is_char_in(unsigned char * string){
 
 static bool is_char_whitespace(){
     return is_char_in("\t\r ");
-}
-
-static bool is_char_numeric(){
-    return isdigit(lexer.currentChar);
-}
-
-static bool is_char_numeric(){
-    return isdigit(lexer.currentChar);
 }
 
 static bool is_char_numeric(){
@@ -84,16 +79,17 @@ static bool is_special_char(){
     return isalpha(lexer.currentChar) || isdigit(lexer.currentChar);
 }
 
-static void peek_comment(){
+void peek_comment(){
     int index = lexer.index;
 
-    peek_char();  // peek ;
+    peek_char();  /* peek ; */
 
-    unsigned int size;  // the size of the comment (not including the ';' char and the EOL char)
-    for (size = 0; !(lexer.string[index + 1 + size] == '\0' || lexer.string[index + 1 + size] == '\n'); ++size);
+    unsigned int size;  /* the size of the comment (not including the ';' char and the EOL char or the \n char) */
+    for (size = 0; !(lexer.string[index + 1 + size] == '\0'); ++size);
 
-    unsigned char * string = malloc(size + 1);  // plus 1 for \0
-    for (int i = 0; i < size; ++i) {
+    unsigned char * string = malloc(size + 1);  /* plus 1 for \0 */
+    int i;
+    for (i = 0; i < size; ++i) {
         string[i] = lexer.string[index + 1 + i];
     }
 
