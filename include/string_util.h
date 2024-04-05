@@ -22,6 +22,7 @@ typedef struct String {
 } String;
 
 String string_init(); /* init string with a buffer of nothing */
+void string_free(String * str); /* free a string buffer data (after freeing the string must not be use) (there string data like the size and the freed \0 index of the freed data is saved)*/
 String string_init_with_data(char * data); /* init string with the data from "data" and with a buffer's size of the uppder cilling of 2^x */
 void string_info(String str); /* print string information */
 void string_add_char(String * str, char ch); /* add a char to the end of the string, if the buffer is full reallocated the buffer with double the size*/

@@ -12,9 +12,13 @@ String string_init(){
     String str;
     str.size = 8; /* just a nice number, 2^3*/
     str.index = 0; /* we setup the string data to have no data so the first chari n the buffer will be \0*/
-    str.data = (char *)calloc(8, sizeof sizeof(char));
+    str.data = (char *)calloc(8, sizeof(char));
 
     return str;
+}
+
+void string_free(String * str){
+    free(str->data);
 }
 
 String string_init_with_data(char * data){
