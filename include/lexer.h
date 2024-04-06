@@ -1,8 +1,10 @@
 #ifndef LABRATORY_C_FINAL_PROJECT_LEXER_H
 #define LABRATORY_C_FINAL_PROJECT_LEXER_H
 
+#include "string_util.h"
+
 typedef enum{
-    COMMENT,    /* / ; ... \n */
+    COMMENT,    /* / ; ... */
     REGISTER,   /* r0, r1, r2, r3, r4, r5, r6, r7 */
     IDENTIFIER,
     NUMBER,     /* 25 -25 +25 */
@@ -44,7 +46,7 @@ typedef enum{
 typedef struct Token{
     TokenKind kind;  /* the token kind */
     int start;  /* the start char index of the token in the file */
-    char * string; /* the token string (null terminated) */
+    String string; /* the string data */
 }Token;
 
 typedef struct TokenList{
@@ -53,12 +55,14 @@ typedef struct TokenList{
 }TokenList;
 
 typedef struct Lexer{
-    unsigned char * string;      /* the input string */
+    String string;      /* the input string */
     int index;          /* the current index */
     char currentChar;   /* the current char looked at in the lexer */
     TokenList * tokens;   /* the output token list */
 }Lexer;
 
-void lexer_init(unsigned char * sourceString);
+void lexer_init(char * sourceString); /* init lexer function */
+void print_token_list(); /* print the token list in a formated way */
 void peek_comment();
-#endif //LABRATORY_C_FINAL_PROJECT_LEXER_H
+
+#endif /*LABRATORY_C_FINAL_PROJECT_LEXER_H*/
