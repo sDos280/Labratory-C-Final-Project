@@ -63,6 +63,7 @@ typedef struct Lexer{
 
 void lexer_init(char * sourceString); /* init lexer function */
 void print_token_list(); /* print the token list in a formated way */
-void peek_comment();
+void peek_comment();  /* peek a comment, the caller must use the function when the token really appears in the current contex */
+void peek_separator();  /* peek a separator, the caller must use the function when the token really appears in the current contex */
 
 #endif /*LABRATORY_C_FINAL_PROJECT_LEXER_H*/

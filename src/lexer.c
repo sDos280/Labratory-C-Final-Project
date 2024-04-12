@@ -31,6 +31,22 @@ void print_token_list(){
             printf("end of line: \\n\n");
             break;
         
+        case COMMA:
+            printf("comma: ,\n");
+            break;
+        
+        case COLON:
+            printf("colon: :\n");
+            break;
+
+        case HASHTAG:
+            printf("hashtag: #\n");
+            break;
+
+        case STAR:
+            printf("star: *\n");
+            break;
+        
         default:
             break;
         }
@@ -125,6 +141,38 @@ void peek_next_line(){
     token.kind = EOL;
     token.start = index;
     token.string = string_init_with_data("\n");
+
+    peek_char();
+
+    add_token(token);
+}
+
+void peek_separator(){
+    int index = lexer.index;
+
+    Token token;
+    switch (lexer.currentChar)
+    {
+    case ',':
+        token.kind = COMMA;
+        break;
+
+    case ':':
+        token.kind = COLON;
+        break;
+    case '#':
+        token.kind = HASHTAG;
+        break;
+    case '*':
+        token.kind = STAR;
+        break;
+    
+    
+    default:
+        break;
+    }
+    token.start = index;
+    token.string = string_init_with_data(&lexer.currentChar);
 
     peek_char();
 
