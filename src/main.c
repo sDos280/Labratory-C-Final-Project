@@ -13,7 +13,6 @@ void main(){
     peek_separator();
     peek_separator();
     peek_separator();
-    peek_separator();
     print_token_list();
 }
 

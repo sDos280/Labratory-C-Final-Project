@@ -4,7 +4,7 @@
 #include "string_util.h"
 
 typedef enum{
-    COMMENT,    /* / ; ... */
+    COMMENT,    /* ; ... */
     REGISTER,   /* r0, r1, r2, r3, r4, r5, r6, r7 */
     IDENTIFIER,
     NUMBER,     /* 25 -25 +25 */
@@ -46,6 +46,7 @@ typedef enum{
 typedef struct Token{
     TokenKind kind;  /* the token kind */
     int start;  /* the start char index of the token in the file */
+    int line;  /* the line the char is inside */
     String string; /* the string data */
 }Token;
 
@@ -58,6 +59,7 @@ typedef struct Lexer{
     String string;      /* the input string */
     int index;          /* the current index */
     char currentChar;   /* the current char looked at in the lexer */
+    unsigned int currentLine; /* the current line looked at in the lexer (we start counting from 0)*/
     TokenList * tokens;   /* the output token list */
 }Lexer;
 

@@ -15,6 +15,7 @@ void lexer_init(char * sourceString){
     lexer.string = string_init_with_data(sourceString);
     lexer.index = 0;
     lexer.currentChar = string_get_char(lexer.string, lexer.index);
+    lexer.currentLine = 1;
 }
 
 void print_token_list(){
@@ -71,15 +72,6 @@ static void add_token(Token token){
         last->next = toAdd;
     }
 }
-static void peek_char(){
-    lexer.index++;
-    lexer.currentChar = string_get_char(lexer.string, lexer.index);
-}
-
-static void peek_drop(){
-    lexer.index--;
-    lexer.currentChar = string_get_char(lexer.string, lexer.index);
-}
 
 static bool is_char(char ch){
     return lexer.currentChar == ch;
@@ -115,13 +107,26 @@ static bool is_special_char(){
     return isalpha(lexer.currentChar) || isdigit(lexer.currentChar);
 }
 
+static void peek_char(){
+    if (is_char('\n')) lexer.currentLine++; /* a new line is started only after the \n char */
+    lexer.index++;
+    lexer.currentChar = string_get_char(lexer.string, lexer.index);
+}
+
+static void peek_drop(){
+    lexer.index--;
+    lexer.currentChar = string_get_char(lexer.string, lexer.index);
+}
+
 void peek_comment(){
     int index = lexer.index;
+    int line = lexer.currentLine;
 
     peek_char();  /* peek ; */
     Token token;
     token.kind = COMMENT;
     token.start = index;
+    token.line = line;
     token.string = string_init();
 
     while(!is_char(EOF)){
@@ -136,10 +141,12 @@ void peek_comment(){
 
 void peek_next_line(){
     int index = lexer.index;
+    int line = lexer.currentLine;
 
     Token token;
     token.kind = EOL;
     token.start = index;
+    token.line = line;
     token.string = string_init_with_data("\n");
 
     peek_char();
@@ -149,6 +156,7 @@ void peek_next_line(){
 
 void peek_separator(){
     int index = lexer.index;
+    int line = lexer.currentLine;
 
     Token token;
     switch (lexer.currentChar)
@@ -172,6 +180,7 @@ void peek_separator(){
         break;
     }
     token.start = index;
+    token.line = line;
     token.string = string_init_with_data(&lexer.currentChar);
 
     peek_char();
