@@ -68,5 +68,6 @@ void lexer_free(); /* reset lexer, after this function call you must not the lex
 void print_token_list(); /* print the token list in a formated way */
 void peek_comment();  /* peek a comment, the caller must use the function when the token really appears in the current contex */
 void peek_separator();  /* peek a separator, the caller must use the function when the token really appears in the current contex */
+void peek_number();  /* peek a number, the caller must use the function when the token really appears in the current contex */
 
 #endif /*LABRATORY_C_FINAL_PROJECT_LEXER_H*/

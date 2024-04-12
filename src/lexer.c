@@ -69,6 +69,10 @@ void print_token_list(){
             printf("star: *\n");
             break;
         
+        case NUMBER:
+            printf("number: %d\n", atoi(tokens->token.string.data));
+            break;
+
         default:
             break;
         }
@@ -205,6 +209,25 @@ void peek_separator(){
     token.string = string_init_with_data(&lexer.currentChar);
 
     peek_char();
+
+    add_token(token);
+}
+
+void peek_number(){
+    int index = lexer.index;
+    int line = lexer.currentLine;
+
+    Token token;
+    token.kind = NUMBER;
+    token.start = index;
+    token.line = line;
+    token.string = string_init();
+
+    int i;
+    for (i = 0; is_char_numeric() || (i == 0 && is_char_in("+-")); i++){
+        string_add_char(&token.string, lexer.currentChar);
+        peek_char();
+    }
 
     add_token(token);
 }

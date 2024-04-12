@@ -3,7 +3,7 @@
 #include "../include/string_util.h"
 
 void main(){
-    lexer_init("*,:##**,,");
+    lexer_init("*,:##**,,-556,252:+6546");
     peek_separator();
     peek_separator();
     peek_separator();
@@ -13,8 +13,12 @@ void main(){
     peek_separator();
     peek_separator();
     peek_separator();
+    peek_number();
+    peek_separator();
+    peek_number();
+    peek_separator();
+    peek_number();
     print_token_list();
-
     lexer_free();
     print_token_list();
 }
