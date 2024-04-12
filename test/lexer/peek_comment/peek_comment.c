@@ -1,6 +1,6 @@
 #include "stdint.h"
-#include "../../include/lexer.h"
-#include "../../include/string_util.h"
+#include "../../../include/lexer.h"
+#include "../../../include/string_util.h"
 
 void main(){
     lexer_init("; adasdfasdf asdf \n; hello world \n\n\n");
