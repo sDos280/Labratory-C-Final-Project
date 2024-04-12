@@ -11,4 +11,6 @@ void main(){
     peek_next_line();
     peek_next_line();
     print_token_list();
+
+    lexer_free();
 }
