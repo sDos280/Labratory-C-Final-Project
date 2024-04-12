@@ -14,6 +14,9 @@ void main(){
     peek_separator();
     peek_separator();
     print_token_list();
+
+    lexer_free();
+    print_token_list();
 }
 
 /*void main(){

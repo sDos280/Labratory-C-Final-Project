@@ -18,6 +18,27 @@ void lexer_init(char * sourceString){
     lexer.currentLine = 1;
 }
 
+void lexer_free(){
+    /* reset the lexer, free the token list (lexer.tokens) and string, and other field */
+    
+    /* free the token list*/
+    TokenList * current = lexer.tokens;
+    TokenList * temp;
+
+    while (current != NULL){
+        temp = current;
+        current = current->next;
+        free(temp);
+    }
+    
+    /* free the source string*/
+    string_free(&lexer.string);
+
+    /* reset other fields */
+    lexer.index = 0;
+    lexer.currentLine = 1;
+}
+
 void print_token_list(){
     TokenList * tokens = lexer.tokens;
 

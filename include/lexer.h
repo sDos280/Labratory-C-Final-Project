@@ -64,6 +64,7 @@ typedef struct Lexer{
 }Lexer;
 
 void lexer_init(char * sourceString); /* init lexer function */
+void lexer_free(); /* reset lexer, after this function call you must not the lexer before calling lexer_init  */
 void print_token_list(); /* print the token list in a formated way */
 void peek_comment();  /* peek a comment, the caller must use the function when the token really appears in the current contex */
 void peek_separator();  /* peek a separator, the caller must use the function when the token really appears in the current contex */
