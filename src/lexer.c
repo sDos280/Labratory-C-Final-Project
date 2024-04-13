@@ -70,7 +70,7 @@ void print_token_list(){
             break;
         
         case NUMBER:
-            printf("number: %d\n", atoi(tokens->token.string.data));
+            printf("number: %d, line_index: %d\n", atoi(tokens->token.string.data), tokens->token.line_index);
             break;
         
         case STRING:
@@ -137,23 +137,33 @@ static bool is_special_char(){
 }
 
 static void peek_char(){
-    if (is_char('\n')) lexer.currentLine++; /* a new line is started only after the \n char */
+    if (is_char('\n')) 
+    {
+        /* a new line is started only after the \n char */
+        lexer.currentLine++;
+        lexer.line_index = 0;
+    }else{
+        lexer.line_index++;
+    }
+    
     lexer.index++;
     lexer.currentChar = string_get_char(lexer.string, lexer.index);
 }
 
-static void peek_drop(){
+/*static void peek_drop(){
     lexer.index--;
     lexer.currentChar = string_get_char(lexer.string, lexer.index);
-}
+}*/
 
 void peek_comment(){
     int index = lexer.index;
     int line = lexer.currentLine;
+    int line_index = lexer.line_index;
 
     Token token;
     token.kind = COMMENT;
-    token.start = index;
+    token.index = index;
+    token.line_index = line_index;
     token.line = line;
     token.string = string_init();
 
@@ -170,10 +180,12 @@ void peek_comment(){
 void peek_next_line(){
     int index = lexer.index;
     int line = lexer.currentLine;
+    int line_index = lexer.line_index;
 
     Token token;
     token.kind = EOL;
-    token.start = index;
+    token.index = index;
+    token.line_index = line_index;
     token.line = line;
     token.string = string_init_with_data("\n");
 
@@ -185,6 +197,7 @@ void peek_next_line(){
 void peek_separator(){
     int index = lexer.index;
     int line = lexer.currentLine;
+    int line_index = lexer.line_index;
 
     Token token;
     switch (lexer.currentChar)
@@ -207,7 +220,8 @@ void peek_separator(){
     default:
         break;
     }
-    token.start = index;
+    token.index = index;
+    token.line_index = line_index;
     token.line = line;
     token.string = string_init_with_data(&lexer.currentChar);
 
@@ -219,10 +233,12 @@ void peek_separator(){
 void peek_number(){
     int index = lexer.index;
     int line = lexer.currentLine;
+    int line_index = lexer.line_index;
 
     Token token;
     token.kind = NUMBER;
-    token.start = index;
+    token.index = index;
+    token.line_index = line_index;
     token.line = line;
     token.string = string_init();
 
@@ -238,10 +254,12 @@ void peek_number(){
 void peek_string(){
     int index = lexer.index;
     int line = lexer.currentLine;
+    int line_index = lexer.line_index;
 
     Token token;
     token.kind = STRING;
-    token.start = index;
+    token.index = index;
+    token.line_index = line_index;
     token.line = line;
     token.string = string_init();
 
