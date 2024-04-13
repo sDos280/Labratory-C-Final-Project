@@ -8,7 +8,7 @@ typedef enum{
     REGISTER,   /* r0, r1, r2, r3, r4, r5, r6, r7 */
     IDENTIFIER,
     NUMBER,     /* 25 -25 +25 */
-    STRING,      /* */
+    STRING,      /* "..." */
     MOV,        /* mov */
     CMP,        /* cmp */
     ADD,        /* add */
@@ -69,5 +69,5 @@ void print_token_list(); /* print the token list in a formated way */
 void peek_comment();  /* peek a comment, the caller must use the function when the token really appears in the current contex */
 void peek_separator();  /* peek a separator, the caller must use the function when the token really appears in the current contex */
 void peek_number();  /* peek a number, the caller must use the function when the token really appears in the current contex */
-
+void peek_string(); /* peek a primery string expresion (AKA "..."), the caller must use the function when the token really appears in the current contex */
 #endif /*LABRATORY_C_FINAL_PROJECT_LEXER_H*/

@@ -72,6 +72,10 @@ void print_token_list(){
         case NUMBER:
             printf("number: %d\n", atoi(tokens->token.string.data));
             break;
+        
+        case STRING:
+            printf("string: %s\n", tokens->token.string.data);
+            break;
 
         default:
             break;
@@ -147,7 +151,6 @@ void peek_comment(){
     int index = lexer.index;
     int line = lexer.currentLine;
 
-    peek_char();  /* peek ; */
     Token token;
     token.kind = COMMENT;
     token.start = index;
@@ -228,6 +231,28 @@ void peek_number(){
         string_add_char(&token.string, lexer.currentChar);
         peek_char();
     }
+
+    add_token(token);
+}
+
+void peek_string(){
+    int index = lexer.index;
+    int line = lexer.currentLine;
+
+    Token token;
+    token.kind = STRING;
+    token.start = index;
+    token.line = line;
+    token.string = string_init();
+
+    int i;
+    for (i = 0; (i == 0 /* for the first " char */) || (lexer.currentChar != '\"') ; i++){
+        string_add_char(&token.string, lexer.currentChar);
+        peek_char();
+    }
+
+    string_add_char(&token.string, lexer.currentChar);
+    peek_char(); /* peek the last " char */
 
     add_token(token);
 }
