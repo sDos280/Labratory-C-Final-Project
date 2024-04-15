@@ -72,4 +72,5 @@ void peek_comment();  /* peek a comment, the caller must use the function when t
 void peek_separator();  /* peek a separator, the caller must use the function when the token really appears in the current contex */
 void peek_number();  /* peek a number, the caller must use the function when the token really appears in the current contex */
 void peek_string(); /* peek a primery string expresion (AKA "..."), the caller must use the function when the token really appears in the current contex */
+void peek_non_op_instruction(); /* peek a none operative instructions (AKA .data/.string/...), the caller must use the function when the token really appears in the current contex */
 #endif /*LABRATORY_C_FINAL_PROJECT_LEXER_H*/

@@ -77,6 +77,21 @@ void print_token_list(){
             printf("string: %s\n", tokens->token.string.data);
             break;
 
+        case DATA_INS:
+            printf("none operative instructions: %s\n", tokens->token.string.data);
+            break;
+        
+        case STRING_INS:
+            printf("none operative instructions: %s\n", tokens->token.string.data);
+            break;
+        
+        case ENTRY_INS:
+            printf("none operative instructions: %s\n", tokens->token.string.data);
+            break;
+        
+        case EXTERN_INS:
+            printf("none operative instructions: %s\n", tokens->token.string.data);
+            break;
         default:
             break;
         }
@@ -145,7 +160,7 @@ static void peek_char(){
     }else{
         lexer.line_index++;
     }
-    
+
     lexer.index++;
     lexer.currentChar = string_get_char(lexer.string, lexer.index);
 }
@@ -271,6 +286,39 @@ void peek_string(){
 
     string_add_char(&token.string, lexer.currentChar);
     peek_char(); /* peek the last " char */
+
+    add_token(token);
+}
+
+void peek_non_op_instruction(){
+    int index = lexer.index;
+    int line = lexer.currentLine;
+    int line_index = lexer.line_index;
+
+    Token token;
+    token.index = index;
+    token.line_index = line_index;
+    token.line = line;
+    token.string = string_init();
+
+    int i;
+    for (i = 0; (i == 0 /* for the . char */) || (is_char_identifier_starter() /* only alpha no numeric*/) ; i++){
+        string_add_char(&token.string, lexer.currentChar);
+        peek_char();
+    }
+
+    if (string_equals_char_pointer(token.string, ".data")){
+        token.kind = DATA_INS;
+    } else if (string_equals_char_pointer(token.string, ".string")){
+        token.kind = STRING_INS;
+    } else if (string_equals_char_pointer(token.string, ".entry")){
+        token.kind = ENTRY_INS;
+    } else if (string_equals_char_pointer(token.string, ".extern")){
+        token.kind = EXTERN_INS;
+    }else {
+        /* there isn't a known none operative instructions that match the one that we know, so we raise an error */
+        /* we currently wont raise an error */
+    }
 
     add_token(token);
 }
