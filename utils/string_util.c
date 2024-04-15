@@ -99,6 +99,16 @@ bool string_equals(String str1, String str2){
     return true;
 }
 
+bool string_equals_char_pointer(String str1, char * str2){
+    int i;
+    for (i = 0; i < str1.index; i++){
+        if (str2[i] == '\0') return false; /* the only way that str1[i] = str2[i] = \0 is when i = str1.index (which nevers really appends)*/
+        if (string_get_char(str1, i) != str2[i]) return false;
+    }
+
+    return true;
+}
+
 static unsigned power_2_floor(unsigned x) {
     int power = 1;
     while (x >>= 1) power <<= 1;

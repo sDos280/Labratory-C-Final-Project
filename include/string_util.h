@@ -30,5 +30,6 @@ void string_add_char_pointer(String * str, char * toAdd); /* add a char * data t
 void string_add_string(String * str, String toAdd); /* add a String to the end of the str */
 char string_get_char(String str, unsigned int index); /* a get function for getting a char by index from the string, if the index exied the length of string (over or equal to the index of \0) returns \0*/
 bool string_equals(String str1, String str2); /* ckeck if two strings are equals */
+bool string_equals_char_pointer(String str1, char * str2); /* ckeck if a String is equals to a string for a char pointer */
 
 #endif /* LABRATORY_C_FINAL_PROJECT_STRING_UTIL */
