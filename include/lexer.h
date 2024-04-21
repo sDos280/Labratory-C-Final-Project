@@ -13,6 +13,33 @@ typedef struct Lexer{
     TokenList * tokens;   /* the output token list */
 }Lexer;
 
+typedef enum {
+    LexerTokenErrorKind,
+    LexerCharErrorKind,
+} LexerTokenErrorKind;
+
+typedef struct LexerTokenError{
+    Token token;  /* the token the error talks about */
+    String message;  /* the message from the caller */
+}LexerTokenError;
+
+typedef struct LexerCharError{
+    char ch;  /* the char the error talks about */
+    String message;  /* the message from the caller */
+}LexerCharError;
+
+typedef struct LexerErrorList{
+    union
+    {
+        LexerTokenError tokenError;  /* the current error */
+        LexerCharError charError;  /* the current error */
+    };
+
+    LexerTokenErrorKind kind;
+    
+    struct LexerErrorList * next;  /* the next error */
+}LexerErrorList;
+
 void lexer_init(char * sourceString); /* init lexer function */
 void lexer_free(); /* reset lexer, after this function call you must not the lexer before calling lexer_init  */
 void print_token_list(); /* print the token list in a formated way */
