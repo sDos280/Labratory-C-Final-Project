@@ -188,7 +188,7 @@ void peek_comment(){
     token.line = line;
     token.string = string_init();
 
-    while(!is_char(EOF)){
+    while(!is_char('\0')){
         if (is_char('\n')) break; /* the end of the comment token */
 
         string_add_char(&token.string, lexer.currentChar);
@@ -264,7 +264,7 @@ void peek_number(){
     token.string = string_init();
 
     int i;
-    for (i = 0; is_char_numeric() || (i == 0 && is_char_in("+-")); i++){
+    for (i = 0; !is_char('\0') && (is_char_numeric() || (i == 0 && is_char_in("+-"))); i++){
         string_add_char(&token.string, lexer.currentChar);
         peek_char();
     }
@@ -285,7 +285,7 @@ void peek_string(){
     token.string = string_init();
 
     int i;
-    for (i = 0; (i == 0 /* for the first " char */) || (lexer.currentChar != '\"') ; i++){
+    for (i = 0; !is_char('\0') && ((i == 0 /* for the first " char */) || (lexer.currentChar != '\"')); i++){
         string_add_char(&token.string, lexer.currentChar);
         peek_char();
     }
@@ -308,7 +308,7 @@ void peek_non_op_instruction(){
     token.string = string_init();
 
     int i;
-    for (i = 0; (i == 0 /* for the . char */) || (is_char_identifier_starter() /* only alpha no numeric*/) ; i++){
+    for (i = 0; !is_char('\0') && ((i == 0 /* for the . char */) || (is_char_identifier_starter() /* only alpha no numeric*/)); i++){
         string_add_char(&token.string, lexer.currentChar);
         peek_char();
     }
