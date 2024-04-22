@@ -2,6 +2,7 @@
  * the lexer
 */
 
+#include "consts.h"
 #include "../include/lexer.h"
 #include "string_util.h"
 #include <stdbool.h>
@@ -10,6 +11,7 @@
 #include <stdio.h>
 
 static Lexer lexer;
+static LexerErrorList * errorList;
 
 void lexer_init(char * sourceString){
     lexer.string = string_init_with_data(sourceString);
@@ -78,20 +80,24 @@ void print_token_list(){
             break;
 
         case DATA_INS:
-            printf("none operative instructions: %s\n", tokens->token.string.data);
+            printf("non operative instructions: %s\n", tokens->token.string.data);
             break;
         
         case STRING_INS:
-            printf("none operative instructions: %s\n", tokens->token.string.data);
+            printf("non operative instructions: %s\n", tokens->token.string.data);
             break;
         
         case ENTRY_INS:
-            printf("none operative instructions: %s\n", tokens->token.string.data);
+            printf("non operative instructions: %s\n", tokens->token.string.data);
             break;
         
         case EXTERN_INS:
-            printf("none operative instructions: %s\n", tokens->token.string.data);
+            printf("non operative instructions: %s\n", tokens->token.string.data);
             break;
+        
+        case TokenError:
+            printf("error token: %s\n", tokens->token.string.data);
+
         default:
             break;
         }
@@ -316,9 +322,74 @@ void peek_non_op_instruction(){
     } else if (string_equals_char_pointer(token.string, ".extern")){
         token.kind = EXTERN_INS;
     }else {
-        /* there isn't a known none operative instructions that match the one that we know, so we raise an error */
-        /* we currently wont raise an error */
+        /* there isn't a known non operative instruction that match the one that we know, so we raise an error */
+        
+        token.kind = TokenError;
+
+        LexerTokenError error;
+        error.token = token;
+        error.message = string_init_with_data("unknown non operative instruction");
+
+        push_lexer_token_error(error);
     }
 
     add_token(token);
+}
+
+
+void push_lexer_token_error(LexerTokenError error){
+    LexerErrorList * toAdd = malloc(sizeof(LexerErrorList));
+    toAdd->tokenError = error;
+    toAdd->kind = LexerTokenErrorKind;
+    toAdd->next = NULL;
+
+    if (errorList == NULL){
+        /* we haven't added an error yet */
+        errorList = toAdd;
+    }else{
+        LexerErrorList * last = errorList;
+        while (last->next != NULL){
+            last = last->next;
+        }
+        last->next = toAdd;
+    }
+}
+
+void flush_lexer_error_list(){
+    LexerErrorList * current = errorList;
+    while (current != NULL)
+    {
+        switch (current->kind)
+        {
+        case LexerTokenErrorKind:
+            unsigned int index = 0;
+            unsigned int line = 1; /* line index */
+
+            /* move index to the first index in the line that the token is inside */
+            while (string_get_char(lexer.string, index) != '\0' && line != current->tokenError.token.line){
+                if (index != 0)
+                    if (string_get_char(lexer.string, index - 1) == '\n') line++;
+                    else index++;
+                else index++;
+            }
+
+            printf("%s : Lexer Error : %s\n", PROJECT_NAME, current->tokenError.message.data);
+            printf("    %u | ", line);
+            
+            while (string_get_char(lexer.string, index) != '\0' && string_get_char(lexer.string, index) != '\n'){ 
+                putchar(string_get_char(lexer.string, index));
+                index++;
+            }
+
+            printf("\n");
+
+            break;
+        
+        default:
+            break;
+        }
+
+        current = current->next;
+    }
+    
 }

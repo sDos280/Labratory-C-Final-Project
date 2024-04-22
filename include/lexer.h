@@ -16,7 +16,7 @@ typedef struct Lexer{
 typedef enum {
     LexerTokenErrorKind,
     LexerCharErrorKind,
-} LexerTokenErrorKind;
+} LexerErrorKind;
 
 typedef struct LexerTokenError{
     Token token;  /* the token the error talks about */
@@ -25,6 +25,8 @@ typedef struct LexerTokenError{
 
 typedef struct LexerCharError{
     char ch;  /* the char the error talks about */
+    unsigned int index; /* the index of the char in the source file*/
+    unsigned int line_index; /* the line index of the char in the source file */
     String message;  /* the message from the caller */
 }LexerCharError;
 
@@ -35,7 +37,7 @@ typedef struct LexerErrorList{
         LexerCharError charError;  /* the current error */
     };
 
-    LexerTokenErrorKind kind;
+    LexerErrorKind kind;
     
     struct LexerErrorList * next;  /* the next error */
 }LexerErrorList;
@@ -48,4 +50,7 @@ void peek_separator();  /* peek a separator, the caller must use the function wh
 void peek_number();  /* peek a number, the caller must use the function when the token really appears in the current contex */
 void peek_string(); /* peek a primery string expresion (AKA "..."), the caller must use the function when the token really appears in the current contex */
 void peek_non_op_instruction(); /* peek a none operative instructions (AKA .data/.string/...), the caller must use the function when the token really appears in the current contex */
+
+void push_lexer_token_error(LexerTokenError error); /* push a new lexer token error to the end of the lexer's error list*/
+void flush_lexer_error_list(); /* flush (output) the lexer's error list to the user */
 #endif /*LABRATORY_C_FINAL_PROJECT_LEXER_H*/
