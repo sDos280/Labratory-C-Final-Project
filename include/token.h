@@ -22,7 +22,7 @@ typedef enum{
     BNE,        /* bne */
     RED,        /* red */
     PRN,        /* prn */
-    JSR,        /* jst */
+    JSR,        /* jsr */
     RTS,        /* rts */
     STOP,       /* stop */
     MACR,       /* macr */

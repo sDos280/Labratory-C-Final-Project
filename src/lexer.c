@@ -98,7 +98,42 @@ void print_token_list(){
         
         case TokenError:
             printf("error token: %s\n", tokens->token.string.data);
+            break;
+        
+        case REGISTER:
+            printf("register: %s\n", tokens->token.string.data);
+            break;
+        
+        case MACR:
+            printf("macro start token: %s\n", tokens->token.string.data);
+            break;
+        
+        case ENDMACR:
+            printf("macro end token: %s\n", tokens->token.string.data);
+            break;
+        
+        case MOV:
+        case CMP:
+        case ADD:
+        case SUB:
+        case LEA:
+        case CLR:
+        case NOT:
+        case INC:
+        case DEC:
+        case JMP:
+        case BNE:
+        case RED:
+        case PRN:
+        case JSR:
+        case RTS:
+        case STOP:
+            printf("operative instruction: %s\n", tokens->token.string.data);
+            break;
 
+        case IDENTIFIER:
+            printf("identifier: %s\n", tokens->token.string.data);
+            break;
         default:
             break;
         }
@@ -337,6 +372,85 @@ void peek_non_op_instruction(){
     add_token(token);
 }
 
+
+void peek_identifier(){
+    int index = lexer.index;
+    int line = lexer.currentLine;
+    int line_index = lexer.line_index;
+
+    Token token;
+    token.index = index;
+    token.line_index = line_index;
+    token.line = line;
+    token.string = string_init();
+
+    string_add_char(&token.string, lexer.currentChar); /* the first char is always an alfa char so it has to be part of the identifier*/
+    peek_char();
+    
+    while (!is_char('\0')){
+        if (is_char_identifier()){
+            string_add_char(&token.string, lexer.currentChar);
+            peek_char();
+        }
+        else 
+        {
+            break;
+        }
+    }
+
+    /* classify idenifiers if needed */
+    /* check for regirster */
+    if (string_equals_char_pointer(token.string, "r0") ||
+        string_equals_char_pointer(token.string, "r1") ||
+        string_equals_char_pointer(token.string, "r2") ||
+        string_equals_char_pointer(token.string, "r3") ||
+        string_equals_char_pointer(token.string, "r4") ||
+        string_equals_char_pointer(token.string, "r5") ||
+        string_equals_char_pointer(token.string, "r6") ||
+        string_equals_char_pointer(token.string, "r7"))
+        token.kind = REGISTER;
+    /* check for macro token*/
+    else if (string_equals_char_pointer(token.string, "macr") ||
+        string_equals_char_pointer(token.string, "endmacr"))
+        token.kind = string_equals_char_pointer(token.string, "macr")? MACR : ENDMACR;
+    /* check for operative instruction*/
+    else if (string_equals_char_pointer(token.string, "mov"))
+        token.kind = MOV;
+    else if (string_equals_char_pointer(token.string, "cmp"))
+        token.kind = CMP;
+    else if (string_equals_char_pointer(token.string, "add"))
+        token.kind = ADD;
+    else if (string_equals_char_pointer(token.string, "sub"))
+        token.kind = SUB;
+    else if (string_equals_char_pointer(token.string, "lea"))
+        token.kind = LEA;
+    else if (string_equals_char_pointer(token.string, "clr"))
+        token.kind = CLR;
+    else if (string_equals_char_pointer(token.string, "not"))
+        token.kind = NOT;
+    else if (string_equals_char_pointer(token.string, "inc"))
+        token.kind = INC;
+    else if (string_equals_char_pointer(token.string, "dec"))
+        token.kind = DEC;
+    else if (string_equals_char_pointer(token.string, "jmp"))
+        token.kind = JMP;
+    else if (string_equals_char_pointer(token.string, "bne"))
+        token.kind = BNE;
+    else if (string_equals_char_pointer(token.string, "red"))
+        token.kind = RED;
+    else if (string_equals_char_pointer(token.string, "prn"))
+        token.kind = PRN;
+    else if (string_equals_char_pointer(token.string, "jsr"))
+        token.kind = JSR;
+    else if (string_equals_char_pointer(token.string, "rts"))
+        token.kind = RTS;
+    else if (string_equals_char_pointer(token.string, "stop"))
+        token.kind = STOP;
+    else
+        token.kind = IDENTIFIER; 
+
+    add_token(token);      
+}
 
 void push_lexer_token_error(LexerTokenError error){
     LexerErrorList * toAdd = malloc(sizeof(LexerErrorList));
