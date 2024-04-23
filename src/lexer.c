@@ -28,6 +28,7 @@ void lexer_free(){
     TokenList * temp;
 
     while (current != NULL){
+        string_free(&current->token.string); /* free the string of each token */
         temp = current;
         current = current->next;
         free(temp);

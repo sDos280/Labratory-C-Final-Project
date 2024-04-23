@@ -5,7 +5,7 @@ current_dir := $(notdir $(CURDIR))
 
 APPNAME = $(current_dir)
 
-.PHONY: clean main
+.PHONY: clean main valgrind
 
 # compiler targets
 $(current_dir): ../../../src/lexer.c ../../../utils/string_util.c
@@ -13,3 +13,7 @@ $(current_dir): ../../../src/lexer.c ../../../utils/string_util.c
 
 clean:
 	rm -f $(APPNAME)
+
+#valgrind
+valgrind:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(APPNAME)

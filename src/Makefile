@@ -4,7 +4,7 @@ LDFLAGS =
 
 APPNAME = ac # ac = AsemblyCompiler
 
-.PHONY: clean main
+.PHONY: clean main valgrind
 
 # compiler targets
 main: lexer.o main.o string_util.o
@@ -19,6 +19,10 @@ main.o: main.c
 # utils targets
 string_util.o: ../utils/string_util.c
 	$(CC) $(CXXFLAGS) -c $< -o $@
+
+#valgrind
+valgrind:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind.out.txt ./$(APPNAME)
 
 clean:
 	rm -f ./*.o ../utils/*.o $(APPNAME)
