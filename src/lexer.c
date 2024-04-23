@@ -310,13 +310,15 @@ void peek_number(){
         if (string_get_char(token.string, 0) == '+' || string_get_char(token.string, 0) == '-'){
             LexerCharError error;
 
-            error.ch = lexer.currentChar;
-            error.index = lexer.index;
-            error.line_index = lexer.line_index;
-            error.line = lexer.currentLine;
+            error.ch = string_get_char(token.string, 0);
+            error.index = token.index;
+            error.line_index = token.line_index;
+            error.line = token.line;
             error.message = string_init_with_data("it seems that you have a number sign but not any numerical chars after it");
 
             push_lexer_char_error(error);
+
+            string_free(&token.string);
 
             return; /* there is no need to add the tokens since it's invalid*/
         }
