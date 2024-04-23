@@ -26,7 +26,8 @@ typedef struct LexerTokenError{
 typedef struct LexerCharError{
     char ch;  /* the char the error talks about */
     unsigned int index; /* the index of the char in the source file*/
-    unsigned int line_index; /* the line index of the char in the source file */
+    unsigned int line_index; /* the line index of the char in the char's line */
+    unsigned int line; /* the line of the char in the source file */
     String message;  /* the message from the caller */
 }LexerCharError;
 
@@ -51,7 +52,9 @@ void peek_number();  /* peek a number, the caller must use the function when the
 void peek_string(); /* peek a primery string expresion (AKA "..."), the caller must use the function when the token really appears in the current contex */
 void peek_non_op_instruction(); /* peek a none operative instructions (AKA .data/.string/...), the caller must use the function when the token really appears in the current contex */
 void peek_identifier(); /* peek an identifier (if an identifier has a meaning of an operative instruction\regirstor\macro token it would be classefied as that) the caller must use the function when the token really appears in the current contex*/
+void lex(); /* operate a full lexer pass on the source code */
 
 void push_lexer_token_error(LexerTokenError error); /* push a new lexer token error to the end of the lexer's error list*/
+void push_lexer_char_error(LexerCharError error); /* push a new lexer char error to the end of the lexer's error list*/
 void flush_lexer_error_list(); /* flush (output) the lexer's error list to the user */
 #endif /*LABRATORY_C_FINAL_PROJECT_LEXER_H*/

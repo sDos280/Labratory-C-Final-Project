@@ -452,6 +452,40 @@ void peek_identifier(){
     add_token(token);      
 }
 
+void lex(){
+    while (!is_char('\0'))
+    {
+        if (is_char_whitespace()){
+            peek_char(); /* we simply move over whitespaces*/
+        } else if (is_char(';')){
+            peek_comment();
+        } else if (is_char_in(",:#*")){
+            peek_separator();
+        } else if (is_char_numeric() || is_char_in("+-")){
+            peek_number();
+        } else if (is_char('\"')){
+            peek_string();
+        } else if (is_char('.')){
+            peek_string();
+        } else if (is_char_identifier_starter()){
+            peek_identifier();
+        }else {
+            LexerCharError error;
+
+            error.ch = lexer.currentChar;
+            error.index = lexer.index;
+            error.line_index = lexer.line_index;
+            error.line = lexer.currentLine;
+            error.message = string_init_with_data("unkonwn char");
+
+            push_lexer_char_error(error);
+
+            peek_char(); /* we would continue to lex in any case, to find more lexer errors*/
+        }
+    }
+    
+}
+
 void push_lexer_token_error(LexerTokenError error){
     LexerErrorList * toAdd = malloc(sizeof(LexerErrorList));
     toAdd->tokenError = error;
@@ -470,15 +504,36 @@ void push_lexer_token_error(LexerTokenError error){
     }
 }
 
+void push_lexer_char_error(LexerCharError error){
+    LexerErrorList * toAdd = malloc(sizeof(LexerCharError));
+    toAdd->charError = error;
+    toAdd->kind = LexerCharErrorKind;
+    toAdd->next = NULL;
+
+    if (errorList == NULL){
+        /* we haven't added an error yet */
+        errorList = toAdd;
+    }else{
+        LexerErrorList * last = errorList;
+        while (last->next != NULL){
+            last = last->next;
+        }
+        last->next = toAdd;
+    }
+}
+
 void flush_lexer_error_list(){
     LexerErrorList * current = errorList;
+    unsigned int index = 0;
+    unsigned int line = 1; /* line index */
+
     while (current != NULL)
     {
         switch (current->kind)
         {
         case LexerTokenErrorKind:
-            unsigned int index = 0;
-            unsigned int line = 1; /* line index */
+            index = 0;
+            line = 1;
 
             /* move index to the first index in the line that the token is inside */
             while (string_get_char(lexer.string, index) != '\0' && line != current->tokenError.token.line){
@@ -499,7 +554,30 @@ void flush_lexer_error_list(){
             printf("\n");
 
             break;
-        
+        case LexerCharErrorKind:
+            index = 0;
+            line = 1;
+
+            /* move index to the first index in the line that the char is inside */
+            while (string_get_char(lexer.string, index) != '\0' && line != current->charError.line){
+                if (index != 0)
+                    if (string_get_char(lexer.string, index - 1) == '\n') line++;
+                    else index++;
+                else index++;
+            }
+
+            printf("%s : Lexer Error : %s\n", PROJECT_NAME, current->charError.message.data);
+            printf("    %u | ", line);
+            
+            while (string_get_char(lexer.string, index) != '\0' && string_get_char(lexer.string, index) != '\n'){ 
+                putchar(string_get_char(lexer.string, index));
+                index++;
+            }
+
+            printf("\n");
+
+            break;
+
         default:
             break;
         }
