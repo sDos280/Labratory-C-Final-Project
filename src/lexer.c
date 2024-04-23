@@ -10,6 +10,17 @@
 #include <ctype.h>
 #include <stdio.h>
 
+/* some local utils */
+int countDigits(int value)
+{
+    int result = 0;
+    while(value != 0) {
+       value /= 10;
+       result++;
+    }
+    return result;
+}
+
 static Lexer lexer;
 static LexerErrorList * errorList;
 
@@ -546,6 +557,7 @@ void flush_lexer_error_list(){
     LexerErrorList * current = errorList;
     unsigned int index = 0;
     unsigned int line = 1; /* line index */
+    unsigned int i;
 
     while (current != NULL)
     {
@@ -565,12 +577,34 @@ void flush_lexer_error_list(){
                 index++;
             }
 
+            /* print the line the error has occurred */
             printf("%s : Lexer Error : %s\n", PROJECT_NAME, current->tokenError.message.data);
             printf("    %u | ", line);
-            
+
             while (string_get_char(lexer.string, index) != '\0' && string_get_char(lexer.string, index) != '\n'){ 
                 putchar(string_get_char(lexer.string, index));
                 index++;
+            }
+
+            printf("\n");
+
+            /* print token highlight */
+            printf("    ");
+            
+            for (i = 0; i < countDigits(line); i++){
+                printf(" ");
+            }
+
+            printf(" | ");
+
+            for (i = 0; i < current->tokenError.token.line_index; i++){
+                printf(" ");
+            }
+
+            /* print to token highligh itself*/
+            for (i = 0; i < current->tokenError.token.string.index; i++){
+                if (i == 0) printf("^");
+                else printf("~");
             }
 
             printf("\n");
@@ -590,6 +624,7 @@ void flush_lexer_error_list(){
                 index++;
             }
 
+            /* print the line the error has occurred */
             printf("%s : Lexer Error : %s : '%c' \n", PROJECT_NAME, current->charError.message.data, current->charError.ch);
             printf("    %u | ", line);
             
@@ -599,6 +634,23 @@ void flush_lexer_error_list(){
             }
 
             printf("\n");
+
+            /* print token highlight */
+            printf("    ");
+            
+            for (i = 0; i < countDigits(line); i++){
+                printf(" ");
+            }
+
+            printf(" | ");
+
+            for (i = 0; i < current->tokenError.token.line_index; i++){
+                printf(" ");
+            }
+
+            /* print to token highligh itself*/
+            printf("^\n");
+
             break;
 
         default:
