@@ -50,6 +50,7 @@ void peek_separator();  /* peek a separator, the caller must use the function wh
 void peek_number();  /* peek a number, the caller must use the function when the token really appears in the current contex */
 void peek_string(); /* peek a primery string expresion (AKA "..."), the caller must use the function when the token really appears in the current contex */
 void peek_non_op_instruction(); /* peek a none operative instructions (AKA .data/.string/...), the caller must use the function when the token really appears in the current contex */
+void peek_identifier(); /* peek an identifier (if an identifier has a meaning of an instruction\regirstor\macro token it would be classefied as that) the caller must use the function when the token really appears in the current contex*/
 
 void push_lexer_token_error(LexerTokenError error); /* push a new lexer token error to the end of the lexer's error list*/
 void flush_lexer_error_list(); /* flush (output) the lexer's error list to the user */
