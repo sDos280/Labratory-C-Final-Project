@@ -73,7 +73,7 @@ void print_token_list(){
             break;
         
         case NUMBER:
-            printf("number: %d, line_index: %d\n", atoi(tokens->token.string.data), tokens->token.line_index);
+            printf("number: %d", atoi(tokens->token.string.data), tokens->token.line_index);
             break;
         
         case STRING:
@@ -466,7 +466,7 @@ void lex(){
         } else if (is_char('\"')){
             peek_string();
         } else if (is_char('.')){
-            peek_string();
+            peek_non_op_instruction();
         } else if (is_char_identifier_starter()){
             peek_identifier();
         }else {
