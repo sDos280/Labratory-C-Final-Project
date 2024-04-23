@@ -37,7 +37,7 @@ typedef enum{
     HASHTAG,    /* # */
     STAR,       /* * */
 
-    IN_MACRO,    /* a token that represents the inside data of a macro */
+    /*IN_MACRO,     a token that represents the inside data of a macro */
     
     TokenError, /* an error has raised in this token*/ 
 
