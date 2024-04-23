@@ -73,7 +73,7 @@ void print_token_list(){
             break;
         
         case NUMBER:
-            printf("number: %d", atoi(tokens->token.string.data), tokens->token.line_index);
+            printf("number: %d\n", atoi(tokens->token.string.data), tokens->token.line_index);
             break;
         
         case STRING:
