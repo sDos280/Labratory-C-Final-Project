@@ -305,6 +305,22 @@ void peek_number(){
         string_add_char(&token.string, lexer.currentChar);
         peek_char();
     }
+    /* check if we only got +/ without any numerical numbers after that */
+    if (token.string.index == 1) {
+        if (string_get_char(token.string, 0) == '+' || string_get_char(token.string, 0) == '-'){
+            LexerCharError error;
+
+            error.ch = lexer.currentChar;
+            error.index = lexer.index;
+            error.line_index = lexer.line_index;
+            error.line = lexer.currentLine;
+            error.message = string_init_with_data("it seems that you have a number sign but not any numerical chars after it");
+
+            push_lexer_char_error(error);
+
+            return; /* there is no need to add the tokens since it's invalid*/
+        }
+    }
 
     add_token(token);
 }
@@ -586,7 +602,7 @@ void flush_lexer_error_list(){
         default:
             break;
         }
-        
+
         current = current->next;
     }
 }
