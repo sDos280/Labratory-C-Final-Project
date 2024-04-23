@@ -58,4 +58,5 @@ void lex(); /* operate a full lexer pass on the source code */
 void push_lexer_token_error(LexerTokenError error); /* push a new lexer token error to the end of the lexer's error list*/
 void push_lexer_char_error(LexerCharError error); /* push a new lexer char error to the end of the lexer's error list*/
 void flush_lexer_error_list(); /* flush (output) the lexer's error list to the user */
+void free_lexer_error_list(); /* free the memory of the error list */
 #endif /*LABRATORY_C_FINAL_PROJECT_LEXER_H*/

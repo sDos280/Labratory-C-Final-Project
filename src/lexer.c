@@ -581,14 +581,37 @@ void flush_lexer_error_list(){
             }
 
             printf("\n");
+            break;
 
+        default:
+            break;
+        }
+        
+        current = current->next;
+    }
+}
+
+void free_lexer_error_list(){
+    LexerErrorList * current = errorList;
+    
+    while (current != NULL)
+    {
+        switch (current->kind)
+        {
+        case LexerTokenErrorKind:
+            string_free(&current->tokenError.message);
+            break;
+        case LexerCharErrorKind:
+            string_free(&current->charError.message);
             break;
 
         default:
             break;
         }
 
+        /* free the current error's memory */
+        LexerErrorList * temp = current;
         current = current->next;
+        free(temp);
     }
-    
 }
