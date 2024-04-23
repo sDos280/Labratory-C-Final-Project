@@ -2,7 +2,7 @@
 #include "../../../include/lexer.h"
 #include "../../../include/string_util.h"
 
-void main(){
+int main(){
     lexer_init("\n\n\n\n");
     peek_next_line();
     peek_next_line();
@@ -11,4 +11,6 @@ void main(){
     print_token_list();
 
     lexer_free();
+
+    return 0;
 }
