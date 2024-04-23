@@ -57,19 +57,19 @@ void print_token_list(){
             break;
         
         case COMMA:
-            printf("comma: ,\n");
+            printf("comma: ','\n");
             break;
         
         case COLON:
-            printf("colon: :\n");
+            printf("colon: ':'\n");
             break;
 
         case HASHTAG:
-            printf("hashtag: #\n");
+            printf("hashtag: '#'\n");
             break;
 
         case STAR:
-            printf("star: *\n");
+            printf("star: '*'\n");
             break;
         
         case NUMBER:
