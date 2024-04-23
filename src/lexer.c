@@ -18,6 +18,7 @@ void lexer_init(char * sourceString){
     lexer.index = 0;
     lexer.currentChar = string_get_char(lexer.string, lexer.index);
     lexer.currentLine = 1;
+    lexer.line_index = 0;
 }
 
 void lexer_free(){
@@ -459,7 +460,9 @@ void lex(){
             peek_char(); /* we simply move over whitespaces*/
         } else if (is_char(';')){
             peek_comment();
-        } else if (is_char_in(",:#*")){
+        } else if (is_char('\n')){
+            peek_next_line();
+        }else if (is_char_in(",:#*")){
             peek_separator();
         } else if (is_char_numeric() || is_char_in("+-")){
             peek_number();
@@ -483,7 +486,6 @@ void lex(){
             peek_char(); /* we would continue to lex in any case, to find more lexer errors*/
         }
     }
-    
 }
 
 void push_lexer_token_error(LexerTokenError error){
@@ -505,7 +507,7 @@ void push_lexer_token_error(LexerTokenError error){
 }
 
 void push_lexer_char_error(LexerCharError error){
-    LexerErrorList * toAdd = malloc(sizeof(LexerCharError));
+    LexerErrorList * toAdd = malloc(sizeof(LexerErrorList));
     toAdd->charError = error;
     toAdd->kind = LexerCharErrorKind;
     toAdd->next = NULL;
@@ -537,10 +539,12 @@ void flush_lexer_error_list(){
 
             /* move index to the first index in the line that the token is inside */
             while (string_get_char(lexer.string, index) != '\0' && line != current->tokenError.token.line){
-                if (index != 0)
-                    if (string_get_char(lexer.string, index - 1) == '\n') line++;
-                    else index++;
-                else index++;
+                if (index != 0 && string_get_char(lexer.string, index - 1) == '\n'){
+                    line++;
+                    if (line == current->charError.line)
+                        break; /* we break now because we already got the wanted index so we don't want index++ to happen*/
+                }
+                index++;
             }
 
             printf("%s : Lexer Error : %s\n", PROJECT_NAME, current->tokenError.message.data);
@@ -560,13 +564,15 @@ void flush_lexer_error_list(){
 
             /* move index to the first index in the line that the char is inside */
             while (string_get_char(lexer.string, index) != '\0' && line != current->charError.line){
-                if (index != 0)
-                    if (string_get_char(lexer.string, index - 1) == '\n') line++;
-                    else index++;
-                else index++;
+                if (index != 0 && string_get_char(lexer.string, index - 1) == '\n'){
+                    line++;
+                    if (line == current->charError.line)
+                        break; /* we break now because we already got the wanted index so we don't want index++ to happen*/
+                }
+                index++;
             }
 
-            printf("%s : Lexer Error : %s\n", PROJECT_NAME, current->charError.message.data);
+            printf("%s : Lexer Error : %s : '%c' \n", PROJECT_NAME, current->charError.message.data, current->charError.ch);
             printf("    %u | ", line);
             
             while (string_get_char(lexer.string, index) != '\0' && string_get_char(lexer.string, index) != '\n'){ 
