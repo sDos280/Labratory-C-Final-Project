@@ -6,7 +6,7 @@
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 static unsigned power_2_ceil(unsigned x);
-static unsigned power_2_floor(unsigned x);
+/*static unsigned power_2_floor(unsigned x);*/
 
 String string_init(){
     String str;
@@ -17,17 +17,18 @@ String string_init(){
     return str;
 }
 
-void string_free(String * str){
-    free(str->data);
+void string_free(String str){
+    free(str.data);
 }
 
 String string_init_with_data(char * data){
     String str;
+    int i;
+
     str.size = MAX(power_2_ceil(strlen(data) + 1), 8); /* strlen(data) for the data itself and + 1 for \0*/
     str.index = strlen(data);
-    str.data = (char *)malloc(str.size /* *sizeof(char)*/);
+    str.data = (char *)calloc(str.size, sizeof(char));
 
-    int i;
     for (i = 0; i < str.index; i++){
         str.data[i] = data[i];
     }
@@ -58,6 +59,8 @@ void string_info(String str){
 }
 
 void string_add_char_pointer(String * str, char * toAdd){
+    int i;
+
     if (toAdd == NULL) return; /* i think i don't need to explain why we to check that */
     
     if (str->index + 1 + strlen(toAdd) > str->size){
@@ -69,7 +72,6 @@ void string_add_char_pointer(String * str, char * toAdd){
         str->data = realloc(str->data, str->size * 2); /* double the buffer size*/
     }
 
-    int i;
     for (i = 0; i < strlen(toAdd); i++){
         str->data[str->index + i] = toAdd[i];
     }
@@ -79,7 +81,7 @@ void string_add_char_pointer(String * str, char * toAdd){
 }
 
 void string_add_string(String * str, String toAdd){
-    return string_add_char_pointer(str, toAdd.data);
+    string_add_char_pointer(str, toAdd.data);
 }
 
 char string_get_char(String str, unsigned int index){
@@ -89,9 +91,10 @@ char string_get_char(String str, unsigned int index){
 }
 
 bool string_equals(String str1, String str2){
+    int i;
+
     if (str1.index != str2.index) return false;
 
-    int i;
     for (i = 0; i < str1.index; i++){
         if (string_get_char(str1, i) != string_get_char(str2, i)) return false;
     }
@@ -101,23 +104,32 @@ bool string_equals(String str1, String str2){
 
 bool string_equals_char_pointer(String str1, char * str2){
     int i;
+    /* check if the lengths aren't equal */
+    if (str1.index != strlen(str2)) return false;
+    
     for (i = 0; i < str1.index; i++){
-        if (str2[i] == '\0') return false; /* the only way that str1[i] = str2[i] = \0 is when i = str1.index (which nevers really appends)*/
         if (string_get_char(str1, i) != str2[i]) return false;
     }
 
     return true;
 }
 
-static unsigned power_2_floor(unsigned x) {
+/*static unsigned power_2_floor(unsigned x) {
     int power = 1;
     while (x >>= 1) power <<= 1;
     return power;
-}
+}*/
 
+/*
+ * (helper function) return the closest number to x in the form of 2^y (where y is a an integer and positive)
+ *
+ * @param x the number to be match with
+ * @return closets number to x in the form of 2^y
+*/
 static unsigned power_2_ceil(unsigned x) {
-    if (x <= 1) return 1;
     int power = 2;
+
+    if (x <= 1) return 1;
     x--;
     while (x >>= 1) power <<= 1;
     return power;
