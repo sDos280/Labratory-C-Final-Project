@@ -29,7 +29,7 @@ void lexer_init(char * sourceString){
     lexer.index = 0;
     lexer.currentChar = string_get_char(lexer.string, lexer.index);
     lexer.currentLine = 1;
-    lexer.line_index = 0;
+    lexer.indexInLine = 0;
 }
 
 void lexer_free(){
@@ -40,14 +40,14 @@ void lexer_free(){
     TokenList * temp;
 
     while (current != NULL){
-        string_free(&current->token.string); /* free the string of each token */
+        string_free(current->token.string); /* free the string of each token */
         temp = current;
         current = current->next;
         free(temp);
     }
     
     /* free the source string*/
-    string_free(&lexer.string);
+    string_free(lexer.string);
 
     /* reset other fields */
     lexer.index = 0;
@@ -210,9 +210,9 @@ static void peek_char(){
     {
         /* a new line is started only after the \n char */
         lexer.currentLine++;
-        lexer.line_index = 0;
+        lexer.indexInLine = 0;
     }else{
-        lexer.line_index++;
+        lexer.indexInLine++;
     }
 
     lexer.index++;
@@ -227,7 +227,7 @@ static void peek_char(){
 void peek_comment(){
     int index = lexer.index;
     int line = lexer.currentLine;
-    int line_index = lexer.line_index;
+    int line_index = lexer.indexInLine;
 
     Token token;
     token.kind = COMMENT;
@@ -249,7 +249,7 @@ void peek_comment(){
 void peek_next_line(){
     int index = lexer.index;
     int line = lexer.currentLine;
-    int line_index = lexer.line_index;
+    int line_index = lexer.indexInLine;
 
     Token token;
     token.kind = EOL;
@@ -266,7 +266,7 @@ void peek_next_line(){
 void peek_separator(){
     int index = lexer.index;
     int line = lexer.currentLine;
-    int line_index = lexer.line_index;
+    int line_index = lexer.indexInLine;
 
     Token token;
     switch (lexer.currentChar)
@@ -302,7 +302,7 @@ void peek_separator(){
 void peek_number(){
     int index = lexer.index;
     int line = lexer.currentLine;
-    int line_index = lexer.line_index;
+    int line_index = lexer.indexInLine;
 
     Token token;
     token.kind = NUMBER;
@@ -323,13 +323,13 @@ void peek_number(){
 
             error.ch = string_get_char(token.string, 0);
             error.index = token.index;
-            error.line_index = token.line_index;
+            error.indexInLine = token.line_index;
             error.line = token.line;
             error.message = string_init_with_data("it seems that you have a number sign but not any numerical chars after it");
 
             push_lexer_char_error(error);
 
-            string_free(&token.string);
+            string_free(token.string);
 
             return; /* there is no need to add the tokens since it's invalid*/
         }
@@ -341,7 +341,7 @@ void peek_number(){
 void peek_string(){
     int index = lexer.index;
     int line = lexer.currentLine;
-    int line_index = lexer.line_index;
+    int line_index = lexer.indexInLine;
 
     Token token;
     token.kind = STRING;
@@ -365,7 +365,7 @@ void peek_string(){
 void peek_non_op_instruction(){
     int index = lexer.index;
     int line = lexer.currentLine;
-    int line_index = lexer.line_index;
+    int line_index = lexer.indexInLine;
 
     Token token;
     token.index = index;
@@ -406,7 +406,7 @@ void peek_non_op_instruction(){
 void peek_identifier(){
     int index = lexer.index;
     int line = lexer.currentLine;
-    int line_index = lexer.line_index;
+    int line_index = lexer.indexInLine;
 
     Token token;
     token.index = index;
@@ -506,7 +506,7 @@ void lex(){
 
             error.ch = lexer.currentChar;
             error.index = lexer.index;
-            error.line_index = lexer.line_index;
+            error.indexInLine = lexer.indexInLine;
             error.line = lexer.currentLine;
             error.message = string_init_with_data("unkonwn char");
 
@@ -669,10 +669,10 @@ void free_lexer_error_list(){
         switch (current->kind)
         {
         case LexerTokenErrorKind:
-            string_free(&current->tokenError.message);
+            string_free(current->tokenError.message);
             break;
         case LexerCharErrorKind:
-            string_free(&current->charError.message);
+            string_free(current->charError.message);
             break;
 
         default:

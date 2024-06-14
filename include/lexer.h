@@ -7,9 +7,10 @@
 typedef struct Lexer{
     String string;      /* the input string */
     unsigned int index;          /* the current index */
-    unsigned int line_index; /* the index of the current char in current line (the \n will be the last char in the current line)*/
+    unsigned int indexInLine; /* the index of the current char in current line (the \n will be the last char in the current line)*/
     char currentChar;   /* the current char looked at in the lexer */
     unsigned int currentLine; /* the current line looked at in the lexer (we start counting from 1)*/
+    
     TokenList * tokens;   /* the output token list */
 }Lexer;
 
@@ -26,7 +27,7 @@ typedef struct LexerTokenError{
 typedef struct LexerCharError{
     char ch;  /* the char the error talks about */
     unsigned int index; /* the index of the char in the source file*/
-    unsigned int line_index; /* the line index of the char in the char's line */
+    unsigned int indexInLine; /* the line index of the char in the char's line */
     unsigned int line; /* the line of the char in the source file */
     String message;  /* the message from the caller */
 }LexerCharError;
