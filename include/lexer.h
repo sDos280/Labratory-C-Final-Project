@@ -8,7 +8,7 @@ typedef struct Lexer{
     String string;      /* the input string */
     unsigned int index;          /* the current index */
     unsigned int indexInLine; /* the index of the current char in current line (the \n will be the last char in the current line)*/
-    char currentChar;   /* the current char looked at in the lexer */
+    char ch;   /* the current char looked at in the lexer */
     unsigned int currentLine; /* the current line looked at in the lexer (we start counting from 1)*/
     
     TokenList * tokens;   /* the output token list */

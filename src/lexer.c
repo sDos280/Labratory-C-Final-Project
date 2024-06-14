@@ -27,7 +27,7 @@ static LexerErrorList * errorList;
 void lexer_init(char * sourceString){
     lexer.string = string_init_with_data(sourceString);
     lexer.index = 0;
-    lexer.currentChar = string_get_char(lexer.string, lexer.index);
+    lexer.ch = string_get_char(lexer.string, lexer.index);
     lexer.currentLine = 1;
     lexer.indexInLine = 0;
 }
@@ -172,14 +172,14 @@ static void add_token(Token token){
 }
 
 static bool is_char(char ch){
-    return lexer.currentChar == ch;
+    return lexer.ch == ch;
 }
 
 static bool is_char_in(char * string){
     /* (string should be null terminated) */
     int i;
     for (i = 0; string[i] != '\0'; i++){
-        if (lexer.currentChar == string[i]) return true;
+        if (lexer.ch == string[i]) return true;
     }
 
     return false;
@@ -190,19 +190,19 @@ static bool is_char_whitespace(){
 }
 
 static bool is_char_numeric(){
-    return isdigit(lexer.currentChar);
+    return isdigit(lexer.ch);
 }
 
 static bool is_char_identifier_starter(){
-    return isalpha(lexer.currentChar);
+    return isalpha(lexer.ch);
 }
 
 static bool is_char_identifier(){
-    return isalpha(lexer.currentChar) || isdigit(lexer.currentChar);
+    return isalpha(lexer.ch) || isdigit(lexer.ch);
 }
 
 static bool is_special_char(){
-    return isalpha(lexer.currentChar) || isdigit(lexer.currentChar);
+    return isalpha(lexer.ch) || isdigit(lexer.ch);
 }
 
 static void peek_char(){
@@ -216,7 +216,7 @@ static void peek_char(){
     }
 
     lexer.index++;
-    lexer.currentChar = string_get_char(lexer.string, lexer.index);
+    lexer.ch = string_get_char(lexer.string, lexer.index);
 }
 
 /*static void peek_drop(){
@@ -239,7 +239,7 @@ void peek_comment(){
     while(!is_char('\0')){
         if (is_char('\n')) break; /* the end of the comment token */
 
-        string_add_char(&token.string, lexer.currentChar);
+        string_add_char(&token.string, lexer.ch);
         peek_char();
     }
     
@@ -269,7 +269,7 @@ void peek_separator(){
     int line_index = lexer.indexInLine;
 
     Token token;
-    switch (lexer.currentChar)
+    switch (lexer.ch)
     {
     case ',':
         token.kind = COMMA;
@@ -292,7 +292,7 @@ void peek_separator(){
     token.index = index;
     token.line_index = line_index;
     token.line = line;
-    token.string = string_init_with_data(&lexer.currentChar);
+    token.string = string_init_with_data(&lexer.ch);
 
     peek_char();
 
@@ -313,7 +313,7 @@ void peek_number(){
 
     int i;
     for (i = 0; !is_char('\0') && (is_char_numeric() || (i == 0 && is_char_in("+-"))); i++){
-        string_add_char(&token.string, lexer.currentChar);
+        string_add_char(&token.string, lexer.ch);
         peek_char();
     }
     /* check if we only got +/ without any numerical numbers after that */
@@ -351,12 +351,12 @@ void peek_string(){
     token.string = string_init();
 
     int i;
-    for (i = 0; !is_char('\0') && ((i == 0 /* for the first " char */) || (lexer.currentChar != '\"')); i++){
-        string_add_char(&token.string, lexer.currentChar);
+    for (i = 0; !is_char('\0') && ((i == 0 /* for the first " char */) || (lexer.ch != '\"')); i++){
+        string_add_char(&token.string, lexer.ch);
         peek_char();
     }
 
-    string_add_char(&token.string, lexer.currentChar);
+    string_add_char(&token.string, lexer.ch);
     peek_char(); /* peek the last " char */
 
     add_token(token);
@@ -375,7 +375,7 @@ void peek_non_op_instruction(){
 
     int i;
     for (i = 0; !is_char('\0') && ((i == 0 /* for the . char */) || (is_char_identifier_starter() /* only alpha no numeric*/)); i++){
-        string_add_char(&token.string, lexer.currentChar);
+        string_add_char(&token.string, lexer.ch);
         peek_char();
     }
 
@@ -414,12 +414,12 @@ void peek_identifier(){
     token.line = line;
     token.string = string_init();
 
-    string_add_char(&token.string, lexer.currentChar); /* the first char is always an alfa char so it has to be part of the identifier*/
+    string_add_char(&token.string, lexer.ch); /* the first char is always an alfa char so it has to be part of the identifier*/
     peek_char();
     
     while (!is_char('\0')){
         if (is_char_identifier()){
-            string_add_char(&token.string, lexer.currentChar);
+            string_add_char(&token.string, lexer.ch);
             peek_char();
         }
         else 
@@ -504,7 +504,7 @@ void lex(){
         }else {
             LexerCharError error;
 
-            error.ch = lexer.currentChar;
+            error.ch = lexer.ch;
             error.index = lexer.index;
             error.indexInLine = lexer.indexInLine;
             error.line = lexer.currentLine;
