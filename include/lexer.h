@@ -11,6 +11,8 @@ typedef struct Lexer {
     char ch;   /* the current char looked at in the lexer */
     unsigned int line; /* the current line looked at in the lexer (we start counting from 1)*/
     
+    char * filePath;
+    
     TokenList * tokens;   /* the output token list */
 } Lexer;
 
