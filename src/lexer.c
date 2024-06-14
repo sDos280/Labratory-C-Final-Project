@@ -172,13 +172,19 @@ static void add_token(Lexer * lexer, Token token){
     }
 }
 
-void peek_char(Lexer * lexer){
-    if (is_char('\n')) 
+void lexer_peek_char(Lexer * lexer){
+    static bool wasNewLineLastChar = false;
+
+    if (is_char_in_char_pointer(lexer->ch, "\n")) 
     {
         /* a new line is started only after the \n char */
         lexer->line++;
-        lexer->indexInLine = 0;
+        wasNewLineLastChar = true;
     }else{
+        if (wasNewLineLastChar == true){
+            lexer->indexInLine = 0;
+            wasNewLineLastChar = false;
+        }
         lexer->indexInLine++;
     }
 
@@ -198,11 +204,11 @@ void lexer_peek_comment(Lexer * lexer){
     token.line = line;
     token.string = string_init();
 
-    while(!is_char('\0')){
-        if (is_char('\n')) break; /* the end of the comment token */
+    while(!is_char_in_char_pointer(lexer->ch, "\0")){
+        if (is_char_in_char_pointer(lexer->ch, "\n")) break; /* the end of the comment token */
 
         string_add_char(&token.string, lexer->ch);
-        peek_char(lexer);
+        lexer_peek_char(lexer);
     }
     
     add_token(lexer, token);
@@ -220,7 +226,7 @@ void lexer_peek_next_line(Lexer * lexer){
     token.line = line;
     token.string = string_init_with_data("\n");
 
-    peek_char(lexer);
+    lexer_peek_char(lexer);
 
     add_token(lexer, token);
 }
@@ -256,7 +262,7 @@ void lexer_peek_separator(Lexer * lexer){
     token.line = line;
     token.string = string_init_with_data(&lexer->ch);
 
-    peek_char(lexer);
+    lexer_peek_char(lexer);
 
     add_token(lexer, token);
 }
@@ -275,9 +281,9 @@ void lexer_peek_number(Lexer * lexer){
     token.string = string_init();
 
     
-    for (i = 0; !is_char('\0') && (is_char_numeric(lexer->ch) || (i == 0 && is_char_in("+-"))); i++){
+    for (i = 0; !is_char_in_char_pointer(lexer->ch, "\0") && (is_char_numeric(lexer->ch) || (i == 0 && is_char_in_char_pointer(lexer->ch, "+-"))); i++){
         string_add_char(&token.string, lexer->ch);
-        peek_char(lexer);
+        lexer_peek_char(lexer);
     }
     /* check if we only got +/ without any numerical numbers after that */
     if (token.string.index == 1) {
@@ -315,13 +321,13 @@ void lexer_peek_string(Lexer * lexer){
     token.string = string_init();
 
     
-    for (i = 0; !is_char('\0') && ((i == 0 /* for the first " char */) || (lexer->ch != '\"')); i++){
+    for (i = 0; !is_char_in_char_pointer(lexer->ch, "\0") && ((i == 0 /* for the first " char */) || (lexer->ch != '\"')); i++){
         string_add_char(&token.string, lexer->ch);
-        peek_char(lexer);
+        lexer_peek_char(lexer);
     }
 
     string_add_char(&token.string, lexer->ch);
-    peek_char(lexer); /* peek the last " char */
+    lexer_peek_char(lexer); /* peek the last " char */
 
     add_token(lexer, token);
 }
@@ -341,9 +347,9 @@ void lexer_peek_non_op_instruction(Lexer * lexer){
     token.string = string_init();
 
     
-    for (i = 0; !is_char('\0') && ((i == 0 /* for the . char */) || (is_char_identifier_starter(lexer->ch) /* only alpha no numeric*/)); i++){
+    for (i = 0; !is_char_in_char_pointer(lexer->ch, "\0") && ((i == 0 /* for the . char */) || (is_char_identifier_starter(lexer->ch) /* only alpha no numeric*/)); i++){
         string_add_char(&token.string, lexer->ch);
-        peek_char(lexer);
+        lexer_peek_char(lexer);
     }
 
     if (string_equals_char_pointer(token.string, ".data")){
@@ -380,12 +386,12 @@ void lexer_peek_identifier(Lexer * lexer){
     token.string = string_init();
 
     string_add_char(&token.string, lexer->ch); /* the first char is always an alfa char so it has to be part of the identifier*/
-    peek_char(lexer);
+    lexer_peek_char(lexer);
     
-    while (!is_char('\0')){
+    while (!is_char_in_char_pointer(lexer->ch, '\0')){
         if (is_char_identifier(lexer->ch)){
             string_add_char(&token.string, lexer->ch);
-            peek_char(lexer);
+            lexer_peek_char(lexer);
         }
         else 
         {
@@ -448,21 +454,21 @@ void lexer_peek_identifier(Lexer * lexer){
 }
 
 void lexer_lex(Lexer * lexer){
-    while (!is_char('\0'))
+    while (!is_char_in_char_pointer(lexer->ch, "\0"))
     {
-        if (is_char_whitespace(lexer)){
-            peek_char(lexer); /* we simply move over whitespaces*/
-        } else if (is_char(';')){
+        if (is_char_whitespace(lexer->ch)){
+            lexer_peek_char(lexer); /* we simply move over whitespaces*/
+        } else if (is_char_in_char_pointer(lexer->ch, ";")){
             lexer_peek_comment(lexer);
-        } else if (is_char('\n')){
+        } else if (is_char_in_char_pointer(lexer->ch, "\n")){
             lexer_peek_next_line(lexer);
-        }else if (is_char_in(",:#*")){
+        }else if (is_char_in_char_pointer(lexer->ch, ",:#*")){
             lexer_peek_separator(lexer);
-        } else if (is_char_numeric(lexer->ch) || is_char_in("+-")){
+        } else if (is_char_numeric(lexer->ch) || is_char_in_char_pointer(lexer->ch, "+-")){
             lexer_peek_number(lexer);
-        } else if (is_char('\"')){
+        } else if (is_char_in_char_pointer(lexer->ch, "\"")){
             lexer_peek_string(lexer);
-        } else if (is_char('.')){
+        } else if (is_char_in_char_pointer(lexer->ch, ".")){
             lexer_peek_non_op_instruction(lexer);
         } else if (is_char_identifier_starter(lexer->ch)){
             lexer_peek_identifier(lexer);
@@ -477,7 +483,7 @@ void lexer_lex(Lexer * lexer){
 
             lexer_push_lexer_char_error(lexer, error);
 
-            peek_char(lexer); /* we would continue to lex in any case, to find more lexer errors*/
+            lexer_peek_char(lexer); /* we would continue to lex in any case, to find more lexer errors*/
         }
     }
 }

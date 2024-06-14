@@ -11,7 +11,7 @@ bool is_char_in_char_pointer(char ch, char * string){
 }
 
 bool is_char_whitespace(char ch){
-    return is_char_in(ch, "\t\r ");
+    return is_char_in_char_pointer(ch, "\t\r ");
 }
 
 bool is_char_numeric(char ch){

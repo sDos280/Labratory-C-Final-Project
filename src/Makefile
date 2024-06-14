@@ -7,7 +7,7 @@ APPNAME = ac # ac = AsemblyCompiler
 .PHONY: clean main valgrind
 
 # compiler targets
-main: lexer.o main.o string_util.o
+main: lexer.o main.o string_util.o char_util.o
 	$(CC) $(LDFLAGS) -o $(APPNAME) $^
 
 lexer.o: lexer.c
@@ -20,7 +20,10 @@ main.o: main.c
 string_util.o: ../utils/string_util.c
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
-#valgrind
+char_util.o: ../utils/char_util.c
+	$(CC) $(CXXFLAGS) -c $< -o $@
+
+# valgrind
 valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind.out.txt ./$(APPNAME)
 

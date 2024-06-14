@@ -65,6 +65,12 @@ void lexer_free(Lexer *lexer);
 void lexer_print_token_list(Lexer *lexer);
 
 /**
+ * Advance the lexer char pointer to the next char.
+ * Update the lexer internal variables du to that advancement
+ */
+void lexer_peek_char(Lexer * lexer);
+
+/**
  * Peeks a comment token.
  * @note The caller must use this function when the token appears in the current context.
  */
