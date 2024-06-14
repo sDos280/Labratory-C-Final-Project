@@ -9,14 +9,14 @@ typedef struct Lexer{
     unsigned int index;          /* the current index */
     unsigned int indexInLine; /* the index of the current char in current line (the \n will be the last char in the current line)*/
     char ch;   /* the current char looked at in the lexer */
-    unsigned int currentLine; /* the current line looked at in the lexer (we start counting from 1)*/
+    unsigned int line; /* the current line looked at in the lexer (we start counting from 1)*/
     
     TokenList * tokens;   /* the output token list */
 }Lexer;
 
 typedef enum {
     LexerTokenErrorKind,
-    LexerCharErrorKind,
+    LexerCharErrorKind
 } LexerErrorKind;
 
 typedef struct LexerTokenError{
@@ -37,7 +37,7 @@ typedef struct LexerErrorList{
     {
         LexerTokenError tokenError;  /* the current error */
         LexerCharError charError;  /* the current error */
-    };
+    } error;
 
     LexerErrorKind kind;
     
@@ -45,19 +45,19 @@ typedef struct LexerErrorList{
 }LexerErrorList;
 
 void lexer_init(char * sourceString); /* init lexer function */
-void lexer_free(); /* reset lexer, after this function call you must not the lexer before calling lexer_init  */
-void print_token_list(); /* print the token list in a formated way */
-void peek_comment();  /* peek a comment, the caller must use the function when the token really appears in the current contex */
-void peek_next_line();  /* peek a next line char (AKA \n), the caller must use the function when the token really appears in the current contex */
-void peek_separator();  /* peek a separator, the caller must use the function when the token really appears in the current contex */
-void peek_number();  /* peek a number, the caller must use the function when the token really appears in the current contex */
-void peek_string(); /* peek a primery string expresion (AKA "..."), the caller must use the function when the token really appears in the current contex */
-void peek_non_op_instruction(); /* peek a none operative instructions (AKA .data/.string/...), the caller must use the function when the token really appears in the current contex */
-void peek_identifier(); /* peek an identifier (if an identifier has a meaning of an operative instruction\regirstor\macro token it would be classefied as that) the caller must use the function when the token really appears in the current contex*/
-void lex(); /* operate a full lexer pass on the source code */
+void lexer_free(void); /* reset lexer, after this function call you must not the lexer before calling lexer_init  */
+void print_token_list(void); /* print the token list in a formated way */
+void peek_comment(void);  /* peek a comment, the caller must use the function when the token really appears in the current contex */
+void peek_next_line(void);  /* peek a next line char (AKA \n), the caller must use the function when the token really appears in the current contex */
+void peek_separator(void);  /* peek a separator, the caller must use the function when the token really appears in the current contex */
+void peek_number(void);  /* peek a number, the caller must use the function when the token really appears in the current contex */
+void peek_string(void); /* peek a primery string expresion (AKA "..."), the caller must use the function when the token really appears in the current contex */
+void peek_non_op_instruction(void); /* peek a none operative instructions (AKA .data/.string/...), the caller must use the function when the token really appears in the current contex */
+void peek_identifier(void); /* peek an identifier (if an identifier has a meaning of an operative instruction\regirstor\macro token it would be classefied as that) the caller must use the function when the token really appears in the current contex*/
+void lex(void); /* operate a full lexer pass on the source code */
 
 void push_lexer_token_error(LexerTokenError error); /* push a new lexer token error to the end of the lexer's error list*/
 void push_lexer_char_error(LexerCharError error); /* push a new lexer char error to the end of the lexer's error list*/
-void flush_lexer_error_list(); /* flush (output) the lexer's error list to the user */
-void free_lexer_error_list(); /* free the memory of the error list */
+void flush_lexer_error_list(void); /* flush (output) the lexer's error list to the user */
+void free_lexer_error_list(void); /* free the memory of the error list */
 #endif /*LABRATORY_C_FINAL_PROJECT_LEXER_H*/
