@@ -1,5 +1,5 @@
 CC = gcc
-CXXFLAGS = -Wstrict-prototypes -Wold-style-declaration -Wall -ansi -pedantic -g -I ../../../include
+CXXFLAGS = -Wall -ansi -pedantic -g -I ../../../include
 LDFLAGS = 
 current_dir := $(notdir $(CURDIR))
 
