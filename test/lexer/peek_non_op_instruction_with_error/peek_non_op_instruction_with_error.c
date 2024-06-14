@@ -4,16 +4,16 @@
 
 int main(){
     lexer_init(".string\n.dataError\n.entry\n.string\n");
-    peek_non_op_instruction();
-    peek_next_line();
-    peek_non_op_instruction();
-    peek_next_line();
-    peek_non_op_instruction();
-    peek_next_line();
-    peek_non_op_instruction();
-    peek_next_line();
-    print_token_list();
-    flush_lexer_error_list();
+    lexer_peek_non_op_instruction();
+    lexer_peek_next_line();
+    lexer_peek_non_op_instruction();
+    lexer_peek_next_line();
+    lexer_peek_non_op_instruction();
+    lexer_peek_next_line();
+    lexer_peek_non_op_instruction();
+    lexer_peek_next_line();
+    lexer_print_token_list();
+    lexer_flush_lexer_error_list();
 
     lexer_free();
 

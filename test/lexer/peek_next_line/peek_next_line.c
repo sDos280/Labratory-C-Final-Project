@@ -4,11 +4,11 @@
 
 int main(){
     lexer_init("\n\n\n\n");
-    peek_next_line();
-    peek_next_line();
-    peek_next_line();
-    peek_next_line();
-    print_token_list();
+    lexer_peek_next_line();
+    lexer_peek_next_line();
+    lexer_peek_next_line();
+    lexer_peek_next_line();
+    lexer_print_token_list();
 
     lexer_free();
 

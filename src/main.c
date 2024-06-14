@@ -3,24 +3,26 @@
 #include "../include/string_util.h"
 
 int main(){
-    lexer_init("*,:##**,,-556,252:+6546");
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_number();
-    peek_separator();
-    peek_number();
-    peek_separator();
-    peek_number();
-    print_token_list();
-    lexer_free();
-    print_token_list();
+    Lexer lexer;
+
+    lexer_init(&lexer, "*,:##**,,-556,252:+6546");
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_number(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_number(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_number(&lexer);
+    lexer_print_token_list(&lexer);
+    lexer_free(&lexer);
+    lexer_print_token_list(&lexer);
 
     return 0;
 }

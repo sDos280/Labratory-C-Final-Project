@@ -4,13 +4,13 @@
 
 int main(){
     lexer_init("; adasdfasdf asdf \n; hello world \n\n\n");
-    peek_comment();
-    peek_next_line();
-    peek_comment();
-    peek_next_line();
-    peek_next_line();
-    peek_next_line();
-    print_token_list();
+    lexer_peek_comment();
+    lexer_peek_next_line();
+    lexer_peek_comment();
+    lexer_peek_next_line();
+    lexer_peek_next_line();
+    lexer_peek_next_line();
+    lexer_print_token_list();
 
     lexer_free();
 

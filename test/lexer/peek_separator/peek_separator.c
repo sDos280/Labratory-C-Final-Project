@@ -4,16 +4,16 @@
 
 int main(){
     lexer_init("*,:##**,,");
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    peek_separator();
-    print_token_list();
+    lexer_peek_separator();
+    lexer_peek_separator();
+    lexer_peek_separator();
+    lexer_peek_separator();
+    lexer_peek_separator();
+    lexer_peek_separator();
+    lexer_peek_separator();
+    lexer_peek_separator();
+    lexer_peek_separator();
+    lexer_print_token_list();
 
     lexer_free();
 

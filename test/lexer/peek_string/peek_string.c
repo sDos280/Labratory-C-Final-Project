@@ -4,10 +4,10 @@
 
 int main(){
     lexer_init("\"hello\"\"world\"\"\"");
-    peek_string();
-    peek_string();
-    peek_string();
-    print_token_list();
+    lexer_peek_string();
+    lexer_peek_string();
+    lexer_peek_string();
+    lexer_print_token_list();
 
     lexer_free();
 

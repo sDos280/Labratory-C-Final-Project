@@ -4,19 +4,19 @@
 
 int main(){
     lexer_init("-556\n252\n+6546\n+\n-");
-    peek_number();
-    peek_next_line();
-    peek_number();
-    peek_next_line();
-    peek_number();
-    peek_next_line();
-    peek_number();
-    peek_next_line();
-    peek_number();
-    print_token_list();
-    flush_lexer_error_list();
+    lexer_peek_number();
+    lexer_peek_next_line();
+    lexer_peek_number();
+    lexer_peek_next_line();
+    lexer_peek_number();
+    lexer_peek_next_line();
+    lexer_peek_number();
+    lexer_peek_next_line();
+    lexer_peek_number();
+    lexer_print_token_list();
+    lexer_flush_lexer_error_list();
     
-    free_lexer_error_list();
+    lexer_free_lexer_error_list();
     lexer_free();
 
     return 0;

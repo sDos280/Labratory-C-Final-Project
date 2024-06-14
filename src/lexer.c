@@ -2,9 +2,8 @@
  * the lexer
 */
 
-#include "consts.h"
+#include "../include/consts.h"
 #include "../include/lexer.h"
-#include "string_util.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -21,22 +20,24 @@ int countDigits(int value)
     return result;
 }
 
-static Lexer lexer;
-static LexerErrorList * errorList;
+void lexer_init(Lexer * lexer, char * sourceString){
+    lexer->string = string_init_with_data(sourceString);
+    lexer->index = 0;
+    lexer->indexInLine = 0;
+    lexer->ch = string_get_char(lexer->string, lexer->index);
+    lexer->line = 1;
 
-void lexer_init(char * sourceString){
-    lexer.string = string_init_with_data(sourceString);
-    lexer.index = 0;
-    lexer.ch = string_get_char(lexer.string, lexer.index);
-    lexer.line = 1;
-    lexer.indexInLine = 0;
+    lexer->filePath = "from_string.txt";
+
+    lexer->errorList = NULL;
+    lexer->tokens = NULL;
 }
 
-void lexer_free(void){
-    /* reset the lexer, free the token list (lexer.tokens) and string, and other field */
+void lexer_free(Lexer * lexer){
+    /* reset the lexer, free the token list (lexer->tokens) and string, and other field */
     
     /* free the token list*/
-    TokenList * current = lexer.tokens;
+    TokenList * current = lexer->tokens;
     TokenList * temp;
 
     while (current != NULL){
@@ -47,15 +48,15 @@ void lexer_free(void){
     }
     
     /* free the source string*/
-    string_free(lexer.string);
+    string_free(lexer->string);
 
     /* reset other fields */
-    lexer.index = 0;
-    lexer.line = 1;
+    lexer->index = 0;
+    lexer->line = 1;
 }
 
-void print_token_list(void){
-    TokenList * tokens = lexer.tokens;
+void lexer_print_token_list(Lexer * lexer){
+    TokenList * tokens = lexer->tokens;
 
     while (tokens != NULL){
         switch (tokens->token.kind)
@@ -154,16 +155,16 @@ void print_token_list(void){
     }
 }
 
-static void add_token(Token token){
+static void add_token(Lexer * lexer, Token token){
     TokenList * toAdd = malloc(sizeof(TokenList));
     toAdd->token = token;
     toAdd->next = NULL;
 
-    if (lexer.tokens == NULL){
+    if (lexer->tokens == NULL){
         /* we haven't added a token yet */
-        lexer.tokens = toAdd;
+        lexer->tokens = toAdd;
     }else{
-        TokenList * last = lexer.tokens;
+        TokenList * last = lexer->tokens;
         while (last->next != NULL){
             last = last->next;
         }
@@ -171,59 +172,24 @@ static void add_token(Token token){
     }
 }
 
-static bool is_char(char ch){
-    return lexer.ch == ch;
-}
-
-static bool is_char_in(char * string){
-    /* (string should be null terminated) */
-    int i;
-    for (i = 0; string[i] != '\0'; i++){
-        if (lexer.ch == string[i]) return true;
-    }
-
-    return false;
-}
-
-static bool is_char_whitespace(void){
-    return is_char_in("\t\r ");
-}
-
-static bool is_char_numeric(void){
-    return isdigit(lexer.ch);
-}
-
-static bool is_char_identifier_starter(void){
-    return isalpha(lexer.ch);
-}
-
-static bool is_char_identifier(void){
-    return isalpha(lexer.ch) || isdigit(lexer.ch);
-}
-
-static void peek_char(void){
+void peek_char(Lexer * lexer){
     if (is_char('\n')) 
     {
         /* a new line is started only after the \n char */
-        lexer.line++;
-        lexer.indexInLine = 0;
+        lexer->line++;
+        lexer->indexInLine = 0;
     }else{
-        lexer.indexInLine++;
+        lexer->indexInLine++;
     }
 
-    lexer.index++;
-    lexer.ch = string_get_char(lexer.string, lexer.index);
+    lexer->index++;
+    lexer->ch = string_get_char(lexer->string, lexer->index);
 }
 
-/*static void peek_drop(){
-    lexer.index--;
-    lexer.currentChar = string_get_char(lexer.string, lexer.index);
-}*/
-
-void peek_comment(void){
-    int index = lexer.index;
-    int line = lexer.line;
-    int line_index = lexer.indexInLine;
+void lexer_peek_comment(Lexer * lexer){
+    int index = lexer->index;
+    int line = lexer->line;
+    int line_index = lexer->indexInLine;
 
     Token token;
     token.kind = COMMENT;
@@ -235,17 +201,17 @@ void peek_comment(void){
     while(!is_char('\0')){
         if (is_char('\n')) break; /* the end of the comment token */
 
-        string_add_char(&token.string, lexer.ch);
-        peek_char();
+        string_add_char(&token.string, lexer->ch);
+        peek_char(lexer);
     }
     
-    add_token(token);
+    add_token(lexer, token);
 }
 
-void peek_next_line(void){
-    int index = lexer.index;
-    int line = lexer.line;
-    int line_index = lexer.indexInLine;
+void lexer_peek_next_line(Lexer * lexer){
+    int index = lexer->index;
+    int line = lexer->line;
+    int line_index = lexer->indexInLine;
 
     Token token;
     token.kind = EOL;
@@ -254,18 +220,18 @@ void peek_next_line(void){
     token.line = line;
     token.string = string_init_with_data("\n");
 
-    peek_char();
+    peek_char(lexer);
 
-    add_token(token);
+    add_token(lexer, token);
 }
 
-void peek_separator(void){
-    int index = lexer.index;
-    int line = lexer.line;
-    int line_index = lexer.indexInLine;
+void lexer_peek_separator(Lexer * lexer){
+    int index = lexer->index;
+    int line = lexer->line;
+    int line_index = lexer->indexInLine;
 
     Token token;
-    switch (lexer.ch)
+    switch (lexer->ch)
     {
     case ',':
         token.kind = COMMA;
@@ -288,17 +254,17 @@ void peek_separator(void){
     token.index = index;
     token.line_index = line_index;
     token.line = line;
-    token.string = string_init_with_data(&lexer.ch);
+    token.string = string_init_with_data(&lexer->ch);
 
-    peek_char();
+    peek_char(lexer);
 
-    add_token(token);
+    add_token(lexer, token);
 }
 
-void peek_number(void){
-    int index = lexer.index;
-    int line = lexer.line;
-    int line_index = lexer.indexInLine;
+void lexer_peek_number(Lexer * lexer){
+    int index = lexer->index;
+    int line = lexer->line;
+    int line_index = lexer->indexInLine;
     int i;
 
     Token token;
@@ -309,9 +275,9 @@ void peek_number(void){
     token.string = string_init();
 
     
-    for (i = 0; !is_char('\0') && (is_char_numeric() || (i == 0 && is_char_in("+-"))); i++){
-        string_add_char(&token.string, lexer.ch);
-        peek_char();
+    for (i = 0; !is_char('\0') && (is_char_numeric(lexer->ch) || (i == 0 && is_char_in("+-"))); i++){
+        string_add_char(&token.string, lexer->ch);
+        peek_char(lexer);
     }
     /* check if we only got +/ without any numerical numbers after that */
     if (token.string.index == 1) {
@@ -324,7 +290,7 @@ void peek_number(void){
             error.line = token.line;
             error.message = string_init_with_data("it seems that you have a number sign but not any numerical chars after it");
 
-            push_lexer_char_error(error);
+            lexer_push_lexer_char_error(lexer, error);
 
             string_free(token.string);
 
@@ -332,13 +298,13 @@ void peek_number(void){
         }
     }
 
-    add_token(token);
+    add_token(lexer, token);
 }
 
-void peek_string(void){
-    int index = lexer.index;
-    int line = lexer.line;
-    int line_index = lexer.indexInLine;
+void lexer_peek_string(Lexer * lexer){
+    int index = lexer->index;
+    int line = lexer->line;
+    int line_index = lexer->indexInLine;
     int i;
 
     Token token;
@@ -349,21 +315,21 @@ void peek_string(void){
     token.string = string_init();
 
     
-    for (i = 0; !is_char('\0') && ((i == 0 /* for the first " char */) || (lexer.ch != '\"')); i++){
-        string_add_char(&token.string, lexer.ch);
-        peek_char();
+    for (i = 0; !is_char('\0') && ((i == 0 /* for the first " char */) || (lexer->ch != '\"')); i++){
+        string_add_char(&token.string, lexer->ch);
+        peek_char(lexer);
     }
 
-    string_add_char(&token.string, lexer.ch);
-    peek_char(); /* peek the last " char */
+    string_add_char(&token.string, lexer->ch);
+    peek_char(lexer); /* peek the last " char */
 
-    add_token(token);
+    add_token(lexer, token);
 }
 
-void peek_non_op_instruction(void){
-    int index = lexer.index;
-    int line = lexer.line;
-    int line_index = lexer.indexInLine;
+void lexer_peek_non_op_instruction(Lexer * lexer){
+    int index = lexer->index;
+    int line = lexer->line;
+    int line_index = lexer->indexInLine;
     int i;
 
     LexerTokenError error;
@@ -375,9 +341,9 @@ void peek_non_op_instruction(void){
     token.string = string_init();
 
     
-    for (i = 0; !is_char('\0') && ((i == 0 /* for the . char */) || (is_char_identifier_starter() /* only alpha no numeric*/)); i++){
-        string_add_char(&token.string, lexer.ch);
-        peek_char();
+    for (i = 0; !is_char('\0') && ((i == 0 /* for the . char */) || (is_char_identifier_starter(lexer->ch) /* only alpha no numeric*/)); i++){
+        string_add_char(&token.string, lexer->ch);
+        peek_char(lexer);
     }
 
     if (string_equals_char_pointer(token.string, ".data")){
@@ -395,17 +361,17 @@ void peek_non_op_instruction(void){
         error.token = token;
         error.message = string_init_with_data("unknown non operative instruction");
 
-        push_lexer_token_error(error);
+        lexer_push_lexer_token_error(lexer, error);
     }
 
-    add_token(token);
+    add_token(lexer, token);
 }
 
 
-void peek_identifier(void){
-    int index = lexer.index;
-    int line = lexer.line;
-    int line_index = lexer.indexInLine;
+void lexer_peek_identifier(Lexer * lexer){
+    int index = lexer->index;
+    int line = lexer->line;
+    int line_index = lexer->indexInLine;
 
     Token token;
     token.index = index;
@@ -413,13 +379,13 @@ void peek_identifier(void){
     token.line = line;
     token.string = string_init();
 
-    string_add_char(&token.string, lexer.ch); /* the first char is always an alfa char so it has to be part of the identifier*/
-    peek_char();
+    string_add_char(&token.string, lexer->ch); /* the first char is always an alfa char so it has to be part of the identifier*/
+    peek_char(lexer);
     
     while (!is_char('\0')){
-        if (is_char_identifier()){
-            string_add_char(&token.string, lexer.ch);
-            peek_char();
+        if (is_char_identifier(lexer->ch)){
+            string_add_char(&token.string, lexer->ch);
+            peek_char(lexer);
         }
         else 
         {
@@ -478,55 +444,55 @@ void peek_identifier(void){
     else
         token.kind = IDENTIFIER; 
 
-    add_token(token);      
+    add_token(lexer, token);      
 }
 
-void lex(void){
+void lexer_lex(Lexer * lexer){
     while (!is_char('\0'))
     {
-        if (is_char_whitespace()){
-            peek_char(); /* we simply move over whitespaces*/
+        if (is_char_whitespace(lexer)){
+            peek_char(lexer); /* we simply move over whitespaces*/
         } else if (is_char(';')){
-            peek_comment();
+            lexer_peek_comment(lexer);
         } else if (is_char('\n')){
-            peek_next_line();
+            lexer_peek_next_line(lexer);
         }else if (is_char_in(",:#*")){
-            peek_separator();
-        } else if (is_char_numeric() || is_char_in("+-")){
-            peek_number();
+            lexer_peek_separator(lexer);
+        } else if (is_char_numeric(lexer->ch) || is_char_in("+-")){
+            lexer_peek_number(lexer);
         } else if (is_char('\"')){
-            peek_string();
+            lexer_peek_string(lexer);
         } else if (is_char('.')){
-            peek_non_op_instruction();
-        } else if (is_char_identifier_starter()){
-            peek_identifier();
+            lexer_peek_non_op_instruction(lexer);
+        } else if (is_char_identifier_starter(lexer->ch)){
+            lexer_peek_identifier(lexer);
         }else {
             LexerCharError error;
 
-            error.ch = lexer.ch;
-            error.index = lexer.index;
-            error.indexInLine = lexer.indexInLine;
-            error.line = lexer.line;
+            error.ch = lexer->ch;
+            error.index = lexer->index;
+            error.indexInLine = lexer->indexInLine;
+            error.line = lexer->line;
             error.message = string_init_with_data("unkonwn char");
 
-            push_lexer_char_error(error);
+            lexer_push_lexer_char_error(lexer, error);
 
-            peek_char(); /* we would continue to lex in any case, to find more lexer errors*/
+            peek_char(lexer); /* we would continue to lex in any case, to find more lexer errors*/
         }
     }
 }
 
-void push_lexer_token_error(LexerTokenError error){
+void lexer_push_lexer_token_error(Lexer * lexer, LexerTokenError error){
     LexerErrorList * toAdd = malloc(sizeof(LexerErrorList));
     toAdd->error.tokenError = error;
     toAdd->kind = LexerTokenErrorKind;
     toAdd->next = NULL;
 
-    if (errorList == NULL){
+    if (lexer->errorList == NULL){
         /* we haven't added an error yet */
-        errorList = toAdd;
+        lexer->errorList = toAdd;
     }else{
-        LexerErrorList * last = errorList;
+        LexerErrorList * last = lexer->errorList;
         while (last->next != NULL){
             last = last->next;
         }
@@ -534,17 +500,17 @@ void push_lexer_token_error(LexerTokenError error){
     }
 }
 
-void push_lexer_char_error(LexerCharError error){
+void lexer_push_lexer_char_error(Lexer * lexer, LexerCharError error){
     LexerErrorList * toAdd = malloc(sizeof(LexerErrorList));
     toAdd->error.charError = error;
     toAdd->kind = LexerCharErrorKind;
     toAdd->next = NULL;
 
-    if (errorList == NULL){
+    if (lexer->errorList == NULL){
         /* we haven't added an error yet */
-        errorList = toAdd;
+        lexer->errorList = toAdd;
     }else{
-        LexerErrorList * last = errorList;
+        LexerErrorList * last = lexer->errorList;
         while (last->next != NULL){
             last = last->next;
         }
@@ -552,8 +518,8 @@ void push_lexer_char_error(LexerCharError error){
     }
 }
 
-void flush_lexer_error_list(void){
-    LexerErrorList * current = errorList;
+void lexer_flush_lexer_error_list(Lexer * lexer){
+    LexerErrorList * current = lexer->errorList;
     unsigned int index = 0;
     unsigned int line = 1; /* line index */
     unsigned int i;
@@ -567,8 +533,8 @@ void flush_lexer_error_list(void){
             line = 1;
 
             /* move index to the first index in the line that the token is inside */
-            while (string_get_char(lexer.string, index) != '\0' && line != current->error.tokenError.token.line){
-                if (index != 0 && string_get_char(lexer.string, index - 1) == '\n'){
+            while (string_get_char(lexer->string, index) != '\0' && line != current->error.tokenError.token.line){
+                if (index != 0 && string_get_char(lexer->string, index - 1) == '\n'){
                     line++;
                     if (line == current->error.tokenError.token.line)
                         break; /* we break now because we already got the wanted index so we don't want index++ to happen*/
@@ -580,8 +546,8 @@ void flush_lexer_error_list(void){
             printf("%s : Lexer Error : %s\n", PROJECT_NAME, current->error.tokenError.message.data);
             printf("    %u | ", line);
 
-            while (string_get_char(lexer.string, index) != '\0' && string_get_char(lexer.string, index) != '\n'){ 
-                putchar(string_get_char(lexer.string, index));
+            while (string_get_char(lexer->string, index) != '\0' && string_get_char(lexer->string, index) != '\n'){ 
+                putchar(string_get_char(lexer->string, index));
                 index++;
             }
 
@@ -614,8 +580,8 @@ void flush_lexer_error_list(void){
             line = 1;
 
             /* move index to the first index in the line that the char is inside */
-            while (string_get_char(lexer.string, index) != '\0' && line != current->error.charError.line){
-                if (index != 0 && string_get_char(lexer.string, index - 1) == '\n'){
+            while (string_get_char(lexer->string, index) != '\0' && line != current->error.charError.line){
+                if (index != 0 && string_get_char(lexer->string, index - 1) == '\n'){
                     line++;
                     if (line == current->error.charError.line)
                         break; /* we break now because we already got the wanted index so we don't want index++ to happen*/
@@ -627,8 +593,8 @@ void flush_lexer_error_list(void){
             printf("%s : Lexer Error : %s : '%c' \n", PROJECT_NAME, current->error.charError.message.data, current->error.charError.ch);
             printf("    %u | ", line);
             
-            while (string_get_char(lexer.string, index) != '\0' && string_get_char(lexer.string, index) != '\n'){ 
-                putchar(string_get_char(lexer.string, index));
+            while (string_get_char(lexer->string, index) != '\0' && string_get_char(lexer->string, index) != '\n'){ 
+                putchar(string_get_char(lexer->string, index));
                 index++;
             }
 
@@ -660,9 +626,9 @@ void flush_lexer_error_list(void){
     }
 }
 
-void free_lexer_error_list(void){
+void lexer_free_lexer_error_list(Lexer * lexer){
     LexerErrorList * temp;
-    LexerErrorList * current = errorList;
+    LexerErrorList * current = lexer->errorList;
     
     while (current != NULL)
     {
