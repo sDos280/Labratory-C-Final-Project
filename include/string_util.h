@@ -124,6 +124,13 @@ int string_length(String str);
 */
 void string_remove_slice(String * str, int start, int end);
 
-void string_remove_slice(String * str, int start, int end);
+/*
+ * replace a pattern in the (passed) string
+ *
+ * @param str the String
+ * @param pattern the pattern
+ * @param replaceWith the string you want the pattern to be replaced with
+*/
+void string_replace_pattern(String * str, String pattern, String replaceWith);
 
 #endif /* LABRATORY_C_MAMAN22_STRING_UTIL */

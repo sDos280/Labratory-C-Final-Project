@@ -151,3 +151,21 @@ void string_remove_slice(String * str, int start, int end){
     str->index = strOut.index;
     str->size = strOut.size;
 }
+
+void string_replace_pattern(String * str, String pattern, String replaceWith){
+    String strOut = string_init();
+    int patternLength = string_length(pattern);
+
+    int i;
+    for (i = 0; i < string_length(*str); i++){
+        if (strncmp(str->data + i, pattern.data, patternLength) == 0) {
+            /* the pattern was found in this index */
+            
+            string_add_string(&strOut, replaceWith);
+
+            i += patternLength;
+        }else{
+            string_add_char(&strOut, string_get_char(*str, i));
+        }
+    }
+}
