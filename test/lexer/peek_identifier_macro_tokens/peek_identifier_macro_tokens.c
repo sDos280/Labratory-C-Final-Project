@@ -3,14 +3,15 @@
 #include "../../../include/string_util.h"
 
 int main(){
-    lexer_init("macr\nendmacr\n");
-    lexer_peek_identifier();
-    lexer_peek_next_line();
-    lexer_peek_identifier();
-    lexer_peek_next_line();
-    lexer_print_token_list();
+    Lexer lexer;
+    lexer_init(&lexer, "macr\nendmacr\n");
+    lexer_peek_identifier(&lexer);
+    lexer_peek_next_line(&lexer);
+    lexer_peek_identifier(&lexer);
+    lexer_peek_next_line(&lexer);
+    lexer_print_token_list(&lexer);
 
-    lexer_free();
+    lexer_free(&lexer);
 
     return 0;
 }

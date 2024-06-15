@@ -3,20 +3,21 @@
 #include "../../../include/string_util.h"
 
 int main(){
-    lexer_init("-556,252\n+6546-55:666666\n99");
-    lexer_peek_number();
-    lexer_peek_separator();
-    lexer_peek_number();
-    lexer_peek_next_line();
-    lexer_peek_number();
-    lexer_peek_number();
-    lexer_peek_separator();
-    lexer_peek_number();
-    lexer_peek_next_line();
-    lexer_peek_number();
-    lexer_print_token_list();
+    Lexer lexer;
+    lexer_init(&lexer, "-556,252\n+6546-55:666666\n99");
+    lexer_peek_number(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_number(&lexer);
+    lexer_peek_next_line(&lexer);
+    lexer_peek_number(&lexer);
+    lexer_peek_number(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_number(&lexer);
+    lexer_peek_next_line(&lexer);
+    lexer_peek_number(&lexer);
+    lexer_print_token_list(&lexer);
 
-    lexer_free();
+    lexer_free(&lexer);
 
     return 0;
 }

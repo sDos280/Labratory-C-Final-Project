@@ -3,13 +3,14 @@
 #include "../../../include/string_util.h"
 
 int main(){
-    lexer_init("\"hello\"\"world\"\"\"");
-    lexer_peek_string();
-    lexer_peek_string();
-    lexer_peek_string();
-    lexer_print_token_list();
+    Lexer lexer;
+    lexer_init(&lexer, "\"hello\"\"world\"\"\"");
+    lexer_peek_string(&lexer);
+    lexer_peek_string(&lexer);
+    lexer_peek_string(&lexer);
+    lexer_print_token_list(&lexer);
 
-    lexer_free();
+    lexer_free(&lexer);
 
     return 0;
 }

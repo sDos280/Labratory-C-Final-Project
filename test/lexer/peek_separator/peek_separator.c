@@ -3,19 +3,20 @@
 #include "../../../include/string_util.h"
 
 int main(){
-    lexer_init("*,:##**,,");
-    lexer_peek_separator();
-    lexer_peek_separator();
-    lexer_peek_separator();
-    lexer_peek_separator();
-    lexer_peek_separator();
-    lexer_peek_separator();
-    lexer_peek_separator();
-    lexer_peek_separator();
-    lexer_peek_separator();
-    lexer_print_token_list();
-
-    lexer_free();
+    Lexer lexer;
+    lexer_init(&lexer, "*,:##**,,");
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_peek_separator(&lexer);
+    lexer_print_token_list(&lexer);
+    
+    lexer_free(&lexer);
 
     return 0;
 }

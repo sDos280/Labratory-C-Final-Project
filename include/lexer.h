@@ -114,6 +114,12 @@ void lexer_peek_non_op_instruction(Lexer *lexer);
 void lexer_peek_identifier(Lexer *lexer);
 
 /**
+ * Peeks an end of file token.
+ * @note The caller must use this function when the token appears in the current context.
+ */
+void lexer_peek_end_of_file(Lexer *lexer);
+
+/**
  * Performs a full lexer pass on the source code.
  */
 void lexer_lex(Lexer *lexer);
