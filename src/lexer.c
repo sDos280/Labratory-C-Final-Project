@@ -316,10 +316,13 @@ void lexer_peek_number(Lexer * lexer){
 }
 
 void lexer_peek_string(Lexer * lexer){
+    bool wasCloserStringFound = false;
     int index = lexer->index;
     int line = lexer->line;
     int indexInLine = lexer->indexInLine;
     int i;
+
+    LexerCharError error;
 
     Token token;
     token.kind = STRING;
@@ -329,13 +332,30 @@ void lexer_peek_string(Lexer * lexer){
     token.string = string_init();
 
     
-    for (i = 0; !(are_chars_equal(lexer->ch, EOF) || are_chars_equal(lexer->ch, '\0')) && ((i == 0 /* for the first " char */) || (lexer->ch != '\"')); i++){
+    for (i = 0; !(are_chars_equal(lexer->ch, EOF) || are_chars_equal(lexer->ch, '\0')); i++){
+        if (i != 0 && lexer->ch == '\"') {
+            wasCloserStringFound = true;
+        }
+
         string_add_char(&token.string, lexer->ch);
         lexer_peek_char(lexer);
+        
+        if (wasCloserStringFound == true) break;
     }
 
-    string_add_char(&token.string, lexer->ch);
-    lexer_peek_char(lexer); /* peek the last " char */
+    if (wasCloserStringFound == false){
+        /* there isn't a known non operative instruction that match the one that we know, so we raise an error */
+        token.kind = TokenError;
+
+        error.ch = '\"';
+        error.index = index;
+        error.indexInLine = indexInLine;
+        error.line = line;
+        error.message = string_init_with_data("no string closer was found");
+
+        printf("%d ggggggggggggggggggggggggggggg\n", index);
+        lexer_push_lexer_char_error(lexer, error);
+    }
 
     add_token(lexer, token);
 }
