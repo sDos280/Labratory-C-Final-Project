@@ -134,18 +134,20 @@ int string_length(String str){
 }
 
 void string_remove_slice(String * str, int start, int end){
+    String strOut = string_init();
+
     int i;
-    int slice_length = end - start + 1;
-    char * endBuffer = (char *)calloc(string_length(*str) - slice_length, sizeof(char));
-    
     for (i = 0; i < string_length(*str); i++){
         if (i >= start && i <= end) continue;
 
-        endBuffer[i] = string_get_char(*str, i);
+        string_add_char(&strOut, string_get_char(*str, i));
     }
 
     /* free the string past buffer */
     free(str->data);
 
-    str->data = endBuffer;
+    /* make a shadow copy */
+    str->data = strOut.data;
+    str->index = strOut.index;
+    str->size = strOut.size;
 }

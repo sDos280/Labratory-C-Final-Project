@@ -124,4 +124,6 @@ int string_length(String str);
 */
 void string_remove_slice(String * str, int start, int end);
 
+void string_remove_slice(String * str, int start, int end);
+
 #endif /* LABRATORY_C_MAMAN22_STRING_UTIL */
