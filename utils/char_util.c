@@ -10,6 +10,10 @@ bool is_char_in_char_pointer(char ch, char * string){
     return false;
 }
 
+bool are_chars_equal(char ch1, char ch2){
+    return ch1 == ch2;
+}
+
 bool is_char_whitespace(char ch){
     return is_char_in_char_pointer(ch, "\t\r ");
 }

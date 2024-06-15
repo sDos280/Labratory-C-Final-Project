@@ -20,6 +20,16 @@
  */
 bool is_char_in_char_pointer(char ch, char *string);
 
+
+/**
+ * Checks if two charecters are equal.
+ * 
+ * @param ch1 The first character.
+ * @param ch2 The second character.
+ * @return true if the characters are equal, false otherwise.
+ */
+bool are_chars_equal(char ch1, char ch2);
+
 /**
  * Checks if a character is whitespace.
  * 
