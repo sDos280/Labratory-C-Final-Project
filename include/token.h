@@ -42,7 +42,7 @@ typedef enum{
     TokenError, /* an error has raised in this token*/ 
 
     EOL,        /* end of line */
-    EOT        /* end of token stream */
+    EOFT        /* end of file token (end of token stream) */
 }TokenKind;
 
 typedef struct Token{
