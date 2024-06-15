@@ -48,8 +48,8 @@ typedef enum{
 typedef struct Token{
     TokenKind kind;  /* the token kind */
     unsigned int index;  /* the index of the starter char of the token (in the file) */
-    unsigned int line_index; /* the index of the starter char the token (in the token line)*/
-    unsigned int line;  /* the line the char is inside */
+    unsigned int indexInLine; /* the index of the starter char the token (in the token line)*/
+    unsigned int line;  /* the line the token is inside */
     String string; /* the string data */
 }Token;
 

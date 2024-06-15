@@ -203,12 +203,12 @@ void lexer_peek_char(Lexer * lexer){
 void lexer_peek_comment(Lexer * lexer){
     int index = lexer->index;
     int line = lexer->line;
-    int line_index = lexer->indexInLine;
+    int indexInLine = lexer->indexInLine;
 
     Token token;
     token.kind = COMMENT;
     token.index = index;
-    token.line_index = line_index;
+    token.indexInLine = indexInLine;
     token.line = line;
     token.string = string_init();
 
@@ -225,12 +225,12 @@ void lexer_peek_comment(Lexer * lexer){
 void lexer_peek_next_line(Lexer * lexer){
     int index = lexer->index;
     int line = lexer->line;
-    int line_index = lexer->indexInLine;
+    int indexInLine = lexer->indexInLine;
 
     Token token;
     token.kind = EOL;
     token.index = index;
-    token.line_index = line_index;
+    token.indexInLine = indexInLine;
     token.line = line;
     token.string = string_init_with_data("\n");
 
@@ -242,7 +242,7 @@ void lexer_peek_next_line(Lexer * lexer){
 void lexer_peek_separator(Lexer * lexer){
     int index = lexer->index;
     int line = lexer->line;
-    int line_index = lexer->indexInLine;
+    int indexInLine = lexer->indexInLine;
 
     Token token;
     switch (lexer->ch)
@@ -266,7 +266,7 @@ void lexer_peek_separator(Lexer * lexer){
         break;
     }
     token.index = index;
-    token.line_index = line_index;
+    token.indexInLine = indexInLine;
     token.line = line;
     token.string = string_init_with_data(&lexer->ch);
 
@@ -278,13 +278,13 @@ void lexer_peek_separator(Lexer * lexer){
 void lexer_peek_number(Lexer * lexer){
     int index = lexer->index;
     int line = lexer->line;
-    int line_index = lexer->indexInLine;
+    int indexInLine = lexer->indexInLine;
     int i;
 
     Token token;
     token.kind = NUMBER;
     token.index = index;
-    token.line_index = line_index;
+    token.indexInLine = indexInLine;
     token.line = line;
     token.string = string_init();
 
@@ -300,7 +300,7 @@ void lexer_peek_number(Lexer * lexer){
 
             error.ch = string_get_char(token.string, 0);
             error.index = token.index;
-            error.indexInLine = token.line_index;
+            error.indexInLine = token.indexInLine;
             error.line = token.line;
             error.message = string_init_with_data("it seems that you have a number sign but not any numerical chars after it");
 
@@ -318,13 +318,13 @@ void lexer_peek_number(Lexer * lexer){
 void lexer_peek_string(Lexer * lexer){
     int index = lexer->index;
     int line = lexer->line;
-    int line_index = lexer->indexInLine;
+    int indexInLine = lexer->indexInLine;
     int i;
 
     Token token;
     token.kind = STRING;
     token.index = index;
-    token.line_index = line_index;
+    token.indexInLine = indexInLine;
     token.line = line;
     token.string = string_init();
 
@@ -343,14 +343,14 @@ void lexer_peek_string(Lexer * lexer){
 void lexer_peek_non_op_instruction(Lexer * lexer){
     int index = lexer->index;
     int line = lexer->line;
-    int line_index = lexer->indexInLine;
+    int indexInLine = lexer->indexInLine;
     int i;
 
     LexerTokenError error;
 
     Token token;
     token.index = index;
-    token.line_index = line_index;
+    token.indexInLine = indexInLine;
     token.line = line;
     token.string = string_init();
 
@@ -385,11 +385,11 @@ void lexer_peek_non_op_instruction(Lexer * lexer){
 void lexer_peek_identifier(Lexer * lexer){
     int index = lexer->index;
     int line = lexer->line;
-    int line_index = lexer->indexInLine;
+    int indexInLine = lexer->indexInLine;
 
     Token token;
     token.index = index;
-    token.line_index = line_index;
+    token.indexInLine = indexInLine;
     token.line = line;
     token.string = string_init();
 
@@ -464,7 +464,7 @@ void lexer_peek_identifier(Lexer * lexer){
 void lexer_peek_end_of_file(Lexer *lexer){
     int index = lexer->index;
     int line = lexer->line;
-    int line_index = lexer->indexInLine;
+    int indexInLine = lexer->indexInLine;
     Token token;
 
     char *temp = (char *)malloc(2 * sizeof(char));
@@ -474,7 +474,7 @@ void lexer_peek_end_of_file(Lexer *lexer){
 
     token.kind = EOFT;
     token.index = index;
-    token.line_index = line_index;
+    token.indexInLine = indexInLine;
     token.line = line;
     token.string = string_init_with_data(temp);
 
@@ -583,7 +583,7 @@ void lexer_flush_lexer_error_list(Lexer * lexer){
             }
 
             /* print the line the error has occurred */
-            printf("%s:%d:%d: %sLexer Error%s: %s\n", lexer->filePath, current->error.tokenError.token.line, current->error.tokenError.token.line_index + 1, RED_COLOR, RESET_COLOR, current->error.tokenError.message.data);
+            printf("%s:%d:%d: %sLexer Error%s: %s\n", lexer->filePath, current->error.tokenError.token.line, current->error.tokenError.token.indexInLine + 1, RED_COLOR, RESET_COLOR, current->error.tokenError.message.data);
             printf("    %u | ", line);
 
             while (string_get_char(lexer->string, index) != '\0' && string_get_char(lexer->string, index) != '\n'){ 
@@ -604,7 +604,7 @@ void lexer_flush_lexer_error_list(Lexer * lexer){
 
             printf(" | ");
 
-            for (i = 0; i < current->error.tokenError.token.line_index; i++){
+            for (i = 0; i < current->error.tokenError.token.indexInLine; i++){
                 printf(" ");
             }
 
@@ -634,7 +634,7 @@ void lexer_flush_lexer_error_list(Lexer * lexer){
             }
 
             /* print the line the error has occurred */
-            printf("%s:%d:%d: %sLexer Error%s: %s\n", lexer->filePath, current->error.tokenError.token.line, current->error.tokenError.token.line_index + 1, RED_COLOR, RESET_COLOR, current->error.charError.message.data);
+            printf("%s:%d:%d: %sLexer Error%s: %s\n", lexer->filePath, current->error.tokenError.token.line, current->error.tokenError.token.indexInLine + 1, RED_COLOR, RESET_COLOR, current->error.charError.message.data);
             printf("    %u | ", line);
             
             while (string_get_char(lexer->string, index) != '\0' && string_get_char(lexer->string, index) != '\n'){
@@ -655,7 +655,7 @@ void lexer_flush_lexer_error_list(Lexer * lexer){
 
             printf(" | ");
 
-            for (i = 0; i < current->error.tokenError.token.line_index; i++){
+            for (i = 0; i < current->error.tokenError.token.indexInLine; i++){
                 printf(" ");
             }
             
