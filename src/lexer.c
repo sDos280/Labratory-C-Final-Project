@@ -213,7 +213,7 @@ void lexer_peek_comment(Lexer * lexer){
     token.string = string_init();
 
     while(!(are_chars_equal(lexer->ch, '\0') || are_chars_equal(lexer->ch, EOF))){
-        if (is_char_in_char_pointer(lexer->ch, "\n")) break; /* the end of the comment token */
+        if (are_chars_equal(lexer->ch, '\n')) break; /* the end of the comment token */
 
         string_add_char(&token.string, lexer->ch);
         lexer_peek_char(lexer);
@@ -490,9 +490,9 @@ void lexer_lex(Lexer * lexer){
     {
         if (is_char_whitespace(lexer->ch)){
             lexer_peek_char(lexer); /* we simply move over whitespaces */
-        } else if (is_char_in_char_pointer(lexer->ch, ";")){
+        } else if (are_chars_equal(lexer->ch, ';')){
             lexer_peek_comment(lexer);
-        } else if (is_char_in_char_pointer(lexer->ch, "\n")){
+        } else if (are_chars_equal(lexer->ch, '\n')){
             lexer_peek_next_line(lexer);
         }else if (are_chars_equal(lexer->ch, EOF)){
             lexer_peek_end_of_file(lexer);
@@ -500,9 +500,9 @@ void lexer_lex(Lexer * lexer){
             lexer_peek_separator(lexer);
         } else if (is_char_numeric(lexer->ch) || is_char_in_char_pointer(lexer->ch, "+-")){
             lexer_peek_number(lexer);
-        } else if (is_char_in_char_pointer(lexer->ch, "\"")){
+        } else if (are_chars_equal(lexer->ch, '\"')){
             lexer_peek_string(lexer);
-        } else if (is_char_in_char_pointer(lexer->ch, ".")){
+        } else if (are_chars_equal(lexer->ch, '.')){
             lexer_peek_non_op_instruction(lexer);
         } else if (is_char_identifier_starter(lexer->ch)){
             lexer_peek_identifier(lexer);
