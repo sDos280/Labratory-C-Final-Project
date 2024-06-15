@@ -107,4 +107,11 @@ bool string_equals(String str1, String str2);
 */
 bool string_equals_char_pointer(String str1, char * str2);
 
+/*
+ * return the length of a string
+ *
+ * @param str the String
+*/
+int string_length(String str);
+
 #endif /* LABRATORY_C_MAMAN22_STRING_UTIL */

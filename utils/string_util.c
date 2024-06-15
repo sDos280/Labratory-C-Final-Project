@@ -134,3 +134,7 @@ static unsigned power_2_ceil(unsigned x) {
     while (x >>= 1) power <<= 1;
     return power;
 }
+
+int string_length(String str){
+    return str.index; /* the string index of the \0 char is the length */
+}
