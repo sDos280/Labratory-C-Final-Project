@@ -9,6 +9,15 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#define RED_COLOR   "\x1B[1;91m"
+#define GRN_COLOR   "\x1B[32m"
+#define YEL_COLOR   "\x1B[33m"
+#define BLU_COLOR   "\x1B[34m"
+#define MAG_COLOR   "\x1B[35m"
+#define CYN_COLOR   "\x1B[36m"
+#define WHT_COLOR   "\x1B[37m"
+#define RESET_COLOR "\x1B[0m"
+
 /* some local utils */
 int countDigits(int value)
 {
@@ -285,7 +294,7 @@ void lexer_peek_number(Lexer * lexer){
         lexer_peek_char(lexer);
     }
     /* check if we only got +/ without any numerical numbers after that */
-    if (token.string.index == 1) {
+    if (string_length(token.string) == 1) {
         if (string_get_char(token.string, 0) == '+' || string_get_char(token.string, 0) == '-'){
             LexerCharError error;
 
@@ -574,10 +583,12 @@ void lexer_flush_lexer_error_list(Lexer * lexer){
             }
 
             /* print the line the error has occurred */
-            printf("%s : Lexer Error : %s\n", PROJECT_NAME, current->error.tokenError.message.data);
+            printf("%s:%d:%d: %sLexer Error%s: %s\n", lexer->filePath, current->error.tokenError.token.line, current->error.tokenError.token.line_index + 1, RED_COLOR, RESET_COLOR, current->error.tokenError.message.data);
             printf("    %u | ", line);
 
             while (string_get_char(lexer->string, index) != '\0' && string_get_char(lexer->string, index) != '\n'){ 
+                if (index == current->error.tokenError.token.index) printf("%s", RED_COLOR);
+                if (index == current->error.tokenError.token.index + string_length(current->error.tokenError.token.string)) printf("%s", RESET_COLOR);
                 putchar(string_get_char(lexer->string, index));
                 index++;
             }
@@ -597,11 +608,13 @@ void lexer_flush_lexer_error_list(Lexer * lexer){
                 printf(" ");
             }
 
-            /* print to token highligh itself*/
-            for (i = 0; i < current->error.tokenError.token.string.index; i++){
+            /* print to token highligh itself */
+            printf("%s", RED_COLOR);
+            for (i = 0; i < string_length(current->error.tokenError.token.string); i++){
                 if (i == 0) printf("^");
                 else printf("~");
             }
+            printf("%s", RESET_COLOR);
 
             printf("\n");
 
@@ -621,11 +634,13 @@ void lexer_flush_lexer_error_list(Lexer * lexer){
             }
 
             /* print the line the error has occurred */
-            printf("%s : Lexer Error : %s : '%c' \n", PROJECT_NAME, current->error.charError.message.data, current->error.charError.ch);
+            printf("%s:%d:%d: %sLexer Error%s: %s\n", lexer->filePath, current->error.tokenError.token.line, current->error.tokenError.token.line_index + 1, RED_COLOR, RESET_COLOR, current->error.charError.message.data);
             printf("    %u | ", line);
             
-            while (string_get_char(lexer->string, index) != '\0' && string_get_char(lexer->string, index) != '\n'){ 
+            while (string_get_char(lexer->string, index) != '\0' && string_get_char(lexer->string, index) != '\n'){
+                if (index == current->error.tokenError.token.index) printf("%s", RED_COLOR);
                 putchar(string_get_char(lexer->string, index));
+                if (index == current->error.tokenError.token.index) printf("%s", RESET_COLOR);
                 index++;
             }
 
@@ -643,9 +658,11 @@ void lexer_flush_lexer_error_list(Lexer * lexer){
             for (i = 0; i < current->error.tokenError.token.line_index; i++){
                 printf(" ");
             }
-
-            /* print to token highligh itself*/
+            
+            printf("%s", RED_COLOR);
+            /* print to token highligh itself */
             printf("^\n");
+            printf("%s", RESET_COLOR);
 
             break;
 
