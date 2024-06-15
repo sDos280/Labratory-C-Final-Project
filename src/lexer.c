@@ -592,6 +592,7 @@ void lexer_flush_lexer_error_list(Lexer * lexer){
                 putchar(string_get_char(lexer->string, index));
                 index++;
             }
+            printf("%s", RESET_COLOR);
 
             printf("\n");
 
@@ -632,6 +633,7 @@ void lexer_flush_lexer_error_list(Lexer * lexer){
                 }
                 index++;
             }
+            printf("%s", RESET_COLOR);
 
             /* print the line the error has occurred */
             printf("%s:%d:%d: %sLexer Error%s: %s\n", lexer->filePath, current->error.tokenError.token.line, current->error.tokenError.token.indexInLine + 1, RED_COLOR, RESET_COLOR, current->error.charError.message.data);
