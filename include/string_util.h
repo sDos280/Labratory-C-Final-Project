@@ -114,4 +114,14 @@ bool string_equals_char_pointer(String str1, char * str2);
 */
 int string_length(String str);
 
+/*
+ * remove a slice of the (passed) string
+ *
+ * @param str the String
+ * @param start the starting index
+ * @param end the ending index
+ * @note the end index is included in the slice
+*/
+void string_remove_slice(String * str, int start, int end);
+
 #endif /* LABRATORY_C_MAMAN22_STRING_UTIL */

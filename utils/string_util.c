@@ -114,12 +114,6 @@ bool string_equals_char_pointer(String str1, char * str2){
     return true;
 }
 
-/*static unsigned power_2_floor(unsigned x) {
-    int power = 1;
-    while (x >>= 1) power <<= 1;
-    return power;
-}*/
-
 /*
  * (helper function) return the closest number to x in the form of 2^y (where y is a an integer and positive)
  *
@@ -137,4 +131,21 @@ static unsigned power_2_ceil(unsigned x) {
 
 int string_length(String str){
     return str.index; /* the string index of the \0 char is the length */
+}
+
+void string_remove_slice(String * str, int start, int end){
+    int i;
+    int slice_length = end - start + 1;
+    char * endBuffer = (char *)calloc(string_length(*str) - slice_length, sizeof(char));
+    
+    for (i = 0; i < string_length(*str); i++){
+        if (i >= start && i <= end) continue;
+
+        endBuffer[i] = string_get_char(*str, i);
+    }
+
+    /* free the string past buffer */
+    free(str->data);
+
+    str->data = endBuffer;
 }
