@@ -353,7 +353,6 @@ void lexer_peek_string(Lexer * lexer){
         error.line = line;
         error.message = string_init_with_data("no string closer was found");
 
-        printf("%d ggggggggggggggggggggggggggggg\n", index);
         lexer_push_lexer_char_error(lexer, error);
     }
 
