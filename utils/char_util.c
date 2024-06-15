@@ -1,8 +1,10 @@
 #include "../include/char_util.h"
 
 bool is_char_in_char_pointer(char ch, char * string){
-    /* (string should be null terminated) */
     int i;
+
+    if (string[0] == ch) return true; /* in case string = "\0" */
+    
     for (i = 0; string[i] != '\0'; i++){
         if (ch == string[i]) return true;
     }
@@ -11,7 +13,7 @@ bool is_char_in_char_pointer(char ch, char * string){
 }
 
 bool are_chars_equal(char ch1, char ch2){
-    return ch1 == ch2;
+    return (char)ch1 == (char)ch2;
 }
 
 bool is_char_whitespace(char ch){
