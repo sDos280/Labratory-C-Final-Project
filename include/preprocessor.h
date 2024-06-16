@@ -33,12 +33,13 @@ typedef struct Preprocessor {
 void add_macro_to_macro_list(Preprocessor * preprocessor, Macro macro);
 
 /**
- * Generate a macro list from lexer tokens.
+ * Generate a macro list from lexer tokens and the new macroList and append the out source to the preprocessor.
  *
+ * @param preprocessor the preprocessor.
  * @param lexer the lexer.
  * @return a pointer to a memory allocated MacroList.
 */
-MacroList * generate_macro_list(Lexer lexer);
+void generate_macro_list(Preprocessor * preprocessor, Lexer lexer);
 
 
 
