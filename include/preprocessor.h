@@ -18,14 +18,19 @@ typedef struct MacroList {
     struct MacroList * next; /* the next macro */
 } MacroList;
 
+typedef struct Preprocessor {
+    String string; /* the string of the source file after the preprocessor pass */
+    MacroList * macroList; /* the macroList of the preprocessor */
+} Preprocessor;
+
 
 /**
  * Add macro to the end of a macro list
  *
- * @param macroList a pointer to a (MacroList *) macroList .
+ * @param preprocessor the preprocessor.
  * @param macro the macro to be added.
 */
-void add_macro_to_macro_list(MacroList ** macroList, Macro macro);
+void add_macro_to_macro_list(Preprocessor * preprocessor, Macro macro);
 
 /**
  * Generate a macro list from lexer tokens.
