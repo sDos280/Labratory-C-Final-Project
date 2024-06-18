@@ -1,0 +1,10 @@
+line:
+    : ... '\n'
+
+lines:
+    : line
+    ; lines ',' line
+
+macro:
+    : MACR IDENTIFIER '\n' ENDMACR '\n'
+    ; MACR IDENTIFIER '\n' lines ENDMACR '\n'
