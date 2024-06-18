@@ -41,8 +41,9 @@ typedef struct Preprocessor {
  * Initializes the preprocesso
  *
  * @param preprocessor the preprocessor.
+ * @param lexer the lexer.
 */
-void preprocessor_init(Preprocessor * preprocessor);
+void preprocessor_init(Preprocessor * preprocessor, Lexer lexer);
 
 /**
  * Add a macro to the end of the preprocessor macro list
