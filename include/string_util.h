@@ -115,6 +115,17 @@ bool string_equals_char_pointer(String str1, char * str2);
 int string_length(String str);
 
 /*
+ * return a slice of the (passed) string
+ *
+ * @param str the String
+ * @param start the starting index
+ * @param end the ending index
+ * @return a string that has the slice
+ * @note the end index is included in the slice
+*/
+String string_get_slice(String str, int start, int end);
+
+/*
  * remove a slice of the (passed) string
  *
  * @param str the String
