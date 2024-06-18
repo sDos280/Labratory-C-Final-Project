@@ -133,6 +133,17 @@ int string_length(String str){
     return str.index; /* the string index of the \0 char is the length */
 }
 
+String string_get_slice(String str, int start, int end){
+    String out;
+    int i;
+
+    for (i = start; i <= end; i++){
+        string_add_char(&out, string_get_char(str, i));
+    }
+
+    return out;
+}
+
 void string_remove_slice(String * str, int start, int end){
     String strOut = string_init();
 
