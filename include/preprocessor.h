@@ -46,6 +46,26 @@ typedef struct Preprocessor {
 void preprocessor_init(Preprocessor * preprocessor, Lexer lexer);
 
 /**
+ * Generate a macro from the current preprocessor looked at token.
+ *
+ * @param preprocessor the preprocessor.
+ * @param source the srouce file as string.
+ * @note An MACR token must be pressent at the current context.
+*/
+void preprocessor_generate_macro(Preprocessor * preprocessor, String source);
+
+
+/**
+ * Generate a macro list from lexer tokens and the new macroList and append the out source to the preprocessor.
+ *
+ * @param preprocessor the preprocessor.
+ * @param lexer the lexer.
+ * @return a pointer to a memory allocated MacroList.
+*/
+void generate_macro_list(Preprocessor * preprocessor, Lexer lexer);
+
+
+/**
  * Add a macro to the end of the preprocessor macro list
  *
  * @param preprocessor the preprocessor.
@@ -60,15 +80,6 @@ void add_macro_to_preprocessor_macro_list(Preprocessor * preprocessor, Macro mac
  * @param error the error to be added.
 */
 void add_error_to_preprocessor_macro_list(Preprocessor * preprocessor, PreprocessorTokenError error);
-
-/**
- * Generate a macro list from lexer tokens and the new macroList and append the out source to the preprocessor.
- *
- * @param preprocessor the preprocessor.
- * @param lexer the lexer.
- * @return a pointer to a memory allocated MacroList.
-*/
-void generate_macro_list(Preprocessor * preprocessor, Lexer lexer);
 
 
 #endif /* LABRATORY_C_FINAL_PREPROCESSOR */
