@@ -5,10 +5,15 @@
 #include "token.h"
 
 typedef enum {
-    LexerTokenErrorKind,
-    LexerCharErrorKind,
-    PreprocessorErrorKind,
+    TokenErrorKind,
+    CharErrorKind
 } ErrorKind;
+
+typedef enum {
+    TokenErrorKind,
+    CharErrorKind,
+    PreprocessorErrorKind
+} ErrorCaller;
 
 typedef struct TokenError {
     Token token;  /* the token the error talks about */
@@ -30,6 +35,7 @@ typedef struct ErrorList {
     } error;
 
     ErrorKind kind; /* the kind of the current error */
+    ErrorCaller caller; /* the caller of the error */
     
     struct LexerErrorList *next;  /* the next error */
 } ErrorList;
@@ -50,8 +56,9 @@ void error_handler_init(ErrorHandler * handler, String source);
 /**
  * Pushes a new token error to the end of the error handler's error list.
  * @param error The token error to be added.
+ * @param caller The caller kind.
  */
-void error_handler_push_token_error(ErrorHandler * handler, TokenError error);
+void error_handler_push_token_error(ErrorHandler * handler, ErrorCaller caller, TokenError error);
 
 /**
  * Pushes a new char error to the end of the error handler's error list.
