@@ -186,5 +186,29 @@ void error_handler_flush_error_list(ErrorHandler * handler){
     }
 }
 
-void error_handler_free_error_list(ErrorHandler * handler);
+void error_handler_free_error_list(ErrorHandler * handler){
+    ErrorList * temp;
+    ErrorList * current = handler->errorList;
+    
+    while (current != NULL)
+    {
+        switch (current->kind)
+        {
+        case TokenErrorKind:
+            string_free(current->error.tokenError.message);
+            break;
+        case CharErrorKind:
+            string_free(current->error.charError.message);
+            break;
+
+        default:
+            break;
+        }
+
+        /* free the current error's memory */
+        temp = current;
+        current = current->next;
+        free(temp);
+    }
+}
 
