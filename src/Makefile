@@ -7,8 +7,11 @@ APPNAME = ac # ac = AsemblyCompiler
 .PHONY: clean main valgrind
 
 # compiler targets
-main: lexer.o main.o string_util.o char_util.o
+main: error_handler.o lexer.o main.o string_util.o _char_util.o
 	$(CC) $(LDFLAGS) -o $(APPNAME) $^
+
+error_handler.o: error_handler.c
+	$(CC) $(CXXFLAGS) -c $< -o $@
 
 lexer.o: lexer.c
 	$(CC) $(CXXFLAGS) -c $< -o $@
@@ -20,7 +23,7 @@ main.o: main.c
 string_util.o: ../utils/string_util.c
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
-char_util.o: ../utils/char_util.c
+_char_util.o: ../utils/char_util.c
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 # valgrind

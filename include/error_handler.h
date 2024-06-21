@@ -36,7 +36,7 @@ typedef struct ErrorList {
     ErrorKind kind; /* the kind of the current error */
     ErrorCaller caller; /* the caller of the error */
     
-    struct LexerErrorList *next;  /* the next error */
+    struct ErrorList *next;  /* the next error */
 } ErrorList;
 
 

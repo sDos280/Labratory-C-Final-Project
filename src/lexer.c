@@ -19,16 +19,6 @@
 #define WHT_COLOR   "\x1B[37m"
 #define RESET_COLOR "\x1B[0m"
 
-/* some local utils */
-int countDigits(int value)
-{
-    int result = 0;
-    while(value != 0) {
-       value /= 10;
-       result++;
-    }
-    return result;
-}
 
 void lexer_init(Lexer * lexer, char * sourceString){
     lexer->string = string_init_with_data(sourceString);
@@ -39,7 +29,11 @@ void lexer_init(Lexer * lexer, char * sourceString){
 
     lexer->filePath = "from_string.txt";
 
+    /* lexer->errorHandler = (ErrorHandler){0}; */
     lexer->tokens = NULL;
+
+    /* initialize lexer error handler */
+    error_handler_init(&lexer->errorHandler, lexer->string, lexer->filePath);
 
     /* add EOF to the end of the buffer so it would follow the convention */
     string_add_char(&lexer->string, EOF);
@@ -304,7 +298,7 @@ void lexer_peek_number(Lexer * lexer){
             error.line = token.line;
             error.message = string_init_with_data("it seems that you have a number sign but not any numerical chars after it");
 
-            error_handler_push_char_error(lexer, LexerErrorKind, error);
+            error_handler_push_char_error(&lexer->errorHandler, LexerErrorKind, error);
 
             string_free(token.string);
 
@@ -353,7 +347,7 @@ void lexer_peek_string(Lexer * lexer){
         error.line = line;
         error.message = string_init_with_data("no string closer was found");
 
-        error_handler_push_char_error(lexer, LexerErrorKind, error);
+        error_handler_push_char_error(&lexer->errorHandler, LexerErrorKind, error);
     }
 
     add_token(lexer, token);
@@ -394,7 +388,7 @@ void lexer_peek_non_op_instruction(Lexer * lexer){
         error.token = token;
         error.message = string_init_with_data("unknown non operative instruction");
 
-        error_handler_push_token_error(lexer, LexerErrorKind, error);
+        error_handler_push_token_error(&lexer->errorHandler, LexerErrorKind, error);
     }
 
     add_token(lexer, token);
@@ -534,7 +528,7 @@ void lexer_lex(Lexer * lexer){
             error.line = lexer->line;
             error.message = string_init_with_data("unkonwn char");
 
-            error_handler_push_char_error(lexer, LexerErrorKind, error);
+            error_handler_push_char_error(&lexer->errorHandler, LexerErrorKind, error);
 
             lexer_peek_char(lexer); /* we would continue to lex in any case, to find more lexer errors */
         }

@@ -9,6 +9,18 @@
 #define WHT_COLOR   "\x1B[37m"
 #define RESET_COLOR "\x1B[0m"
 
+
+/* some local utils */
+int countDigits(int value)
+{
+    int result = 0;
+    while(value != 0) {
+       value /= 10;
+       result++;
+    }
+    return result;
+}
+
 void error_handler_init(ErrorHandler * handler, String string, char * filePath){
     handler->string = string;
     handler->filePath = filePath;

@@ -1,11 +1,12 @@
 #include "stdint.h"
+#include "../include/error_handler.h"
 #include "../include/lexer.h"
 #include "../include/string_util.h"
 
 int main(){
     Lexer lexer;
 
-    lexer_init(&lexer, "*,:##**,,-556,252:+6546");
+    lexer_init(&lexer, "*,:##**,,-556,252:++6546");
     lexer_peek_separator(&lexer);
     lexer_peek_separator(&lexer);
     lexer_peek_separator(&lexer);
@@ -20,9 +21,13 @@ int main(){
     lexer_peek_number(&lexer);
     lexer_peek_separator(&lexer);
     lexer_peek_number(&lexer);
+    lexer_peek_number(&lexer);
+
     lexer_print_token_list(&lexer);
+    error_handler_flush_error_list(&lexer.errorHandler);
+
+    error_handler_free_error_list(&lexer.errorHandler);
     lexer_free(&lexer);
-    lexer_print_token_list(&lexer);
 
     return 0;
 }

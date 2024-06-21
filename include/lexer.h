@@ -4,6 +4,7 @@
 #include "char_util.h"
 #include "string_util.h"
 #include "token.h"
+#include "error_handler.h"
 
 typedef struct Lexer {
     String string;      /* the input string */
@@ -14,6 +15,7 @@ typedef struct Lexer {
     
     char * filePath; /* the relative path to the file */
 
+    ErrorHandler errorHandler; /* the error handler of the lexer */
     TokenList * tokens;   /* the output token list */
 } Lexer;
 
