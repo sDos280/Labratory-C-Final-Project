@@ -63,8 +63,9 @@ void error_handler_push_token_error(ErrorHandler * handler, ErrorCaller caller, 
 /**
  * Pushes a new char error to the end of the error handler's error list.
  * @param error The char error to be added.
+ * @param caller The caller kind.
  */
-void error_handler_push_char_error(ErrorHandler * handler, CharError error);
+void error_handler_push_char_error(ErrorHandler * handler, ErrorCaller caller, CharError error);
 
 /**
  * Flushes (outputs) the error handler's error list to the user.
