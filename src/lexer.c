@@ -3,6 +3,7 @@
 */
 
 #include "../include/consts.h"
+#include "../include/error_handler.h"
 #include "../include/lexer.h"
 #include <stdbool.h>
 #include <stdlib.h>
@@ -38,7 +39,6 @@ void lexer_init(Lexer * lexer, char * sourceString){
 
     lexer->filePath = "from_string.txt";
 
-    lexer->errorList = NULL;
     lexer->tokens = NULL;
 
     /* add EOF to the end of the buffer so it would follow the convention */
@@ -125,7 +125,7 @@ void lexer_print_token_list(Lexer * lexer){
             printf("non operative instructions: %s\n", tokens->token.string.data);
             break;
         
-        case TokenError:
+        case ErrorToken:
             printf("error token: %s\n", tokens->token.string.data);
             break;
         
@@ -296,7 +296,7 @@ void lexer_peek_number(Lexer * lexer){
     /* check if we only got +/ without any numerical numbers after that */
     if (string_length(token.string) == 1) {
         if (string_get_char(token.string, 0) == '+' || string_get_char(token.string, 0) == '-'){
-            LexerCharError error;
+            CharError error;
 
             error.ch = string_get_char(token.string, 0);
             error.index = token.index;
@@ -304,7 +304,7 @@ void lexer_peek_number(Lexer * lexer){
             error.line = token.line;
             error.message = string_init_with_data("it seems that you have a number sign but not any numerical chars after it");
 
-            lexer_push_lexer_char_error(lexer, error);
+            error_handler_push_char_error(lexer, LexerErrorKind, error);
 
             string_free(token.string);
 
@@ -322,7 +322,7 @@ void lexer_peek_string(Lexer * lexer){
     int indexInLine = lexer->indexInLine;
     int i;
 
-    LexerCharError error;
+    CharError error;
 
     Token token;
     token.kind = STRING;
@@ -345,7 +345,7 @@ void lexer_peek_string(Lexer * lexer){
 
     if (wasCloserStringFound == false){
         /* there isn't a known non operative instruction that match the one that we know, so we raise an error */
-        token.kind = TokenError;
+        token.kind = ErrorToken;
 
         error.ch = '\"';
         error.index = index;
@@ -353,7 +353,7 @@ void lexer_peek_string(Lexer * lexer){
         error.line = line;
         error.message = string_init_with_data("no string closer was found");
 
-        lexer_push_lexer_char_error(lexer, error);
+        error_handler_push_char_error(lexer, LexerErrorKind, error);
     }
 
     add_token(lexer, token);
@@ -365,7 +365,7 @@ void lexer_peek_non_op_instruction(Lexer * lexer){
     int indexInLine = lexer->indexInLine;
     int i;
 
-    LexerTokenError error;
+    TokenError error;
 
     Token token;
     token.index = index;
@@ -389,12 +389,12 @@ void lexer_peek_non_op_instruction(Lexer * lexer){
         token.kind = EXTERN_INS;
     }else {
         /* there isn't a known non operative instruction that match the one that we know, so we raise an error */
-        token.kind = TokenError;
+        token.kind = ErrorToken;
 
         error.token = token;
         error.message = string_init_with_data("unknown non operative instruction");
 
-        lexer_push_lexer_token_error(lexer, error);
+        error_handler_push_token_error(lexer, LexerErrorKind, error);
     }
 
     add_token(lexer, token);
@@ -526,7 +526,7 @@ void lexer_lex(Lexer * lexer){
         } else if (is_char_identifier_starter(lexer->ch)){
             lexer_peek_identifier(lexer);
         }else {
-            LexerCharError error;
+            CharError error;
 
             error.ch = lexer->ch;
             error.index = lexer->index;
@@ -534,189 +534,9 @@ void lexer_lex(Lexer * lexer){
             error.line = lexer->line;
             error.message = string_init_with_data("unkonwn char");
 
-            lexer_push_lexer_char_error(lexer, error);
+            error_handler_push_char_error(lexer, LexerErrorKind, error);
 
             lexer_peek_char(lexer); /* we would continue to lex in any case, to find more lexer errors */
         }
-    }
-}
-
-void lexer_push_lexer_token_error(Lexer * lexer, LexerTokenError error){
-    LexerErrorList * toAdd = malloc(sizeof(LexerErrorList));
-    toAdd->error.tokenError = error;
-    toAdd->kind = LexerTokenErrorKind;
-    toAdd->next = NULL;
-
-    if (lexer->errorList == NULL){
-        /* we haven't added an error yet */
-        lexer->errorList = toAdd;
-    }else{
-        LexerErrorList * last = lexer->errorList;
-        while (last->next != NULL){
-            last = last->next;
-        }
-        last->next = toAdd;
-    }
-}
-
-void lexer_push_lexer_char_error(Lexer * lexer, LexerCharError error){
-    LexerErrorList * toAdd = malloc(sizeof(LexerErrorList));
-    toAdd->error.charError = error;
-    toAdd->kind = LexerCharErrorKind;
-    toAdd->next = NULL;
-
-    if (lexer->errorList == NULL){
-        /* we haven't added an error yet */
-        lexer->errorList = toAdd;
-    }else{
-        LexerErrorList * last = lexer->errorList;
-        while (last->next != NULL){
-            last = last->next;
-        }
-        last->next = toAdd;
-    }
-}
-
-void lexer_flush_lexer_error_list(Lexer * lexer){
-    LexerErrorList * current = lexer->errorList;
-    unsigned int index = 0;
-    unsigned int line = 1; /* line index */
-    unsigned int i;
-
-    while (current != NULL)
-    {
-        switch (current->kind)
-        {
-        case LexerTokenErrorKind:
-            index = 0;
-            line = 1;
-
-            /* move index to the first index in the line that the token is inside */
-            while (string_get_char(lexer->string, index) != '\0' && line != current->error.tokenError.token.line){
-                if (index != 0 && string_get_char(lexer->string, index - 1) == '\n'){
-                    line++;
-                    if (line == current->error.tokenError.token.line)
-                        break; /* we break now because we already got the wanted index so we don't want index++ to happen*/
-                }
-                index++;
-            }
-
-            /* print the line the error has occurred */
-            printf("%s:%d:%d: %sLexer Error%s: %s\n", lexer->filePath, current->error.tokenError.token.line, current->error.tokenError.token.indexInLine + 1, RED_COLOR, RESET_COLOR, current->error.tokenError.message.data);
-            printf("    %u | ", line);
-
-            while (string_get_char(lexer->string, index) != '\0' && string_get_char(lexer->string, index) != '\n'){ 
-                if (index == current->error.tokenError.token.index) printf("%s", RED_COLOR);
-                if (index == current->error.tokenError.token.index + string_length(current->error.tokenError.token.string)) printf("%s", RESET_COLOR);
-                putchar(string_get_char(lexer->string, index));
-                index++;
-            }
-            printf("%s", RESET_COLOR);
-
-            printf("\n");
-
-            /* print token highlight */
-            printf("    ");
-            
-            for (i = 0; i < countDigits(line); i++){
-                printf(" ");
-            }
-
-            printf(" | ");
-
-            for (i = 0; i < current->error.tokenError.token.indexInLine; i++){
-                printf(" ");
-            }
-
-            /* print to token highligh itself */
-            printf("%s", RED_COLOR);
-            for (i = 0; i < string_length(current->error.tokenError.token.string); i++){
-                if (i == 0) printf("^");
-                else printf("~");
-            }
-            printf("%s", RESET_COLOR);
-
-            printf("\n");
-
-            break;
-        case LexerCharErrorKind:
-            index = 0;
-            line = 1;
-
-            /* move index to the first index in the line that the char is inside */
-            while (string_get_char(lexer->string, index) != '\0' && line != current->error.charError.line){
-                if (index != 0 && string_get_char(lexer->string, index - 1) == '\n'){
-                    line++;
-                    if (line == current->error.charError.line)
-                        break; /* we break now because we already got the wanted index so we don't want index++ to happen*/
-                }
-                index++;
-            }
-            printf("%s", RESET_COLOR);
-
-            /* print the line the error has occurred */
-            printf("%s:%d:%d: %sLexer Error%s: %s\n", lexer->filePath, current->error.tokenError.token.line, current->error.tokenError.token.indexInLine + 1, RED_COLOR, RESET_COLOR, current->error.charError.message.data);
-            printf("    %u | ", line);
-            
-            while (string_get_char(lexer->string, index) != '\0' && string_get_char(lexer->string, index) != '\n'){
-                if (index == current->error.tokenError.token.index) printf("%s", RED_COLOR);
-                putchar(string_get_char(lexer->string, index));
-                if (index == current->error.tokenError.token.index) printf("%s", RESET_COLOR);
-                index++;
-            }
-
-            printf("\n");
-
-            /* print token highlight */
-            printf("    ");
-            
-            for (i = 0; i < countDigits(line); i++){
-                printf(" ");
-            }
-
-            printf(" | ");
-
-            for (i = 0; i < current->error.tokenError.token.indexInLine; i++){
-                printf(" ");
-            }
-            
-            printf("%s", RED_COLOR);
-            /* print to token highligh itself */
-            printf("^\n");
-            printf("%s", RESET_COLOR);
-
-            break;
-
-        default:
-            break;
-        }
-
-        current = current->next;
-    }
-}
-
-void lexer_free_lexer_error_list(Lexer * lexer){
-    LexerErrorList * temp;
-    LexerErrorList * current = lexer->errorList;
-    
-    while (current != NULL)
-    {
-        switch (current->kind)
-        {
-        case LexerTokenErrorKind:
-            string_free(current->error.tokenError.message);
-            break;
-        case LexerCharErrorKind:
-            string_free(current->error.charError.message);
-            break;
-
-        default:
-            break;
-        }
-
-        /* free the current error's memory */
-        temp = current;
-        current = current->next;
-        free(temp);
     }
 }
