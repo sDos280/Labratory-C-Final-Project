@@ -2,15 +2,17 @@
 
 
 void preprocessor_init(Preprocessor * preprocessor, Lexer lexer){
-    preprocessor->string = (String){};
+    preprocessor->string = lexer.string;
     preprocessor->macroList = NULL;
-    preprocessor->errorList = NULL;
+    /* preprocessor->errorHandler = (ErrorHandler){0}; */
     preprocessor->tokens = lexer.tokens;
+
+    error_handler_init(&preprocessor->errorHandler, lexer.string, lexer.filePath);
 }
 
 void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     Macro macro;
-    PreprocessorTokenError error;
+    TokenError error;
 
     String expansion;
     int expansion_start;
@@ -26,7 +28,7 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
         error.message = string_init_with_data("A (none operative) identifier wasn't found after an macro token");
         error.token = preprocessor->tokens->token;
 
-        add_error_to_preprocessor_macro_list(preprocessor, error);
+        error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
         return; /* there is truly no need to continue to look for other macroes */
     }
 
@@ -39,7 +41,7 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
         error.message = string_init_with_data("A (none operative) identifier wasn't found after an macro token");
         error.token = preprocessor->tokens->token;
 
-        add_error_to_preprocessor_macro_list(preprocessor, error);
+        error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
         return; /* there is truly no need to continue to look for other macroes */
     }
 
@@ -52,7 +54,7 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
         error.message = string_init_with_data("A new line is needed after a macro identifier");
         error.token = preprocessor->tokens->token;
 
-        add_error_to_preprocessor_macro_list(preprocessor, error);
+        error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
         return; /* there is truly no need to continue to look for other macroes*/
     }
 
@@ -79,18 +81,20 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
             wasEndMacroFound = true;
             break;
         }
+
+        preprocessor->tokens = preprocessor->tokens->next;
     }
 
     if ((wasGoodEndMacroFound == false) && (wasEndMacroFound == true)){
         error.message = string_init_with_data("Although an end of macro was found, the grammer isn't correct");
         error.token = preprocessor->tokens->token;
 
-        add_error_to_preprocessor_macro_list(preprocessor, error);
+        error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
     } else if ((wasGoodEndMacroFound == false) && (wasEndMacroFound == false)){
         error.message = string_init_with_data("No end of macro was found");
         error.token = preprocessor->tokens->token;
 
-        add_error_to_preprocessor_macro_list(preprocessor, error);
+        error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
     }
 
     macro.expansion = string_get_slice(source, expansion_start, expansion_end);
@@ -118,26 +122,9 @@ void add_macro_to_preprocessor_macro_list(Preprocessor * preprocessor, Macro mac
     }
 }
 
-void add_error_to_preprocessor_macro_list(Preprocessor * preprocessor, PreprocessorTokenError error){
-    PreprocessorTokenErrorList * toAdd = malloc(sizeof(PreprocessorTokenErrorList));
-    toAdd->error = error;
-    toAdd->next = NULL;
-
-    if (preprocessor->errorList == NULL){
-        /* we haven't added a token yet */
-        preprocessor->errorList = toAdd;
-    }else{
-        PreprocessorTokenErrorList * last = preprocessor->errorList;
-        while (last->next != NULL){
-            last = last->next;
-        }
-        last->next = toAdd;
-    }
-}
-
 void generate_macro_list(Preprocessor * preprocessor, Lexer lexer){
     String expansion;
-    PreprocessorTokenError error;
+    TokenError error;
     Macro currentMacro;
     TokenList * currentToken = lexer.tokens;
     bool wasMacroCloserFound = false;
@@ -157,7 +144,7 @@ void generate_macro_list(Preprocessor * preprocessor, Lexer lexer){
                 error.message = string_init_with_data("A (none operative) identifier wasn't found after an macro token");
                 error.token = currentToken->token;
 
-                add_error_to_preprocessor_macro_list(preprocessor, error);
+                error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
                 return; /* there is truly no need to continue to look for other macroes*/
             }
 
@@ -168,7 +155,7 @@ void generate_macro_list(Preprocessor * preprocessor, Lexer lexer){
                 error.message = string_init_with_data("A new line is needed after a macro identifier");
                 error.token = currentToken->token;
 
-                add_error_to_preprocessor_macro_list(preprocessor, error);
+                error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
                 return; /* there is truly no need to continue to look for other macroes*/
             }
 
@@ -185,7 +172,7 @@ void generate_macro_list(Preprocessor * preprocessor, Lexer lexer){
                         error.message = string_init_with_data("new line is needed after a macro ender");
                         error.token = currentToken->token;
 
-                        add_error_to_preprocessor_macro_list(preprocessor, error);
+                        error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
                         return; /* there is truly no need to continue to look for other macroes*/
                     }
 

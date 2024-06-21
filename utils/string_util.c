@@ -134,7 +134,7 @@ int string_length(String str){
 }
 
 String string_get_slice(String str, int start, int end){
-    String out;
+    String out = string_init();
     int i;
 
     for (i = start; i <= end; i++){
