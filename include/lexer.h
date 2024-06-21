@@ -41,7 +41,7 @@ typedef struct Lexer {
     char ch;   /* the current char looked at in the lexer */
     unsigned int line; /* the current line looked at in the lexer (we start counting from 1)*/
     
-    char * filePath;
+    char * filePath; /* the relative path to the file */
 
     LexerErrorList * errorList; /* the error list of the lexer (on the current source)*/
     TokenList * tokens;   /* the output token list */
