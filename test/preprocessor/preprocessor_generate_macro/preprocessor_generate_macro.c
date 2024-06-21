@@ -16,7 +16,7 @@ int main(){
     error_handler_flush_error_list(&preprocessor.errorHandler);
     
     printf("macro expansion identifier: %s\n", preprocessor.macroList->macro.identifier.string.data);
-    printf("macro expansion start:\n %s\n", preprocessor.macroList->macro.expansion.data);
+    printf("macro expansion start:\n%s\n", preprocessor.macroList->macro.expansion.data);
     printf("macro expansion end!\n");
 
     error_handler_free_error_list(&lexer.errorHandler);
