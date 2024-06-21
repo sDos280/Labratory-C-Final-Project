@@ -5,35 +5,6 @@
 #include "string_util.h"
 #include "token.h"
 
-typedef enum {
-    LexerTokenErrorKind,
-    LexerCharErrorKind
-} LexerErrorKind;
-
-typedef struct LexerTokenError {
-    Token token;  /* the token the error talks about */
-    String message;  /* the message from the caller */
-} LexerTokenError;
-
-typedef struct LexerCharError {
-    char ch;  /* the char the error talks about */
-    unsigned int index; /* the index of the char in the source file */
-    unsigned int indexInLine; /* the line index of the char in the char's line */
-    unsigned int line; /* the line of the char in the source file */
-    String message;  /* the message from the caller */
-} LexerCharError;
-
-typedef struct LexerErrorList {
-    union {
-        LexerTokenError tokenError;  /* the current error */
-        LexerCharError charError;  /* the current error */
-    } error;
-
-    LexerErrorKind kind; /* the kind of the current error */
-    
-    struct LexerErrorList *next;  /* the next error */
-} LexerErrorList;
-
 typedef struct Lexer {
     String string;      /* the input string */
     unsigned int index;          /* the current index */
@@ -43,7 +14,6 @@ typedef struct Lexer {
     
     char * filePath; /* the relative path to the file */
 
-    LexerErrorList * errorList; /* the error list of the lexer (on the current source)*/
     TokenList * tokens;   /* the output token list */
 } Lexer;
 
@@ -123,27 +93,5 @@ void lexer_peek_end_of_file(Lexer *lexer);
  * Performs a full lexer pass on the source code.
  */
 void lexer_lex(Lexer *lexer);
-
-/**
- * Pushes a new lexer token error to the end of the lexer's error list.
- * @param error The lexer token error to be added.
- */
-void lexer_push_lexer_token_error(Lexer *lexer, LexerTokenError error);
-
-/**
- * Pushes a new lexer char error to the end of the lexer's error list.
- * @param error The lexer char error to be added.
- */
-void lexer_push_lexer_char_error(Lexer *lexer, LexerCharError error);
-
-/**
- * Flushes (outputs) the lexer's error list to the user.
- */
-void lexer_flush_lexer_error_list(Lexer *lexer);
-
-/**
- * Frees the memory of the error list.
- */
-void lexer_free_lexer_error_list(Lexer *lexer);
 
 #endif /* LABRATORY_C_FINAL_PROJECT_LEXER_H */
