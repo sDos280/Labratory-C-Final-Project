@@ -10,8 +10,7 @@ typedef enum {
 } ErrorKind;
 
 typedef enum {
-    TokenErrorKind,
-    CharErrorKind,
+    LexerErrorKind,
     PreprocessorErrorKind
 } ErrorCaller;
 
@@ -42,16 +41,18 @@ typedef struct ErrorList {
 
 
 typedef struct ErrorHandler {
-    String source;  /* the source file string the errors are in */
-    LexerErrorList * errorList;  /* the error list */
+    String string;  /* the source file string the errors are in */
+    char * filePath; /* the relative path to the file */
+    ErrorList * errorList;  /* the error list */
 } ErrorHandler;
 
 /**
  * Initializes the error handler with the provided source string.
  * @param handler The error hadler.
- * @param source The source file string.
+ * @param string The source file string.
+ * @param filePath The relative path to the string.
  */
-void error_handler_init(ErrorHandler * handler, String source);
+void error_handler_init(ErrorHandler * handler, String string, char * filePath);
 
 /**
  * Pushes a new token error to the end of the error handler's error list.
