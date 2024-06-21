@@ -39,7 +39,7 @@ typedef enum{
 
     /*IN_MACRO,     a token that represents the inside data of a macro */
     
-    TokenError, /* an error has raised in this token*/ 
+    ErrorToken, /* an error has raised in this token */ 
 
     EOL,        /* end of line */
     EOFT        /* end of file token (end of token stream) \0 */
