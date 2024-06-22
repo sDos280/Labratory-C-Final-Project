@@ -104,6 +104,16 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     add_macro_to_preprocessor_macro_list(preprocessor, macro);
 }
 
+void generate_macro_list(Preprocessor * preprocessor, String source){
+    while (preprocessor->tokens->token.kind != EOFT){
+        if (preprocessor->tokens->token.kind == MACR){
+            preprocessor_generate_macro(preprocessor, source);
+        }
+
+        /* advance to the next token */
+        preprocessor->tokens = preprocessor->tokens->next;
+    }
+}
 
 void add_macro_to_preprocessor_macro_list(Preprocessor * preprocessor, Macro macro){
     MacroList * toAdd = malloc(sizeof(MacroList));
@@ -120,15 +130,4 @@ void add_macro_to_preprocessor_macro_list(Preprocessor * preprocessor, Macro mac
         }
         last->next = toAdd;
     }
-}
-
-void generate_macro_list(Preprocessor * preprocessor, Lexer lexer){
-    /*while (currentToken->token.kind != EOFT){
-        if (currentToken->token.kind == MACR){
-            preprocessor_generate_macro(preprocessor)
-        }
-
-        /* advance to the next token 
-        currentToken = currentToken->next;
-    }*/
 }
