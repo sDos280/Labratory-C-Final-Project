@@ -179,4 +179,12 @@ void string_replace_pattern(String * str, String pattern, String replaceWith){
             string_add_char(&strOut, string_get_char(*str, i));
         }
     }
+
+    /* free the string past buffer */
+    free(str->data);
+
+    /* make a shadow copy */
+    str->data = strOut.data;
+    str->index = strOut.index;
+    str->size = strOut.size;
 }
