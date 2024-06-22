@@ -62,4 +62,11 @@ void generate_macro_list(Preprocessor * preprocessor, String source);
 */
 void preprocessor_add_macro_to_macro_list(Preprocessor * preprocessor, Macro macro);
 
+/**
+ * Prints in a nice way the preprocessor's macro list
+ *
+ * @param preprocessor the preprocessor.
+*/
+void preprocessor_print_macro_list(Preprocessor * preprocessor);
+
 #endif /* LABRATORY_C_FINAL_PREPROCESSOR */

@@ -14,7 +14,6 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     Macro macro;
     TokenError error;
 
-    String expansion;
     int expansion_start;
     int expansion_end;
     
@@ -129,5 +128,17 @@ void preprocessor_add_macro_to_macro_list(Preprocessor * preprocessor, Macro mac
             last = last->next;
         }
         last->next = toAdd;
+    }
+}
+
+void preprocessor_print_macro_list(Preprocessor * preprocessor){
+    MacroList * current = preprocessor->macroList;
+
+    while (current != NULL){
+        printf("macro expansion identifier: %s\n", current->macro.identifier.string.data);
+        printf("macro expansion start:\n%s\n", current->macro.expansion.data);
+        printf("macro expansion end!\n");
+
+        current = current->next;
     }
 }
