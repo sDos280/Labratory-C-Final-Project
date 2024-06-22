@@ -60,6 +60,6 @@ void generate_macro_list(Preprocessor * preprocessor, String source);
  * @param preprocessor the preprocessor.
  * @param macro the macro to be added.
 */
-void add_macro_to_preprocessor_macro_list(Preprocessor * preprocessor, Macro macro);
+void preprocessor_add_macro_to_macro_list(Preprocessor * preprocessor, Macro macro);
 
 #endif /* LABRATORY_C_FINAL_PREPROCESSOR */

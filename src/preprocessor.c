@@ -101,7 +101,7 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     macro.start = start;
     macro.end = end;
 
-    add_macro_to_preprocessor_macro_list(preprocessor, macro);
+    preprocessor_add_macro_to_macro_list(preprocessor, macro);
 }
 
 void generate_macro_list(Preprocessor * preprocessor, String source){
@@ -115,7 +115,7 @@ void generate_macro_list(Preprocessor * preprocessor, String source){
     }
 }
 
-void add_macro_to_preprocessor_macro_list(Preprocessor * preprocessor, Macro macro){
+void preprocessor_add_macro_to_macro_list(Preprocessor * preprocessor, Macro macro){
     MacroList * toAdd = malloc(sizeof(MacroList));
     toAdd->macro = macro;
     toAdd->next = NULL;
