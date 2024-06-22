@@ -6,7 +6,7 @@
 int main(){
     Lexer lexer;
     Preprocessor preprocessor;
-    lexer_init(&lexer, "macr hello   \nmain: dec x\ninc *r1\n  endmacr   \t\n           macr hello2   \n      x: .data 23\nendmacr");
+    lexer_init(&lexer, "macr hello   \nmain: dec x\ninc *r1\n  endmacr   \t\n           macr hello2   \n      x: .data 23\nendmacr\n");
     lexer_lex(&lexer);
     lexer_print_token_list(&lexer);
     error_handler_flush_error_list(&lexer.errorHandler);
