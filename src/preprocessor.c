@@ -20,6 +20,7 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     int start;
     int end;
 
+    MacroList * macroList;
     TokenList * copy;
 
     bool wasGoodEndMacroFound = false;
@@ -47,6 +48,19 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     }
 
     macro.identifier = preprocessor->tokens->token;
+
+    macroList = preprocessor->macroList;
+
+    while (macroList != NULL){
+        if (string_equals(macro.identifier.string, macroList->macro.identifier.string)){
+            error.message = string_init_with_data("That identifer was already used in another macro, please change the macro identifier name");
+            error.token = macro.identifier;
+
+            error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
+        }
+
+        macroList = macroList->next;
+    }
 
     /* move over the IDENTIFIER token */
     preprocessor->tokens = preprocessor->tokens->next;
