@@ -20,6 +20,8 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     int start;
     int end;
 
+    TokenList * copy;
+
     bool wasGoodEndMacroFound = false;
     bool wasEndMacroFound = false;
 
@@ -62,26 +64,41 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     /* move over the EOL token */
     preprocessor->tokens = preprocessor->tokens->next;
 
+    copy = preprocessor->tokens;
+
     /* look for '\n' endmacr '\n' */
-    while (preprocessor->tokens->token.kind != EOFT && 
-           preprocessor->tokens->next->token.kind != EOFT &&
-           preprocessor->tokens->next->next->token.kind != EOFT){
+    while (copy->token.kind != EOFT && 
+           copy->next->token.kind != EOFT &&
+           copy->next->next->token.kind != EOFT){
 
-        if (preprocessor->tokens->token.kind == EOL && 
-            preprocessor->tokens->next->token.kind == ENDMACR &&
-            preprocessor->tokens->next->next->token.kind == EOL) {
+        if (copy->token.kind == EOL && 
+            copy->next->token.kind == ENDMACR &&
+            copy->next->next->token.kind == EOL) {
 
-            expansion_end = preprocessor->tokens->token.index;
-            end = preprocessor->tokens->next->next->token.index;
+            expansion_end = copy->token.index;
+            end = copy->next->next->token.index;
             wasGoodEndMacroFound = true;
             break;
         } 
-        else if (preprocessor->tokens->token.kind == ENDMACR){
+        else if (copy->token.kind == ENDMACR){
             wasEndMacroFound = true;
             break;
         }
 
-        preprocessor->tokens = preprocessor->tokens->next;
+        copy = copy->next;
+    }
+
+    if (wasGoodEndMacroFound == true){
+        preprocessor->tokens = copy;
+    } else {
+        while (preprocessor->tokens->token.kind != EOFT) {
+            if (preprocessor->tokens->token.kind == ENDMACR){
+                wasEndMacroFound = true;
+                break;
+            }
+
+            preprocessor->tokens = preprocessor->tokens->next;
+        }
     }
 
     if ((wasGoodEndMacroFound == false) && (wasEndMacroFound == true)){
