@@ -2,7 +2,7 @@
 
 
 void preprocessor_init(Preprocessor * preprocessor, Lexer lexer){
-    preprocessor->string = lexer.string;
+    preprocessor->string = string_init();
     preprocessor->macroList = NULL;
     /* preprocessor->errorHandler = (ErrorHandler){0}; */
     preprocessor->tokens = lexer.tokens;
@@ -123,65 +123,12 @@ void add_macro_to_preprocessor_macro_list(Preprocessor * preprocessor, Macro mac
 }
 
 void generate_macro_list(Preprocessor * preprocessor, Lexer lexer){
-    String expansion;
-    TokenError error;
-    Macro currentMacro;
-    TokenList * currentToken = lexer.tokens;
-    bool wasMacroCloserFound = false;
-    int expansion_start;
-    int expansion_end;
-    int start;
-    int end;
-
-    while (currentToken->token.kind != EOFT){
+    /*while (currentToken->token.kind != EOFT){
         if (currentToken->token.kind == MACR){
-            start = currentToken->token.index;
-
-            /* move over the MACR token */
-            currentToken = currentToken->next;
-
-            if (currentToken->token.kind != IDENTIFIER){
-                error.message = string_init_with_data("A (none operative) identifier wasn't found after an macro token");
-                error.token = currentToken->token;
-
-                error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
-                return; /* there is truly no need to continue to look for other macroes*/
-            }
-
-            /* move over the IDENTIFIER token */
-            currentToken = currentToken->next;
-
-            if (currentToken->token.kind != EOL){
-                error.message = string_init_with_data("A new line is needed after a macro identifier");
-                error.token = currentToken->token;
-
-                error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
-                return; /* there is truly no need to continue to look for other macroes*/
-            }
-
-            expansion_start = currentToken->token.index + 1;
-
-            /* move over the EOL token */
-            currentToken = currentToken->next;
-
-            while (currentToken->token.kind != EOFT){
-                if (currentToken->token.kind == ENDMACR){
-                    end = currentToken->token.index + string_length(currentToken->token.string);
-                    
-                    if (currentToken->token.kind != EOL){
-                        error.message = string_init_with_data("new line is needed after a macro ender");
-                        error.token = currentToken->token;
-
-                        error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
-                        return; /* there is truly no need to continue to look for other macroes*/
-                    }
-
-                    break; /* every this has been done current so to look for more macroes*/
-                }
-            }
+            preprocessor_generate_macro(preprocessor)
         }
 
-        /* advance to the next token */
+        /* advance to the next token 
         currentToken = currentToken->next;
-    }
+    }*/
 }
