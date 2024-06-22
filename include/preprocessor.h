@@ -52,7 +52,7 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source);
  * @param source the srouce file as string.
  * @return a pointer to a memory allocated MacroList.
 */
-void generate_macro_list(Preprocessor * preprocessor, String source);
+void preprocessor_generate_macro_list(Preprocessor * preprocessor, String source);
 
 /**
  * Add a macro to the end of the preprocessor macro list

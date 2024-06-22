@@ -103,7 +103,7 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     preprocessor_add_macro_to_macro_list(preprocessor, macro);
 }
 
-void generate_macro_list(Preprocessor * preprocessor, String source){
+void preprocessor_generate_macro_list(Preprocessor * preprocessor, String source){
     while (preprocessor->tokens->token.kind != EOFT){
         if (preprocessor->tokens->token.kind == MACR){
             preprocessor_generate_macro(preprocessor, source);
