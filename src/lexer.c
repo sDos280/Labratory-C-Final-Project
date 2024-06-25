@@ -213,7 +213,7 @@ void lexer_peek_comment(Lexer * lexer){
         lexer_peek_char(lexer);
     }
     
-    add_token(lexer, token);
+    /* add_token(lexer, token); */ /* there is need to add a comment token... */
 }
 
 void lexer_peek_next_line(Lexer * lexer){
