@@ -26,6 +26,12 @@ typedef struct Lexer {
 void lexer_init_char_pointer(Lexer *lexer, char *sourceString);
 
 /**
+ * Initializes the lexer with the file.
+ * @param filePath the file path.
+ */
+void lexer_init_file(Lexer *lexer, char * filePath);
+
+/**
  * Frees the resources used by the lexer.
  * After calling this function, the lexer must not be used before calling lexer_init again.
  */

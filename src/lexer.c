@@ -39,6 +39,42 @@ void lexer_init_char_pointer(Lexer * lexer, char * sourceString){
     string_add_char(&lexer->string, EOF);
 }
 
+void lexer_init_file(Lexer *lexer, char * filePath){
+    FILE *file;
+    char ch;
+
+    lexer->string = string_init();
+    lexer->index = 0;
+    lexer->indexInLine = 0;
+    lexer->ch = string_get_char(lexer->string, lexer->index);
+    lexer->line = 1;
+
+    lexer->filePath = filePath;
+
+    /* lexer->errorHandler = (ErrorHandler){0}; */
+    lexer->tokens = NULL;
+
+    /* initialize lexer error handler */
+    error_handler_init(&lexer->errorHandler, lexer->string, lexer->filePath);
+
+    /* add EOF to the end of the buffer so it would follow the convention */
+    string_add_char(&lexer->string, EOF);
+
+    /* Open the file for reading */
+    file = fopen(filePath, "r");
+    if (file == NULL) {
+        printf("%sLexer Error:%s couldn't open \"%s\".\n", RED_COLOR, RESET_COLOR, filePath);
+    }
+
+    while ((ch = fgetc(file)) != EOF) {
+        string_add_char(&lexer->string, ch);
+    }
+
+    string_add_char(&lexer->string, ch); /* add the EOF char */
+
+    fclose(file);
+}
+
 void lexer_free(Lexer * lexer){
     /* reset the lexer, free the token list (lexer->tokens) and string, and other field */
     
