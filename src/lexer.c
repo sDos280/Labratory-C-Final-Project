@@ -59,6 +59,9 @@ void lexer_free(Lexer * lexer){
     /* reset other fields */
     lexer->index = 0;
     lexer->line = 1;
+
+    /* free error handler */
+    error_handler_free_error_list(&lexer->errorHandler);
 }
 
 void lexer_print_token_list(Lexer * lexer){
