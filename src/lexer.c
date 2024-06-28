@@ -21,13 +21,15 @@
 
 
 void lexer_init_char_pointer(Lexer * lexer, char * sourceString){
+    char * filePathCurated = calloc(strlen("from_string.as") + 1, sizeof(char));
+
     lexer->string = string_init_with_data(sourceString);
     lexer->index = 0;
     lexer->indexInLine = 0;
     lexer->ch = string_get_char(lexer->string, lexer->index);
     lexer->line = 1;
 
-    lexer->filePath = "from_string.txt";
+    lexer->filePath = filePathCurated;
 
     /* lexer->errorHandler = (ErrorHandler){0}; */
     lexer->tokens = NULL;
@@ -43,13 +45,13 @@ void lexer_init_file(Lexer *lexer, char * filePath){
     FILE *file;
     char ch;
 
-    lexer->string = string_init();
-    lexer->index = 0;
-    lexer->indexInLine = 0;
-    lexer->ch = string_get_char(lexer->string, lexer->index);
-    lexer->line = 1;
+    /* curate the file path string */
+    char * filePathCurated = calloc((strlen(filePath) + 3) + 1, sizeof(char));
+    strcpy(filePathCurated, filePath);
+    strcat(filePathCurated, ".as");
 
-    lexer->filePath = filePath;
+    lexer->string = string_init();
+    lexer->filePath = filePathCurated;
 
     /* lexer->errorHandler = (ErrorHandler){0}; */
     lexer->tokens = NULL;
@@ -57,13 +59,10 @@ void lexer_init_file(Lexer *lexer, char * filePath){
     /* initialize lexer error handler */
     error_handler_init(&lexer->errorHandler, lexer->string, lexer->filePath);
 
-    /* add EOF to the end of the buffer so it would follow the convention */
-    string_add_char(&lexer->string, EOF);
-
     /* Open the file for reading */
-    file = fopen(filePath, "r");
+    file = fopen(lexer->filePath, "r");
     if (file == NULL) {
-        printf("%sLexer Error:%s couldn't open \"%s\".\n", RED_COLOR, RESET_COLOR, filePath);
+        printf("%sLexer Error:%s couldn't open \"%s\".\n", RED_COLOR, RESET_COLOR, lexer->filePath);
     }
 
     while ((ch = fgetc(file)) != EOF) {
@@ -71,6 +70,11 @@ void lexer_init_file(Lexer *lexer, char * filePath){
     }
 
     string_add_char(&lexer->string, ch); /* add the EOF char */
+
+    lexer->index = 0;
+    lexer->indexInLine = 0;
+    lexer->ch = string_get_char(lexer->string, lexer->index);
+    lexer->line = 1;
 
     fclose(file);
 }
@@ -89,8 +93,9 @@ void lexer_free(Lexer * lexer){
         free(temp);
     }
     
-    /* free the source string*/
+    /* free the source string and file path char pointer*/
     string_free(lexer->string);
+    free(lexer->filePath);
 
     /* reset other fields */
     lexer->index = 0;
