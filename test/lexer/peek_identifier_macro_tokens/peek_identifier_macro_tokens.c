@@ -4,7 +4,7 @@
 
 int main(){
     Lexer lexer;
-    lexer_init(&lexer, "macr\nendmacr\n");
+    lexer_init_char_pointer(&lexer, "macr\nendmacr\n");
     lexer_peek_identifier(&lexer);
     lexer_peek_next_line(&lexer);
     lexer_peek_identifier(&lexer);

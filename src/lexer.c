@@ -20,7 +20,7 @@
 #define RESET_COLOR "\x1B[0m"
 
 
-void lexer_init(Lexer * lexer, char * sourceString){
+void lexer_init_char_pointer(Lexer * lexer, char * sourceString){
     lexer->string = string_init_with_data(sourceString);
     lexer->index = 0;
     lexer->indexInLine = 0;

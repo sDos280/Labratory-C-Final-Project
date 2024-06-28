@@ -4,7 +4,7 @@
 
 int main(){
     Lexer lexer;
-    lexer_init(&lexer, "\"hello\"\"world\"\"\"\"");
+    lexer_init_char_pointer(&lexer, "\"hello\"\"world\"\"\"\"");
     lexer_peek_string(&lexer);
     lexer_peek_string(&lexer);
     lexer_peek_string(&lexer);

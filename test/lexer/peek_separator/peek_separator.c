@@ -4,7 +4,7 @@
 
 int main(){
     Lexer lexer;
-    lexer_init(&lexer, "*,:##**,,");
+    lexer_init_char_pointer(&lexer, "*,:##**,,");
     lexer_peek_separator(&lexer);
     lexer_peek_separator(&lexer);
     lexer_peek_separator(&lexer);

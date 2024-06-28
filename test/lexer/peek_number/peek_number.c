@@ -4,7 +4,7 @@
 
 int main(){
     Lexer lexer;
-    lexer_init(&lexer, "-556\n252\n+6546");
+    lexer_init_char_pointer(&lexer, "-556\n252\n+6546");
     lexer_peek_number(&lexer);
     lexer_peek_next_line(&lexer);
     lexer_peek_number(&lexer);

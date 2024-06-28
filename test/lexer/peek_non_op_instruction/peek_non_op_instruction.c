@@ -4,7 +4,7 @@
 
 int main(){
     Lexer lexer;
-    lexer_init(&lexer, ".string.data.entry.string");
+    lexer_init_char_pointer(&lexer, ".string.data.entry.string");
     lexer_peek_non_op_instruction(&lexer);
     lexer_peek_non_op_instruction(&lexer);
     lexer_peek_non_op_instruction(&lexer);

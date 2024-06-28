@@ -4,7 +4,7 @@
 
 int main(){
     Lexer lexer;
-    lexer_init(&lexer, "x: .data 23\nmain: dec x\ninc *r1\n move *r1, *r2");
+    lexer_init_char_pointer(&lexer, "x: .data 23\nmain: dec x\ninc *r1\n move *r1, *r2");
     lexer_lex(&lexer);
     lexer_print_token_list(&lexer);
 

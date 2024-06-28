@@ -4,7 +4,7 @@
 
 int main(){
     Lexer lexer;
-    lexer_init(&lexer, "mov\ncmp\nadd\nsub\nlea\nclr\nnot\ninc\ndec\njmp\nbne\nred\nprn\njsr\nrts\nstop\n");
+    lexer_init_char_pointer(&lexer, "mov\ncmp\nadd\nsub\nlea\nclr\nnot\ninc\ndec\njmp\nbne\nred\nprn\njsr\nrts\nstop\n");
     lexer_peek_identifier(&lexer);
     lexer_peek_next_line(&lexer);
     lexer_peek_identifier(&lexer);

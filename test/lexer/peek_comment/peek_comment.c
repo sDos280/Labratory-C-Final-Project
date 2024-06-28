@@ -4,7 +4,7 @@
 
 int main(){
     Lexer lexer;
-    lexer_init(&lexer, "; adasdfasdf asdf \n; hello world \n\n\n");
+    lexer_init_char_pointer(&lexer, "; adasdfasdf asdf \n; hello world \n\n\n");
     lexer_peek_comment(&lexer);
     lexer_peek_next_line(&lexer);
     lexer_peek_comment(&lexer);

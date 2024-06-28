@@ -23,7 +23,7 @@ typedef struct Lexer {
  * Initializes the lexer with the provided source string.
  * @param sourceString The source string to be lexed.
  */
-void lexer_init(Lexer *lexer, char *sourceString);
+void lexer_init_char_pointer(Lexer *lexer, char *sourceString);
 
 /**
  * Frees the resources used by the lexer.

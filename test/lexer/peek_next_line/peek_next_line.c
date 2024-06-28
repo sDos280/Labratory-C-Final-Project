@@ -4,7 +4,7 @@
 
 int main(){
     Lexer lexer;
-    lexer_init(&lexer, "\n\n\n\n");
+    lexer_init_char_pointer(&lexer, "\n\n\n\n");
     lexer_peek_next_line(&lexer);
     lexer_peek_next_line(&lexer);
     lexer_peek_next_line(&lexer);

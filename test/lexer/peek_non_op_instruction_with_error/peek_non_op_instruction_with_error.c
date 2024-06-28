@@ -4,7 +4,7 @@
 
 int main(){
     Lexer lexer;
-    lexer_init(&lexer, ".string\n.dataError\n.entry\n.string\n");
+    lexer_init_char_pointer(&lexer, ".string\n.dataError\n.entry\n.string\n");
     lexer_peek_non_op_instruction(&lexer);
     lexer_peek_next_line(&lexer);
     lexer_peek_non_op_instruction(&lexer);
