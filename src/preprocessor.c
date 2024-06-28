@@ -10,6 +10,12 @@ void preprocessor_init(Preprocessor * preprocessor, Lexer lexer){
     error_handler_init(&preprocessor->errorHandler, lexer.string, lexer.filePath);
 }
 
+void preprocessor_free(Preprocessor * preprocessor){
+    string_free(preprocessor->string);
+
+    error_handler_free_error_list(&preprocessor->errorHandler);
+}
+
 void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     Macro macro;
     TokenError error;
@@ -135,7 +141,7 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
 }
 
 void preprocessor_generate_macro_list(Preprocessor * preprocessor, String source){
-    while (preprocessor->tokens->token.kind != EOFT){
+    while (preprocessor->tokens != NULL && preprocessor->tokens->token.kind != EOFT){
         if (preprocessor->tokens->token.kind == MACR){
             preprocessor_generate_macro(preprocessor, source);
         }

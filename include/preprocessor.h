@@ -37,6 +37,11 @@ typedef struct Preprocessor {
 void preprocessor_init(Preprocessor * preprocessor, Lexer lexer);
 
 /**
+ * Frees the preprocesso memory
+*/
+void preprocessor_free(Preprocessor * preprocessor);
+
+/**
  * Generate a macro from the current preprocessor looked at token.
  *
  * @param preprocessor the preprocessor.
