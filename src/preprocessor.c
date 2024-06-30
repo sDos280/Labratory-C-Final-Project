@@ -11,9 +11,23 @@ void preprocessor_init(Preprocessor * preprocessor, Lexer lexer){
 }
 
 void preprocessor_free(Preprocessor * preprocessor){
+    MacroList * current = preprocessor->macroList;
     string_free(preprocessor->string);
 
     error_handler_free_error_list(&preprocessor->errorHandler);
+
+    /* free the macro list */
+    while (preprocessor->macroList != NULL){
+        /* free the macro expansion */
+        string_free(current->macro.expansion);
+
+        /* free the current macro */
+        free(current);
+
+        /* move over to the next macro */
+        preprocessor->macroList = preprocessor->macroList->next;
+        current = preprocessor->macroList;
+    }
 }
 
 void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
@@ -57,6 +71,7 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
 
     macroList = preprocessor->macroList;
 
+    /* check if the macro identifier is already used in another macro */
     while (macroList != NULL){
         if (string_equals(macro.identifier.string, macroList->macro.identifier.string)){
             error.message = string_init_with_data("That identifer was already used in another macro, please change the macro identifier name");
@@ -89,11 +104,11 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     /* look for '\n' endmacr '\n' */
     while ((copy != NULL && copy->token.kind != EOFT) && 
            (copy->next != NULL && copy->next->token.kind != EOFT) &&
-           (copy->next->next != NULL && copy->next->next->token.kind != EOFT)){
+           (copy->next->next != NULL)){
 
         if (copy->token.kind == EOL && 
             copy->next->token.kind == ENDMACR &&
-            copy->next->next->token.kind == EOL) {
+            (copy->next->next->token.kind == EOL || copy->next->next->token.kind == EOFT)) {
 
             expansion_end = copy->token.index;
             end = copy->next->next->token.index;
