@@ -88,8 +88,8 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
 
     /* look for '\n' endmacr '\n' */
     while ((copy != NULL && copy->token.kind != EOFT) && 
-           (copy->next != NULL && copy->next->token.kind) != EOFT &&
-           (copy->next->next != NULL && copy->next->next->token.kind) != EOFT){
+           (copy->next != NULL && copy->next->token.kind != EOFT) &&
+           (copy->next->next != NULL && copy->next->next->token.kind != EOFT)){
 
         if (copy->token.kind == EOL && 
             copy->next->token.kind == ENDMACR &&
