@@ -156,6 +156,8 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
 }
 
 void preprocessor_generate_macro_list(Preprocessor * preprocessor, String source){
+    TokenList * copy = preprocessor->tokens;
+
     while (preprocessor->tokens != NULL && preprocessor->tokens->token.kind != EOFT){
         if (preprocessor->tokens->token.kind == MACR){
             preprocessor_generate_macro(preprocessor, source);
@@ -164,6 +166,8 @@ void preprocessor_generate_macro_list(Preprocessor * preprocessor, String source
         /* advance to the next token */
         preprocessor->tokens = preprocessor->tokens->next;
     }
+
+    preprocessor->tokens = copy; /* make sure the preprocessor will still point to the tokens */
 }
 
 void preprocessor_add_macro_to_macro_list(Preprocessor * preprocessor, Macro macro){
