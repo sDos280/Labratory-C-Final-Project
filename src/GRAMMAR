@@ -1,0 +1,29 @@
+number_list:
+    : NUMBER
+    | number_list ',' NUMBER
+    ;
+
+number_list_end:
+    : number_list '\n'
+    ;
+
+data_guidance_sentece:
+    : ".data" number_list_end
+
+string_guidance_sentece:
+    : ".string" '\"' ... '\"' '\n'
+
+entry_guidance_sentece:
+    : ".entry" IDENTIFIER '\n'
+
+extern_guidance_sentece:
+    : ".extern" IDENTIFIER '\n'
+
+guidance_sentece:
+    : data_guidance_sentece
+    : string_guidance_sentece
+    : entry_guidance_sentece
+    : extern_guidance_sentece
+    : IDENTIFIER ':' data_guidance_sentece
+    : IDENTIFIER ':' string_guidance_sentece
+    ;
