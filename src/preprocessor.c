@@ -1,5 +1,22 @@
 #include "../include/preprocessor.h"
 
+#define RED_COLOR   "\x1B[1;91m"
+#define GRN_COLOR   "\x1B[32m"
+#define YEL_COLOR   "\x1B[33m"
+#define BLU_COLOR   "\x1B[34m"
+#define MAG_COLOR   "\x1B[35m"
+#define CYN_COLOR   "\x1B[36m"
+#define WHT_COLOR   "\x1B[37m"
+#define RESET_COLOR "\x1B[0m"
+
+static void writeDataToFile(FILE *file, String data) {
+    int i = 0;
+
+    while (!(string_get_char(data, i) == EOF || string_get_char(data, i) == '\0')) {
+        fputc(string_get_char(data, i), file);
+        i++;
+    }
+}
 
 void preprocessor_init(Preprocessor * preprocessor, Lexer lexer){
     preprocessor->string = string_init();
@@ -251,4 +268,30 @@ void preprocessor_preprocess_to_source(Preprocessor * preprocessor, String sourc
             i++;
         }
     }
+}
+
+void preprocessor_preprocess(Preprocessor * preprocessor, String source, char * filePath){
+    FILE *file;
+
+    /* curate the file path string */
+    char * filePathCurated = calloc((strlen(filePath) + 3) + 1, sizeof(char));
+    strcpy(filePathCurated, filePath);
+    strcat(filePathCurated, ".am");
+    
+    preprocessor_generate_macro_list(preprocessor, source);
+
+    /* make the preprocess part only if there were on errors */
+    if (preprocessor->errorHandler.errorList != NULL) return;
+
+    preprocessor_preprocess_to_source(preprocessor, source);
+
+    file = fopen(filePathCurated, "w");
+    if (file == NULL) {
+        printf("%sPreprocessor Error:%s couldn't open \"%s\".\n", RED_COLOR, RESET_COLOR, filePathCurated);
+    }
+
+    writeDataToFile(file, preprocessor->string);
+
+    fclose(file);
+    free(filePathCurated);
 }

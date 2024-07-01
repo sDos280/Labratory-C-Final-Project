@@ -82,4 +82,13 @@ void preprocessor_print_macro_list(Preprocessor * preprocessor);
 */
 void preprocessor_preprocess_to_source(Preprocessor * preprocessor, String source);
 
+/**
+ * Make a preprocess on the source string
+ *
+ * @param preprocessor the preprocessor.
+ * @param source the srouce file as string.
+ * @param filePath the file path.
+*/
+void preprocessor_preprocess(Preprocessor * preprocessor, String source, char * filePath);
+
 #endif /* LABRATORY_C_FINAL_PREPROCESSOR */
