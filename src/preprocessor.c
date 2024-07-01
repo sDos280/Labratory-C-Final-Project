@@ -198,3 +198,57 @@ void preprocessor_print_macro_list(Preprocessor * preprocessor){
         current = current->next;
     }
 }
+
+void preprocessor_preprocess_to_source(Preprocessor * preprocessor, String source){
+    bool isTokenMacroIdentifier = false;
+    MacroList * macroListCopy = preprocessor->macroList;
+    MacroList * currentMacro = preprocessor->macroList;
+    TokenList * currentToken = preprocessor->tokens;
+    unsigned int i = 0; /* the current char index */
+
+    for (i = 0; i < string_length(source);){
+        if (currentMacro != NULL && i >= currentMacro->macro.start && i <= currentMacro->macro.end){
+            /* check if the current index is inside the current macro */
+
+            /* move the currentToken to the first token after the macro */
+            while (currentToken != NULL && currentToken->token.index <= currentMacro->macro.end) currentToken = currentToken->next;
+
+            /* set the current char index to the char after the macro end */
+            i = currentMacro->macro.end + 1;
+            currentMacro = currentMacro->next;
+        } else if (currentToken != NULL && i >= currentToken->token.index && i <= currentToken->token.index + string_length(currentToken->token.string) - 1){
+            /* check if the current index is inside the current tooken */
+
+            macroListCopy = preprocessor->macroList;
+            isTokenMacroIdentifier = false;
+
+            /* check if the identifier is a macro identifier */
+            while (macroListCopy != NULL){
+                if (string_equals(macroListCopy->macro.identifier.string, currentToken->token.string)) {
+                    isTokenMacroIdentifier = true;
+                    break; /* break so we save the macro identifier match */
+                }
+
+                macroListCopy = macroListCopy->next;
+            }
+
+            if (isTokenMacroIdentifier == true){
+                string_add_string(&preprocessor->string, macroListCopy->macro.expansion);
+            }else {
+                string_add_string(&preprocessor->string, currentToken->token.string);
+            }
+            
+            /* set the current char index to the char after the current char */
+            i = currentToken->token.index + string_length(currentToken->token.string);
+            currentToken = currentToken->next;
+            /* check if the token after the macro identifier there is an EOL, if there is we wouldn't add it */
+            if (isTokenMacroIdentifier == true && currentToken != NULL && currentToken->token.kind == EOL){
+                currentToken = currentToken->next;
+                i++;
+            }
+        } else {
+            string_add_char(&preprocessor->string, string_get_char(source, i));
+            i++;
+        }
+    }
+}

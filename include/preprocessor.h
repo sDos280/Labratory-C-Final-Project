@@ -74,4 +74,12 @@ void preprocessor_add_macro_to_macro_list(Preprocessor * preprocessor, Macro mac
 */
 void preprocessor_print_macro_list(Preprocessor * preprocessor);
 
+/**
+ * Generate the output string of the after the preprocess pipeline
+ *
+ * @param preprocessor the preprocessor.
+ * @param source the srouce file as string.
+*/
+void preprocessor_preprocess_to_source(Preprocessor * preprocessor, String source);
+
 #endif /* LABRATORY_C_FINAL_PREPROCESSOR */
