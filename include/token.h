@@ -58,4 +58,9 @@ typedef struct TokenList{
     struct TokenList * next;  /* the next token */
 }TokenList;
 
+typedef struct TokenListRefrence {
+    Token * token; /* the current token */
+    struct TokenListRefrence * next; /* the next token */
+}TokenListRefrence;
+
 #endif /*LABRATORY_C_FINAL_PROJECT_TOKEN_H*/
