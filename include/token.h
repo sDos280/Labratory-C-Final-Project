@@ -58,7 +58,7 @@ typedef struct TokenList{
     struct TokenList * next;  /* the next token */
 }TokenList;
 
-typedef struct TokenRefrenceList {
+typedef struct TokenListRefrence {
     Token * token; /* the current token */
     struct TokenRefrenceList * next; /* the next token */
 }TokenListRefrence;
