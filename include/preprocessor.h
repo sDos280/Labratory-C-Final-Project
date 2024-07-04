@@ -29,7 +29,7 @@ typedef struct Preprocessor {
 
 
 /**
- * Initializes the preprocesso
+ * Initializes the preprocessor
  *
  * @param preprocessor the preprocessor.
  * @param lexer the lexer.

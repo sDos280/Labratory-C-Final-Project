@@ -2,6 +2,7 @@
 #ifndef LABRATORY_C_FINAL_PROJECT_NODE
 #define LABRATORY_C_FINAL_PROJECT_NODE
 
+#include "error_handler.h"
 #include "token.h"
 
 typedef enum NodeKind {
@@ -78,6 +79,7 @@ typedef struct TranslationUnit {
     LabalNodeList * instructionLabalList; /* the instructions labal list */
     LabalNodeList * guidanceLabalList; /* the guidance labal list */
 
+    ErrorHandler errorHandler; /* the error handler of the translation unit */
     TokenList * tokens; /* the token list refrence from the lexer */
 }TranslationUnit;
 
