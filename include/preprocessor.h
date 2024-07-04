@@ -24,7 +24,7 @@ typedef struct Preprocessor {
     MacroList * macroList; /* the macroList of the preprocessor */
 
     ErrorHandler errorHandler;  /* the error handler of the preprocessor */
-    TokenList * tokens;   /* the token list refrence from the token */
+    TokenList * tokens;   /* the token list refrence from the lexer */
 } Preprocessor;
 
 

@@ -77,6 +77,8 @@ typedef struct TranslationUnit {
     EntryNodeList * entryNodeList; /* the list of all the entry nodes */
     LabalNodeList * instructionLabalList; /* the instructions labal list */
     LabalNodeList * guidanceLabalList; /* the guidance labal list */
+
+    TokenList * tokens; /* the token list refrence from the lexer */
 }TranslationUnit;
 
 
