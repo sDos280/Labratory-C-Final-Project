@@ -7,19 +7,19 @@ number_list_end:
     : number_list '\n'
     ;
 
-data_guidance_sentece:
+data_guidance_sentence:
     : ".data" number_list_end
 
-string_guidance_sentece:
+string_guidance_sentence:
     : ".string" '\"' ... '\"' '\n'
 
-entry_guidance_sentece:
+entry_guidance_sentence:
     : ".entry" IDENTIFIER '\n'
 
-extern_guidance_sentece:
+extern_guidance_sentecne:
     : ".extern" IDENTIFIER '\n'
 
-guidance_sentece:
+guidance_sentence:
     : data_guidance_sentece
     : string_guidance_sentece
     : entry_guidance_sentece
