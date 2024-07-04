@@ -80,6 +80,10 @@ void error_handler_flush_error_list(ErrorHandler * handler){
             break;
         
         case PreprocessorErrorKind:
+            caller_string = "Preprocessor Error";
+            break;
+        
+        case ParserErrorKind:
             caller_string = "Parser Error";
             break;
         
