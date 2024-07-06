@@ -44,8 +44,6 @@ void parser_move_to_last_end_of_line(TranslationUnit * translationUnit){
 DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
     DataNode dataNode;
     dataNode.numbers = NULL;
-    TokenRefrenceList * listHead = NULL;
-    TokenRefrenceList * listBack = NULL;
     TokenError error;
 
     if (translationUnit->tokens->token.kind != DATA_INS){
@@ -60,20 +58,7 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
 
     while (translationUnit->tokens->token.kind != EOFT){
         if (translationUnit->tokens->token.kind == NUMBER) {
-            /* add the number to the token refrence list */
-            if (listBack == NULL){ /* check if no number was added before */
-                listBack = malloc(sizeof(TokenRefrenceList));
-                listBack->token = &translationUnit->tokens->token;
-                listBack->next = NULL;
-
-                listHead = listBack;
-            } else {
-                listHead->next = malloc(sizeof(TokenRefrenceList));
-                listHead->next->token = &translationUnit->tokens->token;
-                listHead->next->next = NULL;
-
-                listHead = listHead->next;
-            }
+            add_token_refrence_to_the_token_refrence_list(&dataNode.numbers, &translationUnit->tokens->token);
 
             translationUnit->tokens = translationUnit->tokens->next; /* move over the number token */
 
