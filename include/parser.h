@@ -27,4 +27,12 @@ void parser_move_to_last_end_of_line(TranslationUnit * translationUnit);
 */
 DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit);
 
-#endif /*LABRATORY_C_FINAL_PROJECT_PARSER_H*/
+/**
+ * Parse a string guidance sentence
+ *
+ * @param translationUnit the translation unit.
+ * @return the string node
+*/
+StringNode parser_parse_string_guidance_sentence(TranslationUnit * translationUnit);
+
+#endif /*LABRATORY_C_FINAL_PROJECT_PARSER_H */
