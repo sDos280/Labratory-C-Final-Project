@@ -32,6 +32,13 @@ void lexer_init_char_pointer(Lexer *lexer, char *sourceString);
 void lexer_init_file(Lexer *lexer, char * filePath);
 
 /**
+ * Initializes the lexer with passed string.
+ * @param filePath the full fila path with the extension.
+ * @param String the string.
+ */
+void lexer_init_from_string(Lexer *lexer, char * filePath, String string);
+
+/**
  * Frees the resources used by the lexer.
  * After calling this function, the lexer must not be used before calling lexer_init again.
  */

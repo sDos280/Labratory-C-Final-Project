@@ -79,6 +79,23 @@ void lexer_init_file(Lexer *lexer, char * filePath){
     fclose(file);
 }
 
+void lexer_init_from_string(Lexer *lexer, char * filePath, String string){
+    lexer->string = string_init();
+    string_add_string(&lexer->string, string);
+    lexer->filePath = filePath;
+
+    /* lexer->errorHandler = (ErrorHandler){0}; */
+    lexer->tokens = NULL;
+
+    /* initialize lexer error handler */
+    error_handler_init(&lexer->errorHandler, lexer->string, lexer->filePath);
+
+    lexer->index = 0;
+    lexer->indexInLine = 0;
+    lexer->ch = string_get_char(lexer->string, lexer->index);
+    lexer->line = 1;
+}
+
 void lexer_free(Lexer * lexer){
     /* reset the lexer, free the token list (lexer->tokens) and string, and other field */
     
