@@ -8,18 +8,25 @@
  * @param Token the token refrence.
 */
 static void add_token_refrence_to_the_token_refrence_list(TokenRefrenceList ** list, Token * Token){
+    TokenRefrenceList * head, * toAdd;
+
     if (list == NULL) return;
-    TokenRefrenceList * head = *list;
-    TokenRefrenceList * toAdd = malloc(sizeof(TokenRefrenceList));
+
+    head = *list;
+    toAdd = malloc(sizeof(TokenRefrenceList));
     toAdd->token = Token;
     toAdd->next = NULL;
 
-    while (head->next != NULL)
-    {
-        head = head->next;
-    }
+    if (head == NULL){
+        *list = toAdd;
+    } else {
+        while (head->next != NULL)
+        {
+            head = head->next;
+        }
 
-    head->next = toAdd;
+        head->next = toAdd;
+    }
 }
 
 void parser_init_translation_unit(TranslationUnit * translationUnit, Lexer lexer){
@@ -43,11 +50,11 @@ void parser_move_to_last_end_of_line(TranslationUnit * translationUnit){
 
 DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
     DataNode dataNode;
-    dataNode.numbers = NULL;
     TokenError error;
+    dataNode.numbers = NULL;
 
     if (translationUnit->tokens->token.kind != DATA_INS){
-        error.message = string_init_with_data("No .data was found");
+        error.message = string_init_with_data("No .data was found here");
         error.token = translationUnit->tokens->token;
 
         error_handler_push_token_error(&translationUnit->errorHandler, PreprocessorErrorKind, error);
@@ -55,6 +62,8 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
         parser_move_to_last_end_of_line(translationUnit);
         return dataNode;
     }
+
+    translationUnit->tokens = translationUnit->tokens->next; /* move over the .data token */
 
     while (translationUnit->tokens->token.kind != EOFT){
         if (translationUnit->tokens->token.kind == NUMBER) {
@@ -70,7 +79,7 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
             } else if (translationUnit->tokens->token.kind == EOFT){
                 break;
             } else {
-                error.message = string_init_with_data("No comma or end of line found");
+                error.message = string_init_with_data("No comma or end of line found here");
                 error.token = translationUnit->tokens->token;
 
                 error_handler_push_token_error(&translationUnit->errorHandler, PreprocessorErrorKind, error);
@@ -79,13 +88,15 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
                 return dataNode;
             }
         } else {
-                error.message = string_init_with_data("No number found");
-                error.token = translationUnit->tokens->token;
+            error.message = string_init_with_data("No number was found here");
+            error.token = translationUnit->tokens->token;
 
-                error_handler_push_token_error(&translationUnit->errorHandler, PreprocessorErrorKind, error);
+            error_handler_push_token_error(&translationUnit->errorHandler, PreprocessorErrorKind, error);
 
-                parser_move_to_last_end_of_line(translationUnit);
-                return dataNode;
-            }
+            parser_move_to_last_end_of_line(translationUnit);
+            return dataNode;
+        }
     }
+
+    return dataNode;
 }
