@@ -82,7 +82,9 @@ void lexer_init_file(Lexer *lexer, char * filePath){
 void lexer_init_from_string(Lexer *lexer, char * filePath, String string){
     lexer->string = string_init();
     string_add_string(&lexer->string, string);
-    lexer->filePath = filePath;
+    
+    lexer->filePath = calloc(strlen(filePath) + 1, sizeof(char));
+    strcpy(lexer->filePath, filePath);
 
     /* lexer->errorHandler = (ErrorHandler){0}; */
     lexer->tokens = NULL;
@@ -323,7 +325,8 @@ void lexer_peek_separator(Lexer * lexer){
     token.index = index;
     token.indexInLine = indexInLine;
     token.line = line;
-    token.string = string_init_with_data(&lexer->ch);
+    token.string = string_init();
+    string_add_char(&token.string, lexer->ch);
 
     lexer_peek_char(lexer);
 
