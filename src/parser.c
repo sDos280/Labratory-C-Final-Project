@@ -168,7 +168,7 @@ GuidanceNodeList * parser_parse_guidance_sentences(TranslationUnit * translation
     GuidanceNodeList * guidanceList = NULL;
     GuidanceNodeList ** guidanceListLast = &guidanceList; /* the last node in the guidanceList */
 
-    while (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOFT){
+    while (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != EOFT){
         if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOL){
             translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
         } else if (translationUnit->tokens != NULL && (translationUnit->tokens->token.kind == DATA_INS || translationUnit->tokens->token.kind == STRING_INS)){
