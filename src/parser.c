@@ -101,6 +101,17 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
     return dataNode;
 }
 
+void parser_free_data_guidance_sentence(DataNode dataNode){
+    TokenRefrenceList * head = dataNode.numbers;
+    TokenRefrenceList * copy = head;
+
+    while (head != NULL){
+        copy = head;
+        head = head->next;
+        free(copy);
+    }
+}
+
 StringNode parser_parse_string_guidance_sentence(TranslationUnit * translationUnit){
     StringNode stringNode;
     TokenError error;
@@ -146,4 +157,46 @@ StringNode parser_parse_string_guidance_sentence(TranslationUnit * translationUn
     }
 
     return stringNode;
+}
+
+GuidanceNodeList * parser_parse_guidance_sentences(TranslationUnit * translationUnit){
+    GuidanceNodeList * guidanceList = NULL;
+    GuidanceNodeList ** guidanceListLast = &guidanceList; /* the last node in the guidanceList */
+
+    while (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOFT){
+        if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOL){
+            translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
+        } else if (translationUnit->tokens != NULL && (translationUnit->tokens->token.kind == DATA_INS || translationUnit->tokens->token.kind == STRING_INS)){
+            if (guidanceList == NULL){ /* no sentence was added yet */
+                guidanceList = malloc(sizeof(GuidanceNodeList));
+                guidanceList->next = NULL;
+
+                if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == DATA_INS){
+                    guidanceList->kind = DataNodeKind;
+                    guidanceList->node.dataNode = parser_parse_data_guidance_sentence(translationUnit);
+                } else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == STRING_INS){
+                    guidanceList->kind = StringNodeKind;
+                    guidanceList->node.stringNode = parser_parse_string_guidance_sentence(translationUnit);
+                }
+
+                guidanceListLast = &guidanceList;
+            } else { /* at least one sentence was added */
+                (*guidanceListLast)->next = malloc(sizeof(GuidanceNodeList));
+                guidanceListLast = &((*guidanceListLast)->next); /* update guidanceListLast to the last allocated node */
+                (*guidanceListLast)->next = NULL;
+
+                if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == DATA_INS){
+                    (*guidanceListLast)->kind = DataNodeKind;
+                    (*guidanceListLast)->node.dataNode = parser_parse_data_guidance_sentence(translationUnit);
+                } else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == STRING_INS){
+                    (*guidanceListLast)->kind = StringNodeKind;
+                    (*guidanceListLast)->node.stringNode = parser_parse_string_guidance_sentence(translationUnit);
+                }
+            }
+        } else {
+            break; /* the end of the grammer*/ 
+        }
+    }
+
+    return guidanceList;
 }

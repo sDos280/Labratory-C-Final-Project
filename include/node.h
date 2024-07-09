@@ -58,7 +58,7 @@ typedef struct GuidanceNodeList {
         StringNode stringNode;
     }node; /* the current node */
 
-    NodeKind * kind; /* the node type */
+    NodeKind kind; /* the node type */
     struct GuidanceNodeList * next; /* the next node */
 }GuidanceNodeList;
 

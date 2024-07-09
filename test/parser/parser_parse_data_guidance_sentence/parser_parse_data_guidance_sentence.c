@@ -39,6 +39,8 @@ int main(){
     }
     printf("\n");
 
+
+    parser_free_data_guidance_sentence(dataNode);
     lexer_free(&lexerPreprocess);
     lexer_free(&lexerPostprocess);
     preprocessor_free(&preprocessor);
