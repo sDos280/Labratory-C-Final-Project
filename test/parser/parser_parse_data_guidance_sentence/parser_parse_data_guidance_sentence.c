@@ -44,6 +44,7 @@ int main(){
     lexer_free(&lexerPreprocess);
     lexer_free(&lexerPostprocess);
     preprocessor_free(&preprocessor);
+    parser_free_translation_unit(&translationUnit);
 
     return 0;
 }

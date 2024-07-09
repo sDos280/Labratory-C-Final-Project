@@ -40,6 +40,11 @@ void parser_init_translation_unit(TranslationUnit * translationUnit, Lexer lexer
     error_handler_init(&translationUnit->errorHandler, lexer.string, lexer.filePath);
 }
 
+void parser_free_translation_unit(TranslationUnit * translationUnit){
+    /* free the error handler */
+    error_handler_free_error_list(&translationUnit->errorHandler);
+}
+
 void parser_move_to_last_end_of_line(TranslationUnit * translationUnit){
     while (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != EOFT){
         if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOL) return;

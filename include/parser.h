@@ -13,6 +13,13 @@
 void parser_init_translation_unit(TranslationUnit * translationUnit, Lexer lexer);
 
 /**
+ * Free the (memory of) translation unit.
+ *
+ * @param translationUnit the translation unit.
+*/
+void parser_free_translation_unit(TranslationUnit * translationUnit);
+
+/**
  * Move the current token pointer (tokens) to the end of line token.
  *
  * @param translationUnit the translation unit.
