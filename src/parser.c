@@ -141,5 +141,9 @@ StringNode parser_parse_string_guidance_sentence(TranslationUnit * translationUn
         return stringNode;
     }
 
+    if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOL){
+        translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
+    }
+
     return stringNode;
 }
