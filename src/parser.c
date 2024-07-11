@@ -205,3 +205,18 @@ GuidanceNodeList * parser_parse_guidance_sentences(TranslationUnit * translation
 
     return guidanceList;
 }
+
+void parser_free_guidance_sentences(GuidanceNodeList * guidanceList){
+    GuidanceNodeList * copy;
+
+    while (guidanceList != NULL){
+        if (guidanceList->kind == DataNodeKind){
+            parser_free_data_guidance_sentence(guidanceList->node.dataNode);
+        } /*else if (guidanceList->kind == StringNodeKind){ there is no need for that check because the StringNode doesn't use malloc/calloc
+            ...
+        }*/
+        copy = guidanceList->next;
+        free(guidanceList);
+        guidanceList = copy;
+    }
+}

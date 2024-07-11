@@ -57,4 +57,12 @@ StringNode parser_parse_string_guidance_sentence(TranslationUnit * translationUn
 */
 GuidanceNodeList * parser_parse_guidance_sentences(TranslationUnit * translationUnit);
 
+/**
+ * Free (the memory of the) guidance sentences
+ *
+ * @param guidanceList the guidance list head.
+*/
+void parser_free_guidance_sentences(GuidanceNodeList * guidanceList);
+
+
 #endif /*LABRATORY_C_FINAL_PROJECT_PARSER_H */

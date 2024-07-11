@@ -10,6 +10,7 @@ int main(){
     Preprocessor preprocessor;
     TranslationUnit translationUnit;
     GuidanceNodeList * guidanceList;
+    GuidanceNodeList * copy;
     TokenRefrenceList * list = NULL;
 
     /* preprocess lexer pass */
@@ -30,6 +31,7 @@ int main(){
     /* parser pass */
     parser_init_translation_unit(&translationUnit, lexerPostprocess);
     guidanceList = parser_parse_guidance_sentences(&translationUnit);
+    copy = guidanceList;
     error_handler_flush_error_list(&translationUnit.errorHandler);
 
     while (guidanceList != NULL){
@@ -56,6 +58,7 @@ int main(){
     lexer_free(&lexerPreprocess);
     lexer_free(&lexerPostprocess);
     preprocessor_free(&preprocessor);
+    parser_free_guidance_sentences(copy);
     parser_free_translation_unit(&translationUnit);
 
     return 0;
