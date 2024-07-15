@@ -333,6 +333,11 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
     instruction.operation = &translationUnit->tokens->token;
     translationUnit->tokens = translationUnit->tokens->next; /* move over the instruction token */
 
+    /* check if a zero operand instruction, if it is, just return */
+    if (translationUnit->tokens != NULL && (translationUnit->tokens->token.kind == EOL || translationUnit->tokens->token.kind == EOFT)){
+        return instruction;
+    }
+
     /* parse operands */
     firstOperand = parser_parse_instruction_operand(translationUnit, &wasErrorInOperand);
 
@@ -376,4 +381,48 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
     }
 
     return instruction;
+}
+
+InstructionNodeList * parser_parse_instruction_sentences(TranslationUnit * translationUnit){
+    InstructionNodeList * instructionList = NULL;
+    InstructionNodeList ** instructionListLast = &instructionList; /* the last node in the instructionList */
+
+    while (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != EOFT){
+        if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOL){
+            translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
+        } else if (translationUnit->tokens != NULL && 
+                  (translationUnit->tokens->token.kind == MOV ||
+                   translationUnit->tokens->token.kind == CMP ||
+                   translationUnit->tokens->token.kind == ADD ||
+                   translationUnit->tokens->token.kind == SUB ||
+                   translationUnit->tokens->token.kind == LEA ||
+                   translationUnit->tokens->token.kind == CLR ||
+                   translationUnit->tokens->token.kind == NOT ||
+                   translationUnit->tokens->token.kind == INC ||
+                   translationUnit->tokens->token.kind == DEC ||
+                   translationUnit->tokens->token.kind == JMP ||
+                   translationUnit->tokens->token.kind == BNE ||
+                   translationUnit->tokens->token.kind == RED ||
+                   translationUnit->tokens->token.kind == PRN ||
+                   translationUnit->tokens->token.kind == JSR ||
+                   translationUnit->tokens->token.kind == RTS ||
+                   translationUnit->tokens->token.kind == STOP)){
+            if (instructionList == NULL){ /* no sentence was added yet */
+                instructionList = malloc(sizeof(InstructionNodeList));
+                instructionList->next = NULL;
+                instructionList->node = parser_parse_instruction_sentence(translationUnit);
+                instructionListLast = &instructionList;
+            } else { /* at least one sentence was added */
+                (*instructionListLast)->next = malloc(sizeof(InstructionNodeList));
+                instructionListLast = &((*instructionListLast)->next); /* update guidanceListLast to the last allocated node */
+                (*instructionListLast)->next = NULL;
+
+                (*instructionListLast)->node = parser_parse_instruction_sentence(translationUnit);
+            }
+        } else {
+            break; /* the end of the grammer*/ 
+        }
+    }
+
+    return instructionList;
 }
