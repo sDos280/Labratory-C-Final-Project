@@ -39,12 +39,18 @@ typedef struct StringNode {
     Token * token; /* the that is the string */
 }StringNode;
 
+typedef struct InstructionOperand {
+    Token * Operand; /* the operand token */
+    bool isOperandDerefrenced; /* true if the first operand is derefrenced else false */
+}InstructionOperand;
+
+
 typedef struct InstructionNode {
     Token * operation; /* the operation token */
-    Token * source; /* the source operand token, may be NULL for one operand instruction */
-    bool is_source_derefrenced; /* true if the source is derefrenced else false */
-    Token * destination; /* the destination operand token */
-    bool is_destination_derefrenced; /* true if the destination is derefrenced else false */
+    Token * firstOperand; /* the first operand token */
+    bool isFirstOperandDerefrenced; /* true if the first operand is derefrenced else false */
+    Token * secondOperand; /* the second operand token */
+    bool isSecondOperandDerefrenced; /* true if the second operand is derefrenced else false */
 }InstructionNode;
 
 typedef struct InstructionNodeList {

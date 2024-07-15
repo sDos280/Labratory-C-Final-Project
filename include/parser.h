@@ -64,5 +64,12 @@ GuidanceNodeList * parser_parse_guidance_sentences(TranslationUnit * translation
 */
 void parser_free_guidance_sentences(GuidanceNodeList * guidanceList);
 
+/**
+ * Parse an instruction sentence
+ *
+ * @param translationUnit the translation unit.
+ * @return the instruction node
+*/
+InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationUnit);
 
 #endif /*LABRATORY_C_FINAL_PROJECT_PARSER_H */
