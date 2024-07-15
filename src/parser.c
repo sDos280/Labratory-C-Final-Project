@@ -426,3 +426,93 @@ InstructionNodeList * parser_parse_instruction_sentences(TranslationUnit * trans
 
     return instructionList;
 }
+
+EntryNode parser_parse_entry_sentence(TranslationUnit * translationUnit){
+    EntryNode node;
+    node.token = NULL;
+    TokenError error;
+
+    if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != ENTRY_INS){
+        error.message = string_init_with_data("No .entry was found here");
+        error.token = translationUnit->tokens->token;
+
+        error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+        parser_move_to_last_end_of_line(translationUnit);
+        return node;
+    }
+
+    translationUnit->tokens = translationUnit->tokens->next; /* move over the .entry token */
+
+    if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != IDENTIFIER){
+        error.message = string_init_with_data("No identifier was found here");
+        error.token = translationUnit->tokens->token;
+
+        error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+        parser_move_to_last_end_of_line(translationUnit);
+        return node;
+    }
+
+    node.token = &translationUnit->tokens->token;
+    translationUnit->tokens = translationUnit->tokens->next; /* move over the identifier token */
+
+    if (translationUnit->tokens != NULL && !(translationUnit->tokens->token.kind == EOL || translationUnit->tokens->token.kind == EOFT)){
+        error.message = string_init_with_data("No end of line was found here");
+        error.token = translationUnit->tokens->token;
+
+        error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+        parser_move_to_last_end_of_line(translationUnit);
+        return node;
+    }
+
+    translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
+
+    return node;
+}
+
+ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit){
+    ExternalNode node;
+    node.token = NULL;
+    TokenError error;
+
+    if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != ENTRY_INS){
+        error.message = string_init_with_data("No .external was found here");
+        error.token = translationUnit->tokens->token;
+
+        error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+        parser_move_to_last_end_of_line(translationUnit);
+        return node;
+    }
+
+    translationUnit->tokens = translationUnit->tokens->next; /* move over the .entry token */
+
+    if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != IDENTIFIER){
+        error.message = string_init_with_data("No identifier was found here");
+        error.token = translationUnit->tokens->token;
+
+        error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+        parser_move_to_last_end_of_line(translationUnit);
+        return node;
+    }
+
+    node.token = &translationUnit->tokens->token;
+    translationUnit->tokens = translationUnit->tokens->next; /* move over the identifier token */
+
+    if (translationUnit->tokens != NULL && !(translationUnit->tokens->token.kind == EOL || translationUnit->tokens->token.kind == EOFT)){
+        error.message = string_init_with_data("No end of line was found here");
+        error.token = translationUnit->tokens->token;
+
+        error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+        parser_move_to_last_end_of_line(translationUnit);
+        return node;
+    }
+
+    translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
+
+    return node;
+}

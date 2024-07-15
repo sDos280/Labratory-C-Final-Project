@@ -80,4 +80,20 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
 */
 InstructionNodeList * parser_parse_instruction_sentences(TranslationUnit * translationUnit);
 
+/**
+ * Parse an entry sentence
+ *
+ * @param translationUnit the translation unit.
+ * @return the entry node 
+*/
+EntryNode parser_parse_entry_sentence(TranslationUnit * translationUnit);
+
+/**
+ * Parse an external sentence
+ *
+ * @param translationUnit the translation unit.
+ * @return the external node 
+*/
+ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit);
+
 #endif /*LABRATORY_C_FINAL_PROJECT_PARSER_H */
