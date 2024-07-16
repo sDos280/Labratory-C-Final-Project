@@ -10,6 +10,7 @@ int main(){
     Preprocessor preprocessor;
     TranslationUnit translationUnit;
     InstructionNodeList * instructionList;
+    InstructionNodeList * copy;
 
     /* preprocess lexer pass */
     lexer_init_file(&lexerPreprocess, "test1");
@@ -29,6 +30,7 @@ int main(){
     /* parser pass */
     parser_init_translation_unit(&translationUnit, lexerPostprocess);
     instructionList = parser_parse_instruction_sentences(&translationUnit);
+    copy = instructionList;
     error_handler_flush_error_list(&translationUnit.errorHandler);
     
     while (instructionList){
@@ -46,6 +48,8 @@ int main(){
     lexer_free(&lexerPreprocess);
     lexer_free(&lexerPostprocess);
     preprocessor_free(&preprocessor);
+    parser_free_instruction_sentences(copy);
+    parser_free_translation_unit(&translationUnit);
 
     return 0;
 }

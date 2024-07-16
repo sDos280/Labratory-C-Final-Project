@@ -427,10 +427,20 @@ InstructionNodeList * parser_parse_instruction_sentences(TranslationUnit * trans
     return instructionList;
 }
 
+void parser_free_instruction_sentences(InstructionNodeList * instractionList){
+    InstructionNodeList * copy;
+
+    while (instractionList != NULL){
+        copy = instractionList->next;
+        free(instractionList);
+        instractionList = copy;
+    }
+}
+
 EntryNode parser_parse_entry_sentence(TranslationUnit * translationUnit){
     EntryNode node;
-    node.token = NULL;
     TokenError error;
+    node.token = NULL;
 
     if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != ENTRY_INS){
         error.message = string_init_with_data("No .entry was found here");
@@ -474,8 +484,9 @@ EntryNode parser_parse_entry_sentence(TranslationUnit * translationUnit){
 
 ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit){
     ExternalNode node;
-    node.token = NULL;
     TokenError error;
+    node.token = NULL;
+    
 
     if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != ENTRY_INS){
         error.message = string_init_with_data("No .external was found here");

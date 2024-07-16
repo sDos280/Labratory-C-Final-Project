@@ -81,6 +81,14 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
 InstructionNodeList * parser_parse_instruction_sentences(TranslationUnit * translationUnit);
 
 /**
+ * Free (the memory of the) instruction sentences
+ *
+ * @param translationUnit the translation unit.
+ * @return the instructions list 
+*/
+void parser_free_instruction_sentences(InstructionNodeList * instractionList);
+
+/**
  * Parse an entry sentence
  *
  * @param translationUnit the translation unit.
