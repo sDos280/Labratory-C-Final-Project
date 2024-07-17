@@ -112,4 +112,11 @@ ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit);
 */
 LabalNode parser_parse_labal(TranslationUnit * translationUnit);
 
+/**
+ * Parse translation unit
+ *
+ * @param translationUnit the translation unit.
+*/
+void parser_parse_translation_unit(TranslationUnit * translationUnit);
+
 #endif /*LABRATORY_C_FINAL_PROJECT_PARSER_H */
