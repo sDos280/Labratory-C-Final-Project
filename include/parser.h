@@ -104,4 +104,12 @@ EntryNode parser_parse_entry_sentence(TranslationUnit * translationUnit);
 */
 ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit);
 
+/**
+ * Parse labal
+ *
+ * @param translationUnit the translation unit.
+ * @return return labal
+*/
+LabalNode parser_parse_labal(TranslationUnit * translationUnit);
+
 #endif /*LABRATORY_C_FINAL_PROJECT_PARSER_H */

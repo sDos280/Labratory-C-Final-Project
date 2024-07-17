@@ -574,3 +574,106 @@ ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit){
 
     return node;
 }
+
+LabalNode parser_parse_labal(TranslationUnit * translationUnit){
+    LabalNode labal;
+    TokenError error;
+    bool wasLabalIdentifierFound = false;
+    labal.guidanceNodeList = NULL;
+    labal.instructionNodeList = NULL;
+    labal.labal = NULL;
+    labal.position = 0;
+    labal.size = 0;
+
+    if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == IDENTIFIER){
+        labal.labal = &translationUnit->tokens->token;
+        translationUnit->tokens = translationUnit->tokens->next; /* move over the labal identifier */
+            
+        if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != COLON){
+            error.message = string_init_with_data("No colon was found after labal identifier");
+            error.token = translationUnit->tokens->token;
+
+            error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+            parser_move_to_last_end_of_line(translationUnit);
+            return labal;
+        }
+
+        if (labal.labal->index + string_length(labal.labal->string) != translationUnit->tokens->token.index){
+            error.message = string_init_with_data("The colon should be exactly next to the labal identifier");
+            error.token = translationUnit->tokens->token;
+
+            error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+            parser_move_to_last_end_of_line(translationUnit);
+            return labal;
+        }
+
+        translationUnit->tokens = translationUnit->tokens->next; /* move over the colon token */
+
+        /* move over the EOL that are after the colon*/
+        while (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != EOFT)
+            if (translationUnit->tokens->token.kind == EOL)
+                translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
+            else
+                break;
+        
+        wasLabalIdentifierFound = true;
+    }
+
+    if (translationUnit->tokens != NULL && 
+       (translationUnit->tokens->token.kind == MOV ||
+        translationUnit->tokens->token.kind == CMP ||
+        translationUnit->tokens->token.kind == ADD ||
+        translationUnit->tokens->token.kind == SUB ||
+        translationUnit->tokens->token.kind == LEA ||
+        translationUnit->tokens->token.kind == CLR ||
+        translationUnit->tokens->token.kind == NOT ||
+        translationUnit->tokens->token.kind == INC ||
+        translationUnit->tokens->token.kind == DEC ||
+        translationUnit->tokens->token.kind == JMP ||
+        translationUnit->tokens->token.kind == BNE ||
+        translationUnit->tokens->token.kind == RED ||
+        translationUnit->tokens->token.kind == PRN ||
+        translationUnit->tokens->token.kind == JSR ||
+        translationUnit->tokens->token.kind == RTS ||
+        translationUnit->tokens->token.kind == STOP)){
+        if (wasLabalIdentifierFound == false){
+            error.message = string_init_with_data("An instruction was found here but no labal identifier, please add a labal identifier");
+            error.token = translationUnit->tokens->token;
+
+            error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+            parser_move_to_last_end_of_line(translationUnit);
+            return labal;
+        }
+
+        labal.instructionNodeList = parser_parse_instruction_sentences(translationUnit);
+        labal.guidanceNodeList = NULL;
+        labal.size = calc_labal_size(labal);
+        labal.position = 0; /* not yet initialized */
+        return labal;
+    }
+
+    if (translationUnit->tokens != NULL && 
+       (translationUnit->tokens->token.kind == STRING_INS ||
+        translationUnit->tokens->token.kind == DATA_INS)){
+        labal.guidanceNodeList = parser_parse_guidance_sentences(translationUnit);
+        labal.instructionNodeList = NULL;
+        labal.size = calc_labal_size(labal);
+        labal.position = 0; /* not yet initialized */
+        return labal;
+    }
+
+    if (translationUnit->tokens != NULL){
+        error.message = string_init_with_data("No instraction/guidance was found here");
+        error.token = translationUnit->tokens->token;
+
+        error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+        parser_move_to_last_end_of_line(translationUnit);
+        return labal;
+    }
+
+    return labal;
+}
