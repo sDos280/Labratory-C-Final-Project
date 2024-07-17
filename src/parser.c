@@ -92,6 +92,44 @@ static InstructionOperand parser_parse_instruction_operand(TranslationUnit * tra
     return out;
 }
 
+/**
+ * Calculate the size of memory a labal would occupied 
+ *
+ * @param labal the labal.
+ * @return the size of the labal
+*/
+static unsigned int calc_labal_size(LabalNode labal){
+    InstructionNodeList * instructionNodeList = labal.instructionNodeList;
+    GuidanceNodeList * guidanceNodeList = labal.guidanceNodeList;
+    TokenRefrenceList * numbers = NULL;
+    int out = 0;
+
+    while (instructionNodeList != NULL){
+        out++; /* +1 for the memory instruction itself */
+        if (instructionNodeList->node.firstOperand != NULL) out++;
+        if (instructionNodeList->node.secondOperand != NULL) out++;
+
+        instructionNodeList = instructionNodeList->next;
+    }
+
+    while (guidanceNodeList != NULL){
+        if (guidanceNodeList->kind == StringNodeKind)
+            out += string_length(guidanceNodeList->node.stringNode.token->string) + 1; /* +1 for the \0 char */
+
+        if (guidanceNodeList->kind == DataNodeKind){
+            numbers = guidanceNodeList->node.dataNode.numbers;
+            while (numbers != NULL){
+                out++; /* each number have the size of 1*/
+                numbers = numbers->next;
+            }
+        }
+        
+        guidanceNodeList = guidanceNodeList->next;
+    }
+
+    return out;
+}
+
 void parser_init_translation_unit(TranslationUnit * translationUnit, Lexer lexer){
     translationUnit->externalNodeList = NULL;
     translationUnit->entryNodeList = NULL;
@@ -164,6 +202,15 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
             parser_move_to_last_end_of_line(translationUnit);
             return dataNode;
         }
+    }
+
+    if (dataNode.numbers == NULL){
+        error.message = string_init_with_data("No numbers were found after .data");
+        error.token = translationUnit->tokens->token;
+
+        error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+        parser_move_to_last_end_of_line(translationUnit);
     }
 
     return dataNode;
