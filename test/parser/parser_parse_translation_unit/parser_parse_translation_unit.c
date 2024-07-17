@@ -63,13 +63,13 @@ int main(){
     void * copy;
 
     /* preprocess lexer pass */
-    lexer_init_file(&lexerPreprocess, "test1");
+    lexer_init_file(&lexerPreprocess, "test2");
     lexer_lex(&lexerPreprocess);
     error_handler_flush_error_list(&lexerPreprocess.errorHandler);
     
     /* preprocesser pass */
     preprocessor_init(&preprocessor, lexerPreprocess);
-    preprocessor_preprocess(&preprocessor, lexerPreprocess.string, "test1");
+    preprocessor_preprocess(&preprocessor, lexerPreprocess.string, "test2");
     error_handler_flush_error_list(&preprocessor.errorHandler);
 
     /* postprocess lexer pass */
