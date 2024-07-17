@@ -590,7 +590,7 @@ void lexer_lex(Lexer * lexer){
             error.index = lexer->index;
             error.indexInLine = lexer->indexInLine;
             error.line = lexer->line;
-            error.message = string_init_with_data("unkonwn char");
+            error.message = string_init_with_data("unkonwn char (in the current context)");
 
             error_handler_push_char_error(&lexer->errorHandler, LexerErrorKind, error);
 
