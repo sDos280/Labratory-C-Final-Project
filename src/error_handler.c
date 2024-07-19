@@ -86,6 +86,10 @@ void error_handler_flush_error_list(ErrorHandler * handler){
         case ParserErrorKind:
             caller_string = "Parser Error";
             break;
+
+        case AstCheckerKind:
+            caller_string = "AST Checker Error";
+            break;
         
         default:
             caller_string = "";

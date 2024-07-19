@@ -2,6 +2,7 @@
 #define LABRATORY_C_MAMAN22_AST_CHECKER
 
 #include "parser.h"
+#include "lexer.h"
 
 typedef enum IdentifierHashCellKind {
     LabalCellKind,
@@ -19,8 +20,10 @@ typedef struct IdentifierHashCell {
 }IdentifierHashCell;
 
 typedef struct AstChecker {
-    IdentifierHashCell * hash; /* a pointer to the array of the identifiers cells */
+    IdentifierHashCell * hash; /* a pointer to the array of the identifiers cells, used for naming checking */
     unsigned int size; /* the amount of cells in the array (hash) */
+
+    ErrorHandler errorHandler; /* the error handler of the translation unit */
 }AstChecker;
 
 /**
@@ -31,5 +34,13 @@ typedef struct AstChecker {
  * @note from https://www.cs.yale.edu/homes/aspnes/pinewiki/C(2f)HashTables.html?highlight=%28CategoryAlgorithmNotes%29.
 */
 unsigned long hash(String str);
+
+/**
+ * Initialize the AST checker.
+ *
+ * @param astChecker the AST checker.
+ * @param lexer the lexer.
+*/
+void ast_checker_init(AstChecker * astChecker, Lexer lexer);
 
 #endif /* LABRATORY_C_MAMAN22_AST_CHECKER */

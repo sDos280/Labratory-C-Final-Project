@@ -1,4 +1,4 @@
-#include "../include/AST_checker.h"
+#include "../include/ast_checker.h"
 #include "../include/string_util.h"
 
 #define MULTIPLIER (37)
@@ -18,4 +18,8 @@ unsigned long hash(String str) {
     } 
 
     return h;
+}
+
+void ast_checker_init(AstChecker * astChecker, Lexer lexer){
+    error_handler_init(&astChecker->errorHandler, lexer.string, lexer.filePath);
 }
