@@ -105,12 +105,7 @@ int main(){
         print_labal(guidanceLabalList->labal);
         guidanceLabalList = guidanceLabalList->next;
     }
-
-    externalNodeList = translationUnit.externalNodeList;
-    entryNodeList = translationUnit.entryNodeList;
-    instructionLabalList = translationUnit.instructionLabalList;
-    guidanceLabalList = translationUnit.guidanceLabalList;
-
+    
     lexer_free(&lexerPreprocess);
     lexer_free(&lexerPostprocess);
     preprocessor_free(&preprocessor);

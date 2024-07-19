@@ -142,6 +142,33 @@ void parser_init_translation_unit(TranslationUnit * translationUnit, Lexer lexer
 }
 
 void parser_free_translation_unit(TranslationUnit * translationUnit){
+    void * copy;
+    /* free translationUnit's lists */
+    while (translationUnit->externalNodeList != NULL)
+    {
+        copy = translationUnit->externalNodeList->next;
+        free(translationUnit->externalNodeList);
+        translationUnit->externalNodeList = copy;
+    }
+    while (translationUnit->entryNodeList != NULL)
+    {
+        copy = translationUnit->entryNodeList->next;
+        free(translationUnit->entryNodeList);
+        translationUnit->entryNodeList = copy;
+    }
+    while (translationUnit->instructionLabalList != NULL){
+        parser_free_instruction_sentences(translationUnit->instructionLabalList->labal.instructionNodeList);
+        copy = translationUnit->instructionLabalList->next;
+        free(translationUnit->instructionLabalList);
+        translationUnit->instructionLabalList = copy;
+    }
+    while (translationUnit->guidanceLabalList != NULL){
+        parser_free_guidance_sentences(translationUnit->guidanceLabalList->labal.guidanceNodeList);
+        copy = translationUnit->guidanceLabalList->next;
+        free(translationUnit->guidanceLabalList);
+        translationUnit->guidanceLabalList = copy;
+    }
+
     /* free the error handler */
     error_handler_free_error_list(&translationUnit->errorHandler);
 }

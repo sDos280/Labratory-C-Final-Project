@@ -43,12 +43,12 @@ void preprocessor_free(Preprocessor * preprocessor){
         /* free the macro expansion */
         string_free(current->macro.expansion);
 
+        /* move over to the next macro and save a "copy" of the current */
+        current = preprocessor->macroList;
+        preprocessor->macroList = preprocessor->macroList->next;
+
         /* free the current macro */
         free(current);
-
-        /* move over to the next macro */
-        preprocessor->macroList = preprocessor->macroList->next;
-        current = preprocessor->macroList;
     }
 
     free(preprocessor->errorHandler.filePath); /* the filepath in the error handler doens't free itself, so we free it here*/

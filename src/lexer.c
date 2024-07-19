@@ -277,6 +277,7 @@ void lexer_peek_comment(Lexer * lexer){
     }
     
     /* add_token(lexer, token); */ /* there is need to add a comment token... */
+    string_free(token.string);
 }
 
 void lexer_peek_next_line(Lexer * lexer){
