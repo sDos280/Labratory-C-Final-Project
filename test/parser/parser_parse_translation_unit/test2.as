@@ -14,12 +14,16 @@ LOOP: prn #48
       add r7, *r6
       clr K
       sub L3, L3
+      macr test
+        .entry g889858515
+#652
+      endmacr
 
 .entry MAIN
       jmp LOOP
 END:  stop
 STR:  .string "abcd"
 LIST: .data 6, -9
-      .data -100
+      .data -100 test
 K:    .data 31
 .extern L3
