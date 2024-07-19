@@ -60,7 +60,6 @@ int main(){
     EntryNodeList * entryNodeList = NULL;
     LabalNodeList * instructionLabalList = NULL;
     LabalNodeList * guidanceLabalList = NULL;
-    void * copy;
 
     /* preprocess lexer pass */
     lexer_init_file(&lexerPreprocess, "test2");
@@ -68,8 +67,8 @@ int main(){
     error_handler_flush_error_list(&lexerPreprocess.errorHandler);
     
     /* preprocesser pass */
-    preprocessor_init(&preprocessor, lexerPreprocess);
-    preprocessor_preprocess(&preprocessor, lexerPreprocess.string, "test2");
+    preprocessor_init(&preprocessor, lexerPreprocess, "test2");
+    preprocessor_preprocess(&preprocessor, lexerPreprocess.string);
     error_handler_flush_error_list(&preprocessor.errorHandler);
 
     /* postprocess lexer pass */
@@ -115,30 +114,6 @@ int main(){
     lexer_free(&lexerPreprocess);
     lexer_free(&lexerPostprocess);
     preprocessor_free(&preprocessor);
-    while (externalNodeList != NULL)
-    {
-        copy = externalNodeList->next;
-        free(externalNodeList);
-        externalNodeList = copy;
-    }
-    while (entryNodeList != NULL)
-    {
-        copy = entryNodeList->next;
-        free(entryNodeList);
-        entryNodeList = copy;
-    }
-    while (instructionLabalList != NULL){
-        parser_free_instruction_sentences(instructionLabalList->labal.instructionNodeList);
-        copy = instructionLabalList->next;
-        free(instructionLabalList);
-        instructionLabalList = copy;
-    }
-    while (guidanceLabalList != NULL){
-        parser_free_guidance_sentences(guidanceLabalList->labal.guidanceNodeList);
-        copy = guidanceLabalList->next;
-        free(guidanceLabalList);
-        guidanceLabalList = copy;
-    }
     parser_free_translation_unit(&translationUnit);
 
     return 0;

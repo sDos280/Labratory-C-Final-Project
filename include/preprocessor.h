@@ -33,8 +33,9 @@ typedef struct Preprocessor {
  *
  * @param preprocessor the preprocessor.
  * @param lexer the lexer.
+ * @param filePath the file path (without the extention).
 */
-void preprocessor_init(Preprocessor * preprocessor, Lexer lexer);
+void preprocessor_init(Preprocessor * preprocessor, Lexer lexer, char * filePath);
 
 /**
  * Frees the preprocesso memory
@@ -87,8 +88,7 @@ void preprocessor_preprocess_to_source(Preprocessor * preprocessor, String sourc
  *
  * @param preprocessor the preprocessor.
  * @param source the srouce file as string.
- * @param filePath the file path.
 */
-void preprocessor_preprocess(Preprocessor * preprocessor, String source, char * filePath);
+void preprocessor_preprocess(Preprocessor * preprocessor, String source);
 
 #endif /* LABRATORY_C_FINAL_PREPROCESSOR */

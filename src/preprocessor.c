@@ -18,13 +18,18 @@ static void writeDataToFile(FILE *file, String data) {
     }
 }
 
-void preprocessor_init(Preprocessor * preprocessor, Lexer lexer){
+void preprocessor_init(Preprocessor * preprocessor, Lexer lexer, char * filePath){
+    /* curate the file path string */
+    char * filePathCurated = calloc((strlen(filePath) + 3) + 1, sizeof(char));
+    strcpy(filePathCurated, filePath);
+    strcat(filePathCurated, ".am");
+    
     preprocessor->string = string_init();
     preprocessor->macroList = NULL;
     /* preprocessor->errorHandler = (ErrorHandler){0}; */
     preprocessor->tokens = lexer.tokens;
 
-    error_handler_init(&preprocessor->errorHandler, lexer.string, lexer.filePath);
+    error_handler_init(&preprocessor->errorHandler, lexer.string, filePathCurated);
 }
 
 void preprocessor_free(Preprocessor * preprocessor){
@@ -45,6 +50,8 @@ void preprocessor_free(Preprocessor * preprocessor){
         preprocessor->macroList = preprocessor->macroList->next;
         current = preprocessor->macroList;
     }
+
+    free(preprocessor->errorHandler.filePath); /* the filepath in the error handler doens't free itself, so we free it here*/
 }
 
 void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
@@ -270,13 +277,8 @@ void preprocessor_preprocess_to_source(Preprocessor * preprocessor, String sourc
     }
 }
 
-void preprocessor_preprocess(Preprocessor * preprocessor, String source, char * filePath){
+void preprocessor_preprocess(Preprocessor * preprocessor, String source){
     FILE *file;
-
-    /* curate the file path string */
-    char * filePathCurated = calloc((strlen(filePath) + 3) + 1, sizeof(char));
-    strcpy(filePathCurated, filePath);
-    strcat(filePathCurated, ".am");
     
     preprocessor_generate_macro_list(preprocessor, source);
 
@@ -285,13 +287,12 @@ void preprocessor_preprocess(Preprocessor * preprocessor, String source, char * 
 
     preprocessor_preprocess_to_source(preprocessor, source);
 
-    file = fopen(filePathCurated, "w");
+    file = fopen(preprocessor->errorHandler.filePath, "w");
     if (file == NULL) {
-        printf("%sPreprocessor Error:%s couldn't open \"%s\".\n", RED_COLOR, RESET_COLOR, filePathCurated);
+        printf("%sPreprocessor Error:%s couldn't open \"%s\".\n", RED_COLOR, RESET_COLOR, preprocessor->errorHandler.filePath);
     }
 
     writeDataToFile(file, preprocessor->string);
 
     fclose(file);
-    free(filePathCurated);
 }
