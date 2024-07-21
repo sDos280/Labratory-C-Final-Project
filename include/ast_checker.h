@@ -83,7 +83,8 @@ void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode 
  * Check for duplicate identifiers
  *
  * @param astChecker the AST checker.
+ * @param translationUnit the translation unit.
 */
-void ast_checker_check_duplicate_identifiers(AstChecker * astChecker);
+void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, TranslationUnit * translationUnit);
 
 #endif /* LABRATORY_C_MAMAN22_AST_CHECKER */
