@@ -63,10 +63,9 @@ void ast_checker_free(AstChecker * astChecker);
 IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker, String str);
 
 /**
- * Set the corresponding cell to the hash that is related to the passed string
+ * Set the corresponding cell to the hash that is related to the string (key) in the cell
  *
  * @param astChecker the AST checker.
- * @param str the string (the key).
  * @param cell the cell.
  * @return true for success else false.
 */
