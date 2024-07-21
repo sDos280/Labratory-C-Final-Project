@@ -33,7 +33,7 @@ int main(){
     node = parser_parse_data_guidance_sentence(&translationUnit);
     error_handler_flush_error_list(&translationUnit.errorHandler);
     
-    ast_checker_init(&astChecker, lexerPostprocess);
+    ast_checker_init(&astChecker, &translationUnit, lexerPostprocess);
     ast_checker_check_data_guidance_sentence(&astChecker, node);
     error_handler_flush_error_list(&astChecker.errorHandler);
 
