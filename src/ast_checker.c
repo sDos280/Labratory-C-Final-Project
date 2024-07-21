@@ -62,14 +62,14 @@ void ast_checker_free(AstChecker * astChecker){
     error_handler_free_error_list(&astChecker->errorHandler);
 }
 
-IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker, String str){
-    unsigned long index = hash(str) % astChecker->size - 1;
-    unsigned long indexCopy = hash(str) % astChecker->size - 1;
+IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker, String key){
+    unsigned long index = hash(key) % astChecker->size - 1;
+    unsigned long indexCopy = hash(key) % astChecker->size - 1;
     IdentifierHashCell * out = NULL;
 
     /* Loop till we find an empty entry. */
     while (astChecker->hash[index].key != NULL) {
-        if (strcmp(str.data, astChecker->hash[index].key->data) == 0) {
+        if (strcmp(key.data, astChecker->hash[index].key->data) == 0) {
             return astChecker->hash + index;
         }
 

@@ -54,22 +54,22 @@ void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit
 void ast_checker_free(AstChecker * astChecker);
 
 /**
- * Retrive the corresponding cell from the hash that is related to the passed string
+ * Retrive the cell that has the passed key.
  *
  * @param astChecker the AST checker.
- * @param str the string (the key).
+ * @param key the key as string.
  * @return the pointer to the cell (if no found/allocated return null)
 */
-IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker, String str);
+IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker, String key);
 
 /**
- * Set the corresponding cell to the hash that is related to the string (key) in the cell
+ * Set the cell that has the passed key with the data of the passed cell.
  *
  * @param astChecker the AST checker.
  * @param cell the cell.
  * @return true for success else false.
 */
-bool ast_checker_set_hash_cell_by_string(AstChecker * astChecker, String str, IdentifierHashCell cell);
+bool ast_checker_set_hash_cell_by_string(AstChecker * astChecker, IdentifierHashCell cell);
 
 /**
  * Check if the passed data node is currect (the numbers aren't too low/high)
