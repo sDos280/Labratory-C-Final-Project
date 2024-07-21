@@ -13,7 +13,7 @@ typedef enum {
     LexerErrorKind,
     PreprocessorErrorKind,
     ParserErrorKind,
-    AstCheckerKind
+    AstCheckerErrorKind
 } ErrorCaller;
 
 typedef struct TokenError {
