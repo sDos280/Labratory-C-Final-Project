@@ -113,8 +113,7 @@ int main(){
         guidanceLabalList = guidanceLabalList->next;
     }
     
-    error_handler_free_error_list(&astChecker.errorHandler);
-    /*ast_checker_free(&astChecker);*/
+    ast_checker_free(&astChecker);
     parser_free_translation_unit(&translationUnit);
     preprocessor_free(&preprocessor);
     lexer_free(&lexerPostprocess);

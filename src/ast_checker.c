@@ -26,15 +26,17 @@ void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit
     ExternalNodeList * externalNodeList = translationUnit->externalNodeList;
     LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
     LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
-    unsigned int i = 0;
-    /*IdentifierHashCell temp;
+    astChecker->hash = NULL;
+      astChecker->size = 0;
+    /*unsigned int i = 0;
+    IdentifierHashCell temp;
     temp.key = NULL;
     temp.value.labal = NULL;
     temp.value.external = NULL;
     temp.kind = 0;
-    temp.hasEntry = false;*/
+    temp.hasEntry = false;
 
-    astChecker->size = 0;
+    */
 
     /* add the size of the instraction labals (note, all instruction labals have a labal so we can add that with no problem) */
     while (instructionLabalList != NULL){
@@ -54,6 +56,8 @@ void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit
         astChecker->size++;
         externalNodeList = externalNodeList->next;
     }
+
+    printf("size: %d\n", astChecker->size);
 
     /* allocate the hash memory */
     astChecker->hash = calloc(astChecker->size, sizeof(IdentifierHashCell));
@@ -93,8 +97,8 @@ IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker
 }
 
 bool ast_checker_set_hash_cell_by_string(AstChecker * astChecker, IdentifierHashCell cell){
-    unsigned long index = hash(*cell.key) % astChecker->size - 1;
-    unsigned long indexCopy = hash(*cell.key) % astChecker->size - 1;
+    unsigned long index = (hash(*cell.key) % astChecker->size);
+    unsigned long indexCopy = (hash(*cell.key) % astChecker->size);
 
     /* Loop till we find an empty entry. */
     while (astChecker->hash[index].key != NULL) {
