@@ -87,6 +87,33 @@ IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker
     return NULL;
 }
 
+bool ast_checker_set_hash_cell_by_string(AstChecker * astChecker, IdentifierHashCell cell){
+    unsigned long index = hash(*cell.key) % astChecker->size - 1;
+    unsigned long indexCopy = hash(*cell.key) % astChecker->size - 1;
+
+    /* Loop till we find an empty entry. */
+    while (astChecker->hash[index].key != NULL) {
+        /* check if there is an existing cell with the cell with the same key as passed*/
+        if (strcmp(cell.key->data, astChecker->hash[index].key->data) == 0) {
+            return false;
+        }
+
+        index++;
+
+        /* loop back to start*/
+        if (index >= astChecker->size) {
+            index = 0;
+        }
+
+        /* we looped once but we found nothing so we just break */
+        if (index == indexCopy) return false;
+    }
+
+    /* we are now in an empty place */
+    astChecker->hash[index] = cell;
+    return true;
+}
+
 void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode node){
     TokenRefrenceList * numbers = node.numbers;
     TokenError error;

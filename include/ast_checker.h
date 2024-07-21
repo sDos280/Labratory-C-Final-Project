@@ -63,6 +63,16 @@ void ast_checker_free(AstChecker * astChecker);
 IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker, String str);
 
 /**
+ * Set the corresponding cell to the hash that is related to the passed string
+ *
+ * @param astChecker the AST checker.
+ * @param str the string (the key).
+ * @param cell the cell.
+ * @return true for success else false.
+*/
+bool ast_checker_set_hash_cell_by_string(AstChecker * astChecker, String str, IdentifierHashCell cell);
+
+/**
  * Check if the passed data node is currect (the numbers aren't too low/high)
  *
  * @param astChecker the AST checker.
