@@ -22,11 +22,43 @@ unsigned long hash(String str) {
     return h;
 }
 
-void ast_checker_init(AstChecker * astChecker, Lexer lexer){
+void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit, Lexer lexer){
+    ExternalNodeList * externalNodeList = translationUnit->externalNodeList;
+    EntryNodeList * entryNodeList = translationUnit->entryNodeList;
+    LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
+    LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
+
+    astChecker->size = 0;
+
+    /* add the size of the instraction labals (note, all instruction labals have a labal so we can add that with no problem) */
+    while (instructionLabalList != NULL){
+        astChecker->size++;
+        instructionLabalList = instructionLabalList->next;
+    }
+
+    /* add the size of the guidance labals */
+    while (guidanceLabalList != NULL){
+        if (guidanceLabalList->labal.labal != NULL)
+            astChecker->size++;
+        guidanceLabalList = guidanceLabalList->next;
+    }
+
+    /* add the size of the external labals */
+    while (externalNodeList != NULL){
+        astChecker->size++;
+        guidanceLabalList = guidanceLabalList->next;
+    }
+
+    /* allocate the hash memory */
+    astChecker->hash = calloc(astChecker->size, sizeof(IdentifierHashCell));
+    
     error_handler_init(&astChecker->errorHandler, lexer.string, lexer.filePath);
 }
 
 void ast_checker_free(AstChecker * astChecker){
+    /* free the hash memory */
+    free(astChecker->hash);
+
     error_handler_free_error_list(&astChecker->errorHandler);
 }
 
@@ -51,4 +83,8 @@ void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode 
 
         numbers = numbers->next;
     }
+}
+
+void ast_checker_check_duplicate_identifiers(AstChecker * astChecker){
+
 }

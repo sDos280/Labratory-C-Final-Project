@@ -39,9 +39,10 @@ unsigned long hash(String str);
  * Initialize the AST checker.
  *
  * @param astChecker the AST checker.
+ * @param translationUnit the translation unit.
  * @param lexer the lexer.
 */
-void ast_checker_init(AstChecker * astChecker, Lexer lexer);
+void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit, Lexer lexer);
 
 /**
  * Free the (memory of) AST checker.
@@ -57,5 +58,12 @@ void ast_checker_free(AstChecker * astChecker);
  * @param node the data node.
 */
 void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode node);
+
+/**
+ * Check for duplicate identifiers
+ *
+ * @param astChecker the AST checker.
+*/
+void ast_checker_check_duplicate_identifiers(AstChecker * astChecker);
 
 #endif /* LABRATORY_C_MAMAN22_AST_CHECKER */
