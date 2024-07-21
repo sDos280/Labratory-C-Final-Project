@@ -24,9 +24,15 @@ unsigned long hash(String str) {
 
 void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit, Lexer lexer){
     ExternalNodeList * externalNodeList = translationUnit->externalNodeList;
-    EntryNodeList * entryNodeList = translationUnit->entryNodeList;
     LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
     LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
+    unsigned int i = 0;
+    /*IdentifierHashCell temp;
+    temp.key = NULL;
+    temp.value.labal = NULL;
+    temp.value.external = NULL;
+    temp.kind = 0;
+    temp.hasEntry = false;*/
 
     astChecker->size = 0;
 
@@ -46,12 +52,12 @@ void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit
     /* add the size of the external labals */
     while (externalNodeList != NULL){
         astChecker->size++;
-        guidanceLabalList = guidanceLabalList->next;
+        externalNodeList = externalNodeList->next;
     }
 
     /* allocate the hash memory */
     astChecker->hash = calloc(astChecker->size, sizeof(IdentifierHashCell));
-    
+
     error_handler_init(&astChecker->errorHandler, lexer.string, lexer.filePath);
 }
 
@@ -65,7 +71,6 @@ void ast_checker_free(AstChecker * astChecker){
 IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker, String key){
     unsigned long index = hash(key) % astChecker->size - 1;
     unsigned long indexCopy = hash(key) % astChecker->size - 1;
-    IdentifierHashCell * out = NULL;
 
     /* Loop till we find an empty entry. */
     while (astChecker->hash[index].key != NULL) {
@@ -125,18 +130,62 @@ void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode 
             error.message = string_init_with_data("This number is too high");
             error.token = *numbers->token;
 
-            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerKind, error);
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
         }else if (value < LOWEST_INTEGER_IN_COMPILER){
             error.message = string_init_with_data("This number is too low");
             error.token = *numbers->token;
 
-            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerKind, error);
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
         }
 
         numbers = numbers->next;
     }
 }
 
-void ast_checker_check_duplicate_identifiers(AstChecker * astChecker){
+void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, TranslationUnit * translationUnit){
+    /*ExternalNodeList * externalNodeList = translationUnit->externalNodeList;
+    EntryNodeList * entryNodeList = translationUnit->entryNodeList;*/
+    LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
+    /*LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;*/
+    IdentifierHashCell cell;
+    bool temp = false;
+    TokenError error;
 
+    while (instructionLabalList != NULL){
+        cell.key = &instructionLabalList->labal.labal->string;
+        cell.kind = LabalCellKind;
+        cell.value.labal = &instructionLabalList->labal;
+
+        temp = ast_checker_set_hash_cell_by_string(astChecker, cell);
+
+        if (temp == false){
+            error.message = string_init_with_data("A Duplicate of this labal was found");
+            error.token = *instructionLabalList->labal.labal;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+        }
+
+        instructionLabalList = instructionLabalList->next;
+    }
+
+    /*
+    while (guidanceLabalList != NULL){
+        if (guidanceLabalList->labal.labal != NULL){
+            cell.key = &guidanceLabalList->labal.labal->string;
+            cell.kind = LabalCellKind;
+            cell.value.labal = &guidanceLabalList->labal;
+
+            temp = ast_checker_set_hash_cell_by_string(astChecker, cell);
+
+            if (temp == false){
+                error.message = string_init_with_data("A Duplicate of this labal was found");
+                error.token = *guidanceLabalList->labal.labal;
+
+                error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            }
+        }
+        
+
+        guidanceLabalList = guidanceLabalList->next;
+    }*/
 }

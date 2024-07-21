@@ -16,4 +16,4 @@ clean:
 
 # valgrind
 valgrind:
-	valgrind --show-error-list=yes --leak-check=full --show-leak-kinds=all --track-origins=yes  ./$(APPNAME)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(APPNAME)
