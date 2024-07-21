@@ -63,10 +63,10 @@ void lexer_init_file(Lexer *lexer, char * filePath){
     file = fopen(lexer->filePath, "r");
     if (file == NULL) {
         printf("%sLexer Error:%s couldn't open \"%s\".\n", RED_COLOR, RESET_COLOR, lexer->filePath);
-    }
-
-    while ((ch = fgetc(file)) != EOF) {
-        string_add_char(&lexer->string, ch);
+    } else {
+        while ((ch = fgetc(file)) != EOF) {
+            string_add_char(&lexer->string, ch);
+        }
     }
 
     string_add_char(&lexer->string, ch); /* add the EOF char */
@@ -76,7 +76,8 @@ void lexer_init_file(Lexer *lexer, char * filePath){
     lexer->ch = string_get_char(lexer->string, lexer->index);
     lexer->line = 1;
 
-    fclose(file);
+    if (file != NULL)
+        fclose(file);
 }
 
 void lexer_init_from_string(Lexer *lexer, char * filePath, String string){
