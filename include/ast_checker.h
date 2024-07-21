@@ -10,10 +10,12 @@ typedef enum IdentifierHashCellKind {
 }IdentifierHashCellKind;
 
 typedef struct IdentifierHashCell {
+    String * key; /* the key of the labal*/
+
     union {
         LabalNode * labal;
         ExternalNode * external;
-    }data; /* the data of the cell */
+    }value; /* the data of the cell */
 
     IdentifierHashCellKind kind; /* the kind of the cell */
     bool hasEntry; /* true if there is an .entry for this identifier else false */
@@ -50,6 +52,15 @@ void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit
  * @param astChecker the AST checker.
 */
 void ast_checker_free(AstChecker * astChecker);
+
+/**
+ * Retrive the corresponding cell from the hash that is related to the passed string
+ *
+ * @param astChecker the AST checker.
+ * @param str the string (the key).
+ * @return the pointer to the cell (if no found/allocated return null)
+*/
+IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker, String str);
 
 /**
  * Check if the passed data node is currect (the numbers aren't too low/high)

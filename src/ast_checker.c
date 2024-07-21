@@ -62,6 +62,31 @@ void ast_checker_free(AstChecker * astChecker){
     error_handler_free_error_list(&astChecker->errorHandler);
 }
 
+IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker, String str){
+    unsigned long index = hash(str) % astChecker->size - 1;
+    unsigned long indexCopy = hash(str) % astChecker->size - 1;
+    IdentifierHashCell * out = NULL;
+
+    /* Loop till we find an empty entry. */
+    while (astChecker->hash[index].key != NULL) {
+        if (strcmp(str.data, astChecker->hash[index].key->data) == 0) {
+            return astChecker->hash + index;
+        }
+
+        index++;
+
+        /* loop back to start*/
+        if (index >= astChecker->size) {
+            index = 0;
+        }
+
+        /* we looped once but we found nothing so we just break */
+        if (index == indexCopy) break;
+    }
+
+    return NULL;
+}
+
 void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode node){
     TokenRefrenceList * numbers = node.numbers;
     TokenError error;
