@@ -10,10 +10,10 @@ typedef enum IdentifierHashCellKind {
 }IdentifierHashCellKind;
 
 typedef struct IdentifierHashCell {
-    union data {
+    union {
         LabalNode * labal;
         ExternalNode * external;
-    }; /* the data of the cell */
+    }data; /* the data of the cell */
 
     IdentifierHashCellKind kind; /* the kind of the cell */
     bool hasEntry; /* true if there is an .entry for this identifier else false */
@@ -42,5 +42,20 @@ unsigned long hash(String str);
  * @param lexer the lexer.
 */
 void ast_checker_init(AstChecker * astChecker, Lexer lexer);
+
+/**
+ * Free the (memory of) AST checker.
+ *
+ * @param astChecker the AST checker.
+*/
+void ast_checker_free(AstChecker * astChecker);
+
+/**
+ * Check if the passed data node is currect (the numbers aren't too low/high)
+ *
+ * @param astChecker the AST checker.
+ * @param node the data node.
+*/
+void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode node);
 
 #endif /* LABRATORY_C_MAMAN22_AST_CHECKER */
