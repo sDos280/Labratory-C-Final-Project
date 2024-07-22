@@ -5,6 +5,48 @@
 #define HIGHST_INTEGER_IN_COMPILER  (signed int)(((2 << (14-1))) -1)
 #define LOWEST_INTEGER_IN_COMPILER (signed int)(-(2 << (14-1)))
 
+/**
+ * Get the addressing mod of an operand, if the grammar is wrond raise an error.
+ *
+ * @param astChecker the ast checker.
+ * @param operand_token the operand token.
+ * @param operand_token true if the operand is derefrenced else false.
+ * @return the addressing mode.
+*/
+static AddressingMode get_addressing_mode_of_operand(AstChecker * astChecker, Token * operand_token, bool isDerefrenced){
+    TokenError error;
+    if (operand_token->kind == NUMBER) {
+        if (isDerefrenced == true){
+            error.message = string_init_with_data("A Number can't be derefrenced");
+            error.token = *operand_token;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+        }
+        
+        return AbsoluteAddressing;
+    } else if (operand_token->kind == IDENTIFIER) {
+        if (isDerefrenced == true){
+            error.message = string_init_with_data("A Labal can't be derefrenced");
+            error.token = *operand_token;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+        }
+        
+        return DirectAddressing;
+    } else if (operand_token->kind == REGISTER) {
+        if (isDerefrenced == true) return IndirectRegisterAddressing;
+        
+        return DirectRegisterAddressing;
+    } else {
+        error.message = string_init_with_data("Wrong operand grammar");
+        error.token = *operand_token;
+
+        error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+    }
+
+    return AbsoluteAddressing;
+}
+
 unsigned long hash(String str) {
     unsigned long h;
     unsigned const char *us;
@@ -144,6 +186,158 @@ void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode 
 
         numbers = numbers->next;
     }
+}
+
+void ast_checker_check_instruction_sentence(AstChecker * astChecker, InstructionNode node){
+    Token * source = NULL;
+    bool isSourceDerefrenced = false;
+    Token * destination = NULL;
+    bool isDestinationDerefrenced = false;
+    TokenError error;
+    AddressingMode AM = AbsoluteAddressing;
+
+    if (node.firstOperand == NULL && node.secondOperand == NULL) {} /* no arguments, so no update is needed*/
+    else if (node.secondOperand == NULL){
+        destination = node.firstOperand;
+        isDestinationDerefrenced = node.isFirstOperandDerefrenced;
+    } else { /* both argument */
+        source = node.firstOperand;
+        isSourceDerefrenced = node.isFirstOperandDerefrenced;
+        destination = node.secondOperand;
+        isDestinationDerefrenced = node.isSecondOperandDerefrenced;
+    }
+
+    if (node.operation->kind == CMP){
+        if (source == NULL || destination == NULL){
+            error.message = string_init_with_data("This instruction should have 2 operands");
+            error.token = *node.operation;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+    } else if (node.operation->kind == MOV || node.operation->kind == ADD || node.operation->kind == SUB){
+        if (source == NULL || destination == NULL){
+            error.message = string_init_with_data("This instruction should have 2 operands");
+            error.token = *node.operation;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+
+        /* AM of source can be anything, so we check AM of destination */
+        AM = get_addressing_mode_of_operand(astChecker, destination, isDestinationDerefrenced);
+        if (AM == AbsoluteAddressing){
+            error.message = string_init_with_data("Wrong addressing mode of operand");
+            error.token = *destination;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+    } else if (node.operation->kind == CMP){
+        if (source == NULL || destination == NULL){
+            error.message = string_init_with_data("This instruction should have 2 operands");
+            error.token = *node.operation;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+
+        AM = get_addressing_mode_of_operand(astChecker, source, isSourceDerefrenced);
+        if (AM != DirectAddressing){
+            error.message = string_init_with_data("Wrong addressing mode of operand");
+            error.token = *node.operation;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+
+        AM = get_addressing_mode_of_operand(astChecker, destination, isDestinationDerefrenced);
+        if (AM == AbsoluteAddressing){
+            error.message = string_init_with_data("Wrong addressing mode of operand");
+            error.token = *destination;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+    } else if (node.operation->kind == CLR || node.operation->kind == NOT || node.operation->kind == INC || node.operation->kind == DEC || node.operation->kind == RED){
+        if (source != NULL || destination == NULL){
+            error.message = string_init_with_data("This instruction should have destination but no source");
+            error.token = *node.operation;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+
+        AM = get_addressing_mode_of_operand(astChecker, destination, isDestinationDerefrenced);
+        if (AM == AbsoluteAddressing){
+            error.message = string_init_with_data("Wrong addressing mode of operand");
+            error.token = *destination;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+    } else if (node.operation->kind == JMP || node.operation->kind == BNE || node.operation->kind == JSR){
+        if (source != NULL || destination == NULL){
+            error.message = string_init_with_data("This instruction should have destination but no source");
+            error.token = *node.operation;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+        
+        AM = get_addressing_mode_of_operand(astChecker, destination, isDestinationDerefrenced);
+        if (AM == AbsoluteAddressing || AM == DirectRegisterAddressing){
+            error.message = string_init_with_data("Wrong addressing mode of operand");
+            error.token = *destination;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+    } else if (node.operation->kind == RTS || node.operation->kind == STOP){
+        if (source != NULL || destination != NULL){
+            error.message = string_init_with_data("This instruction should have nor destination nor source");
+            error.token = *node.operation;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+        
+        AM = get_addressing_mode_of_operand(astChecker, destination, isDestinationDerefrenced);
+        if (AM == AbsoluteAddressing || AM == DirectRegisterAddressing){
+            error.message = string_init_with_data("Wrong addressing mode of operand");
+            error.token = *destination;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+    } else if (node.operation->kind == RED){
+        if (source != NULL){
+            error.message = string_init_with_data("This instruction should have destination but no source");
+            error.token = *node.operation;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+        
+        AM = get_addressing_mode_of_operand(astChecker, destination, isDestinationDerefrenced);
+        if (AM == AbsoluteAddressing){
+            error.message = string_init_with_data("Wrong addressing mode of operand");
+            error.token = *destination;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+    } else if (node.operation->kind == PRN){
+        if (source != NULL){
+            error.message = string_init_with_data("This instruction should have destination but no source");
+            error.token = *node.operation;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+    }
+    
+    return;
 }
 
 void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, TranslationUnit * translationUnit){
