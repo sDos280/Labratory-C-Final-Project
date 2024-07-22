@@ -233,7 +233,7 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
             return;
         }
-    } else if (node.operation->kind == CMP){
+    } else if (node.operation->kind == LEA){
         if (source == NULL || destination == NULL){
             error.message = string_init_with_data("This instruction should have 2 operands");
             error.token = *node.operation;
@@ -245,7 +245,7 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
         AM = get_addressing_mode_of_operand(astChecker, source, isSourceDerefrenced);
         if (AM != DirectAddressing){
             error.message = string_init_with_data("Wrong addressing mode of operand");
-            error.token = *node.operation;
+            error.token = *source;
 
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
             return;
@@ -295,17 +295,8 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
         }
     } else if (node.operation->kind == RTS || node.operation->kind == STOP){
         if (source != NULL || destination != NULL){
-            error.message = string_init_with_data("This instruction should have nor destination nor source");
+            error.message = string_init_with_data("This instruction should have nor destination or source");
             error.token = *node.operation;
-
-            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-            return;
-        }
-        
-        AM = get_addressing_mode_of_operand(astChecker, destination, isDestinationDerefrenced);
-        if (AM == AbsoluteAddressing || AM == DirectRegisterAddressing){
-            error.message = string_init_with_data("Wrong addressing mode of operand");
-            error.token = *destination;
 
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
             return;
@@ -328,7 +319,7 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
             return;
         }
     } else if (node.operation->kind == PRN){
-        if (source != NULL){
+        if (source != NULL || destination == NULL){
             error.message = string_init_with_data("This instruction should have destination but no source");
             error.token = *node.operation;
 
@@ -336,8 +327,6 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
             return;
         }
     }
-    
-    return;
 }
 
 void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, TranslationUnit * translationUnit){
