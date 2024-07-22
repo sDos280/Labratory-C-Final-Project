@@ -4,6 +4,13 @@
 #include "parser.h"
 #include "lexer.h"
 
+typedef enum AddressingMode {
+    AbsoluteAddressing = 0,  /* # then number */
+    DirectAddressing = 1,  /* just a labal */
+    IndirectRegisterAddressing = 2,  /* derefrencing a register */
+    DirectRegisterAddressing = 3,  /* just a register */
+}AddressingMode;
+
 typedef enum IdentifierHashCellKind {
     LabalCellKind,
     ExternalCellKind
@@ -78,6 +85,14 @@ bool ast_checker_set_hash_cell_by_string(AstChecker * astChecker, IdentifierHash
  * @param node the data node.
 */
 void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode node);
+
+/**
+ * Check if the passed instruction node is currect (the source/destination is allowed)
+ *
+ * @param astChecker the AST checker.
+ * @param node the instruction node.
+*/
+void ast_checker_check_instruction_sentence(AstChecker * astChecker, InstructionNode node);
 
 /**
  * Check for duplicate identifiers
