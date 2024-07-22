@@ -219,9 +219,6 @@ void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, Translatio
                 error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
             }*/
         }
-        
-
-        
 
         externalNodeList = externalNodeList->next;
     }
@@ -235,7 +232,14 @@ void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, Translatio
 
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
         }else {
-            cellPointerTemp->hasEntry = true;
+            if (cellPointerTemp->kind == ExternalCellKind){
+                error.message = string_init_with_data("An entry can't be also an external");
+                error.token = *externalNodeList->node.token;
+
+                error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            } else { /*cellPointerTemp->kind == LabalCellKind */
+                cellPointerTemp->hasEntry = true;
+            }
         }
 
         entryNodeList = entryNodeList->next;
