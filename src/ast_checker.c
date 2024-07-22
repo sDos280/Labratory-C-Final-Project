@@ -73,8 +73,8 @@ void ast_checker_free(AstChecker * astChecker){
 }
 
 IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker, String key){
-    unsigned long index = hash(key) % astChecker->size - 1;
-    unsigned long indexCopy = hash(key) % astChecker->size - 1;
+    unsigned long index = hash(key) % astChecker->size;
+    unsigned long indexCopy = hash(key) % astChecker->size;
 
     /* Loop till we find an empty entry. */
     while (astChecker->hash[index].key != NULL) {
@@ -97,8 +97,8 @@ IdentifierHashCell * ast_checker_get_hash_cell_by_string(AstChecker * astChecker
 }
 
 bool ast_checker_set_hash_cell_by_string(AstChecker * astChecker, IdentifierHashCell cell){
-    unsigned long index = (hash(*cell.key) % astChecker->size);
-    unsigned long indexCopy = (hash(*cell.key) % astChecker->size);
+    unsigned long index = hash(*cell.key) % astChecker->size;
+    unsigned long indexCopy = hash(*cell.key) % astChecker->size;
 
     /* Loop till we find an empty entry. */
     while (astChecker->hash[index].key != NULL) {
@@ -147,10 +147,11 @@ void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode 
 }
 
 void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, TranslationUnit * translationUnit){
-    /*ExternalNodeList * externalNodeList = translationUnit->externalNodeList;
-    EntryNodeList * entryNodeList = translationUnit->entryNodeList;*/
+    ExternalNodeList * externalNodeList = translationUnit->externalNodeList;
+    EntryNodeList * entryNodeList = translationUnit->entryNodeList;
     LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
-    /*LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;*/
+    LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
+    IdentifierHashCell * cellPointerTemp = NULL;
     IdentifierHashCell cell;
     bool temp = false;
     TokenError error;
@@ -172,7 +173,6 @@ void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, Translatio
         instructionLabalList = instructionLabalList->next;
     }
 
-    /*
     while (guidanceLabalList != NULL){
         if (guidanceLabalList->labal.labal != NULL){
             cell.key = &guidanceLabalList->labal.labal->string;
@@ -191,5 +191,53 @@ void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, Translatio
         
 
         guidanceLabalList = guidanceLabalList->next;
-    }*/
+    }
+
+    while (externalNodeList != NULL){
+        cellPointerTemp = ast_checker_get_hash_cell_by_string(astChecker, externalNodeList->node.token->string);
+        
+        if (cellPointerTemp == NULL){
+            /* this external identifier wasn't added yet so we add it*/
+            cell.key = &externalNodeList->node.token->string;
+            cell.kind = ExternalCellKind;
+            cell.value.external = &externalNodeList->node;
+        
+            temp = ast_checker_set_hash_cell_by_string(astChecker, cell);
+        }else {
+            /* this external identifier was added already */
+
+            if (cellPointerTemp->kind == LabalCellKind){
+                error.message = string_init_with_data("An identifier can't be declare as a labal and also an external");
+                error.token = *externalNodeList->node.token;
+
+                error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            } /*else {  cellPointerTemp->kind == ExternalCellKind */
+                /* a decleration of external twice isn't really a problem, so is no really a problem
+                error.message = string_init_with_data("A Duplicate of this labal was found");
+                error.token = *externalNodeList->node.token;
+
+                error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            }*/
+        }
+        
+
+        
+
+        externalNodeList = externalNodeList->next;
+    }
+
+    while (entryNodeList != NULL){
+        cellPointerTemp = ast_checker_get_hash_cell_by_string(astChecker, entryNodeList->node.token->string);
+
+        if (cellPointerTemp == NULL){
+            error.message = string_init_with_data("No labal was found for this entry");
+            error.token = *entryNodeList->node.token;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+        }else {
+            cellPointerTemp->hasEntry = true;
+        }
+
+        entryNodeList = entryNodeList->next;
+    }
 }

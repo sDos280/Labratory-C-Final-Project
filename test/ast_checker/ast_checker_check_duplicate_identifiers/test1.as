@@ -1,5 +1,6 @@
 .entry fff
-.extern gfgfg
+.extern f
+.extern f
 .entry ff2
 .extern f5
 f: 
