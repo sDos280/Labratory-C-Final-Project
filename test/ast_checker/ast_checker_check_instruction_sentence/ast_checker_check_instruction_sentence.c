@@ -85,7 +85,7 @@ int main(){
     
     /* ast check pass */
     ast_checker_init(&astChecker, &translationUnit, lexerPostprocess);
-    
+    ast_checker_check_duplicate_identifiers(&astChecker, &translationUnit);
 
     externalNodeList = translationUnit.externalNodeList;
     entryNodeList = translationUnit.entryNodeList;
@@ -102,7 +102,7 @@ int main(){
     }
 
     error_handler_flush_error_list(&astChecker.errorHandler);
-    
+
     ast_checker_free(&astChecker);
     parser_free_translation_unit(&translationUnit);
     preprocessor_free(&preprocessor);

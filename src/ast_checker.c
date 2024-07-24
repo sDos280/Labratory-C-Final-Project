@@ -195,7 +195,9 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
     bool isDestinationDerefrenced = false;
     TokenError error;
     AddressingMode AM = AbsoluteAddressing;
+    IdentifierHashCell cell;
 
+    /* check for valid operator kind */
     if (node.firstOperand == NULL && node.secondOperand == NULL) {} /* no arguments, so no update is needed*/
     else if (node.secondOperand == NULL){
         destination = node.firstOperand;
@@ -322,6 +324,26 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
         if (source != NULL || destination == NULL){
             error.message = string_init_with_data("This instruction should have destination but no source");
             error.token = *node.operation;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+    }
+
+    /* check of known identifiers */
+    if (source != NULL){
+        if (source->kind == IDENTIFIER && ast_checker_get_hash_cell_by_string(astChecker, source->string) == NULL){
+            error.message = string_init_with_data("Unknown identifier");
+            error.token = *source;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+            return;
+        }
+    }
+    if (destination != NULL){
+        if (destination->kind == IDENTIFIER && ast_checker_get_hash_cell_by_string(astChecker, destination->string) == NULL){
+            error.message = string_init_with_data("Unknown identifier");
+            error.token = *destination;
 
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
             return;
