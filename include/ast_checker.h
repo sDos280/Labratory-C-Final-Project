@@ -110,4 +110,12 @@ void ast_checker_check_labal(AstChecker * astChecker, LabalNode node);
 */
 void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, TranslationUnit * translationUnit);
 
+/**
+ * Check all of the translation unit.
+ *
+ * @param astChecker the AST checker.
+ * @param translationUnit the translation unit.
+*/
+void ast_checker_check_translation_unit(AstChecker * astChecker, TranslationUnit * translationUnit);
+
 #endif /* LABRATORY_C_MAMAN22_AST_CHECKER */

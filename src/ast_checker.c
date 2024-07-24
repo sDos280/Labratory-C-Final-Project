@@ -336,18 +336,20 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
             error.token = *source;
 
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-            return;
         }
     }
+    
     if (destination != NULL){
         if (destination->kind == IDENTIFIER && ast_checker_get_hash_cell_by_string(astChecker, destination->string) == NULL){
             error.message = string_init_with_data("Unknown identifier");
             error.token = *destination;
 
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-            return;
+            
         }
     }
+
+    return;
 }
 
 void ast_checker_check_labal(AstChecker * astChecker, LabalNode node){
@@ -471,5 +473,25 @@ void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, Translatio
         }
 
         entryNodeList = entryNodeList->next;
+    }
+}
+
+void ast_checker_check_translation_unit(AstChecker * astChecker, TranslationUnit * translationUnit){
+    LabalNodeList * instructionLabalList = NULL;
+    LabalNodeList * guidanceLabalList = NULL;
+    
+    ast_checker_check_duplicate_identifiers(astChecker, translationUnit);
+
+    instructionLabalList = translationUnit->instructionLabalList;
+    guidanceLabalList = translationUnit->guidanceLabalList;
+
+    while (instructionLabalList != NULL){
+        ast_checker_check_labal(astChecker, instructionLabalList->labal);
+        instructionLabalList = instructionLabalList->next;
+    }
+
+    while (guidanceLabalList != NULL){
+        ast_checker_check_labal(astChecker, guidanceLabalList->labal);
+        guidanceLabalList = guidanceLabalList->next;
     }
 }
