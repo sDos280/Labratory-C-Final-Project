@@ -195,7 +195,6 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
     bool isDestinationDerefrenced = false;
     TokenError error;
     AddressingMode AM = AbsoluteAddressing;
-    IdentifierHashCell cell;
 
     /* check for valid operator kind */
     if (node.firstOperand == NULL && node.secondOperand == NULL) {} /* no arguments, so no update is needed*/
@@ -348,6 +347,30 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
             return;
         }
+    }
+}
+
+void ast_checker_check_labal(AstChecker * astChecker, LabalNode node){
+    TokenError error;
+    InstructionNodeList * copyI = node.instructionNodeList;
+    GuidanceNodeList * copyG = node.guidanceNodeList;
+    
+    /* check if a labal with instructions have a labal identifier */
+    if (node.instructionNodeList != NULL && node.labal == NULL){
+        error.message = string_init_with_data("A labal with instructions should have a labal identifier");
+        error.token = *node.instructionNodeList->node.firstOperand;
+
+        error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+    }
+
+    while (copyI != NULL){
+        ast_checker_check_instruction_sentence(astChecker, copyI->node);
+        copyI = copyI->next;
+    }
+
+    while (copyG != NULL){
+        if (copyG->kind == DataNodeKind) ast_checker_check_data_guidance_sentence(astChecker, copyG->node.dataNode);
+        copyG = copyG->next;
     }
 }
 

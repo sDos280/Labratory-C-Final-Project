@@ -8,7 +8,7 @@ typedef enum AddressingMode {
     AbsoluteAddressing = 0,  /* # then number */
     DirectAddressing = 1,  /* just a labal */
     IndirectRegisterAddressing = 2,  /* derefrencing a register */
-    DirectRegisterAddressing = 3,  /* just a register */
+    DirectRegisterAddressing = 3  /* just a register */
 }AddressingMode;
 
 typedef enum IdentifierHashCellKind {
@@ -93,6 +93,14 @@ void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode 
  * @param node the instruction node.
 */
 void ast_checker_check_instruction_sentence(AstChecker * astChecker, InstructionNode node);
+
+/**
+ * Check if the passed labal node is currect (the instructions/guidance sentences don't have a problem)
+ *
+ * @param astChecker the AST checker.
+ * @param node the labal node.
+*/
+void ast_checker_check_labal(AstChecker * astChecker, LabalNode node);
 
 /**
  * Check for duplicate identifiers
