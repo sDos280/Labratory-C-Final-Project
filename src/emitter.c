@@ -86,6 +86,22 @@ static unsigned int calc_labal_size(LabalNode labal){
     return out;
 }
 
+void emitter_init(Emitter * emitter, Lexer lexer){
+    emitter->entryFile = string_init();
+    emitter->externalFile = string_init();
+    emitter->objectFile = string_init();
+
+    error_handler_init(&emitter->errorHandler, lexer.string, lexer.filePath);
+}
+
+void emitter_free(Emitter * emitter){
+    string_free(emitter->entryFile);
+    string_free(emitter->externalFile);
+    string_free(emitter->objectFile);
+
+    error_handler_free_error_list(&emitter->errorHandler);
+}
+
 void emitter_update_labals_size_and_position(Emitter * emitter, TranslationUnit * translationUnit){
     LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
     LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;

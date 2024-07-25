@@ -13,6 +13,21 @@ typedef struct Emitter
 }Emitter;
 
 /**
+ * Initialize the emitter.
+ *
+ * @param emmiter the emmiter.
+ * @param lexer the lexer.
+*/
+void emitter_init(Emitter * emitter, Lexer lexer);
+
+/**
+ * Free the (memory of) emitter.
+ *
+ * @param emmiter the emmiter.
+*/
+void emitter_free(Emitter * emitter);
+
+/**
  * Update the size and position of the labals in the translation unit.
  *
  * @param emitter the emitter.
