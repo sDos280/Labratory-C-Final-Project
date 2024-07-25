@@ -470,7 +470,7 @@ void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, Translatio
                 error.token = *externalNodeList->node.token;
 
                 error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-            } /*else { /*cellPointerTemp->kind == LabalCellKind 
+            } /*else { cellPointerTemp->kind == LabalCellKind 
             }*/
         }
 
