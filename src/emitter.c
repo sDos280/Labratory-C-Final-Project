@@ -1,0 +1,141 @@
+#include "../include/emitter.h"
+#include "../include/ast_checker.h"
+#include "../include/string_util.h"
+
+#define STARTING_POSITION 100
+#define MAX_POSITION 9999
+
+/**
+ * Get the addressing mod of an operand.
+ *
+ * @param operand_token the operand token.
+ * @param operand_token true if the operand is derefrenced else false.
+ * @return the addressing mode.
+ * @note almost the same function as in ast_cheker
+*/
+static AddressingMode get_addressing_mode_of_operand(Token * operand_token, bool isDerefrenced){
+    TokenError error;
+    if (operand_token->kind == NUMBER) {
+        return AbsoluteAddressing;
+    } else if (operand_token->kind == IDENTIFIER) {
+        return DirectAddressing;
+    } else if (operand_token->kind == REGISTER) {
+        if (isDerefrenced == true) return IndirectRegisterAddressing;
+        
+        return DirectRegisterAddressing;
+    }
+
+    return AbsoluteAddressing;
+}
+
+/**
+ * Calculate the size of memory a labal would occupied 
+ *
+ * @param labal the labal.
+ * @return the size of the labal
+*/
+static unsigned int calc_labal_size(LabalNode labal){
+    InstructionNodeList * instructionNodeList = labal.instructionNodeList;
+    GuidanceNodeList * guidanceNodeList = labal.guidanceNodeList;
+    TokenRefrenceList * numbers = NULL;
+    AddressingMode first = AbsoluteAddressing;
+    AddressingMode second = AbsoluteAddressing;
+    int out = 0;
+
+    while (instructionNodeList != NULL){
+        out++; /* +1 for the memory instruction itself */
+        
+        first = AbsoluteAddressing;
+        second = AbsoluteAddressing;
+
+        if (instructionNodeList->node.firstOperand != NULL) 
+            first = get_addressing_mode_of_operand(instructionNodeList->node.firstOperand, 
+                                           instructionNodeList->node.isFirstOperandDerefrenced);
+        if (instructionNodeList->node.secondOperand != NULL) 
+            second = get_addressing_mode_of_operand(instructionNodeList->node.secondOperand, 
+                                           instructionNodeList->node.isSecondOperandDerefrenced);
+
+        if ((first == IndirectRegisterAddressing || first == DirectRegisterAddressing) &&
+            (second == IndirectRegisterAddressing || second == DirectRegisterAddressing))
+            out++; /* only 2 registers have the property to fit in one word together */
+        else {
+            if (instructionNodeList->node.firstOperand != NULL) 
+                out++; /* add +1 for the first operand */
+            if (instructionNodeList->node.secondOperand != NULL) 
+                out++; /* add +1 for the second operand */
+        }
+
+        instructionNodeList = instructionNodeList->next;
+    }
+
+    while (guidanceNodeList != NULL){
+        if (guidanceNodeList->kind == StringNodeKind)
+            out += string_length(guidanceNodeList->node.stringNode.token->string) + 1 - 2; /* +1 for the \0 char and -2 for the 2 \" "*/
+
+        if (guidanceNodeList->kind == DataNodeKind){
+            numbers = guidanceNodeList->node.dataNode.numbers;
+            while (numbers != NULL){
+                out++; /* each number have the size of 1*/
+                numbers = numbers->next;
+            }
+        }
+        
+        guidanceNodeList = guidanceNodeList->next;
+    }
+
+    return out;
+}
+
+void emmiter_update_labals_size_and_position(Emitter * emitter, TranslationUnit * translationUnit){
+    LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
+    LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
+    unsigned int position = STARTING_POSITION;
+    TokenError error;
+
+    while (instructionLabalList != NULL){
+        /* update the labal poistion and size */
+        instructionLabalList->labal.size = calc_labal_size(instructionLabalList->labal);
+        instructionLabalList->labal.position = position;
+
+        position += instructionLabalList->labal.size;
+        if (position > MAX_POSITION) { /* 9999*/
+            error.message = string_init_with_data("Maxed out position size, got over 9999");
+
+            if (instructionLabalList->labal.labal != NULL)
+                error.token = *instructionLabalList->labal.labal;
+            else 
+                error.token = *instructionLabalList->labal.instructionNodeList->node.operation;
+
+            error_handler_push_token_error(&emitter->errorHandler, EmitterErrorKind, error);
+
+            return;
+        } 
+
+        instructionLabalList = instructionLabalList->next;
+    }
+
+    while (guidanceLabalList != NULL){
+        /* update the labal poistion and size */
+        guidanceLabalList->labal.size = calc_labal_size(guidanceLabalList->labal);
+        guidanceLabalList->labal.position = position;
+
+        position += guidanceLabalList->labal.size;
+        if (position > MAX_POSITION) { /* 9999*/
+            error.message = string_init_with_data("Maxed out position size, got over 9999");
+
+            if (guidanceLabalList->labal.labal != NULL)
+                error.token = *guidanceLabalList->labal.labal;
+            else 
+                if (guidanceLabalList->labal.guidanceNodeList->kind == DataNodeKind)
+                    error.token = *guidanceLabalList->labal.guidanceNodeList->node.dataNode.numbers->token;
+                else 
+                    error.token = *guidanceLabalList->labal.guidanceNodeList->node.stringNode.token;
+
+            error_handler_push_token_error(&emitter->errorHandler, EmitterErrorKind, error);
+
+            return;
+        } 
+
+        guidanceLabalList = guidanceLabalList->next;
+    }
+}
