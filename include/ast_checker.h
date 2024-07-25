@@ -25,7 +25,7 @@ typedef struct IdentifierHashCell {
     }value; /* the data of the cell */
 
     IdentifierHashCellKind kind; /* the kind of the cell */
-    bool hasEntry; /* true if there is an .entry for this identifier else false */
+    bool wasEntryAdded; /* true if an entry for the labal if the same identfier as the entry was added to the .ent file */
 }IdentifierHashCell;
 
 typedef struct AstChecker {
