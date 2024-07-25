@@ -91,6 +91,10 @@ void error_handler_flush_error_list(ErrorHandler * handler){
             caller_string = "AST Checker Error";
             break;
         
+        case EmitterErrorKind:
+            caller_string = "Emitter Error";
+            break;
+        
         default:
             caller_string = "";
             break;
