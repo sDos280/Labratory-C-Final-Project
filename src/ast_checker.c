@@ -142,6 +142,9 @@ bool ast_checker_set_hash_cell_by_string(AstChecker * astChecker, IdentifierHash
     unsigned long index = hash(*cell.key) % astChecker->size;
     unsigned long indexCopy = hash(*cell.key) % astChecker->size;
 
+    cell.wasEntryAdded = false; /* make sure that under any circumstances the ast checker couldn't 
+    interfire with the work of the emitter in relation to the entry check */
+
     /* Loop till we find an empty entry. */
     while (astChecker->hash[index].key != NULL) {
         /* check if there is an existing cell with the cell with the same key as passed*/
