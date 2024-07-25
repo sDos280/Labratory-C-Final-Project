@@ -13,11 +13,20 @@ typedef struct Emitter
 }Emitter;
 
 /**
- * Update the size and position of the labals in the translation unit
+ * Update the size and position of the labals in the translation unit.
  *
  * @param emitter the emitter.
  * @param translationUnit the translation unit.
 */
-void emmiter_update_labals_size_and_position(Emitter * emitter, TranslationUnit * translationUnit);
+void emitter_update_labals_size_and_position(Emitter * emitter, TranslationUnit * translationUnit);
+
+/**
+ * Generate the entry file string.
+ *
+ * @param emitter the emitter.
+ * @param astChecker the ast checker.
+ * @param translationUnit the translation unit.
+*/
+void emitter_generate_entry_file_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit);
 
 #endif /*LABRATORY_C_FINAL_PROJECT_EMITTER*/

@@ -86,7 +86,7 @@ static unsigned int calc_labal_size(LabalNode labal){
     return out;
 }
 
-void emmiter_update_labals_size_and_position(Emitter * emitter, TranslationUnit * translationUnit){
+void emitter_update_labals_size_and_position(Emitter * emitter, TranslationUnit * translationUnit){
     LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
     LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
     unsigned int position = STARTING_POSITION;
@@ -137,5 +137,29 @@ void emmiter_update_labals_size_and_position(Emitter * emitter, TranslationUnit 
         } 
 
         guidanceLabalList = guidanceLabalList->next;
+    }
+}
+
+void emitter_generate_entry_file_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit){
+    EntryNodeList * entryNodeList = translationUnit->entryNodeList;
+    IdentifierHashCell * temp = NULL;
+    char * tempAtoiS = NULL; /* temp char pointer for storing the value of the position in a string format*/
+
+    while (entryNodeList != NULL){
+        temp = ast_checker_get_hash_cell_by_string(astChecker, entryNodeList->node.token->string);
+        
+        if (temp != NULL){
+            if (temp->wasEntryAdded == false){
+                tempAtoiS = calloc(10, sizeof(char));
+                string_add_string(&emitter->entryFile, entryNodeList->node.token->string); /* add the name of entry */
+                sprintf(tempAtoiS, " %d\n", temp->value.labal->position);
+                string_add_char_pointer(&emitter->entryFile, tempAtoiS);
+                free(tempAtoiS);
+            }
+
+            temp->wasEntryAdded = true;
+        }
+
+        entryNodeList = entryNodeList->next;
     }
 }
