@@ -14,7 +14,6 @@
  * @note almost the same function as in ast_cheker
 */
 static AddressingMode get_addressing_mode_of_operand(Token * operand_token, bool isDerefrenced){
-    TokenError error;
     if (operand_token->kind == NUMBER) {
         return AbsoluteAddressing;
     } else if (operand_token->kind == IDENTIFIER) {

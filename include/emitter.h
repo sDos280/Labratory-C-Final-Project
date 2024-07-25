@@ -1,7 +1,10 @@
 #ifndef LABRATORY_C_FINAL_PROJECT_EMITTER
 #define LABRATORY_C_FINAL_PROJECT_EMITTER
 
+#include "lexer.h"
+#include "ast_checker.h"
 #include "node.h"
+
 
 typedef struct Emitter
 {
