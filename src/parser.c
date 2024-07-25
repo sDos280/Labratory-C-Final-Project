@@ -92,44 +92,6 @@ static InstructionOperand parser_parse_instruction_operand(TranslationUnit * tra
     return out;
 }
 
-/**
- * Calculate the size of memory a labal would occupied 
- *
- * @param labal the labal.
- * @return the size of the labal
-*/
-static unsigned int calc_labal_size(LabalNode labal){
-    InstructionNodeList * instructionNodeList = labal.instructionNodeList;
-    GuidanceNodeList * guidanceNodeList = labal.guidanceNodeList;
-    TokenRefrenceList * numbers = NULL;
-    int out = 0;
-
-    while (instructionNodeList != NULL){
-        out++; /* +1 for the memory instruction itself */
-        if (instructionNodeList->node.firstOperand != NULL) out++;
-        if (instructionNodeList->node.secondOperand != NULL) out++;
-
-        instructionNodeList = instructionNodeList->next;
-    }
-
-    while (guidanceNodeList != NULL){
-        if (guidanceNodeList->kind == StringNodeKind)
-            out += string_length(guidanceNodeList->node.stringNode.token->string) + 1 - 2; /* +1 for the \0 char and -2 for the 2 \" "*/
-
-        if (guidanceNodeList->kind == DataNodeKind){
-            numbers = guidanceNodeList->node.dataNode.numbers;
-            while (numbers != NULL){
-                out++; /* each number have the size of 1*/
-                numbers = numbers->next;
-            }
-        }
-        
-        guidanceNodeList = guidanceNodeList->next;
-    }
-
-    return out;
-}
-
 void parser_init_translation_unit(TranslationUnit * translationUnit, Lexer lexer){
     translationUnit->externalNodeList = NULL;
     translationUnit->entryNodeList = NULL;
@@ -676,7 +638,7 @@ LabalNode parser_parse_labal(TranslationUnit * translationUnit){
 
         labal.instructionNodeList = parser_parse_instruction_sentences(translationUnit);
         labal.guidanceNodeList = NULL;
-        labal.size = calc_labal_size(labal);
+        labal.size = 0; /* not yet initialized */
         labal.position = 0; /* not yet initialized */
         return labal;
     }
@@ -686,7 +648,7 @@ LabalNode parser_parse_labal(TranslationUnit * translationUnit){
         translationUnit->tokens->token.kind == DATA_INS)){
         labal.guidanceNodeList = parser_parse_guidance_sentences(translationUnit);
         labal.instructionNodeList = NULL;
-        labal.size = calc_labal_size(labal);
+        labal.size = 0; /* not yet initialized */
         labal.position = 0; /* not yet initialized */
         return labal;
     }
