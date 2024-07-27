@@ -15,12 +15,12 @@ int main(){
     Emitter emitter;
 
     /* preprocess lexer pass */
-    lexer_init_file(&lexerPreprocess, "test1");
+    lexer_init_file(&lexerPreprocess, "test2");
     lexer_lex(&lexerPreprocess);
     error_handler_flush_error_list(&lexerPreprocess.errorHandler);
     
     /* preprocesser pass */
-    preprocessor_init(&preprocessor, lexerPreprocess, "test1");
+    preprocessor_init(&preprocessor, lexerPreprocess, "test2");
     preprocessor_preprocess(&preprocessor, lexerPreprocess.string);
     error_handler_flush_error_list(&preprocessor.errorHandler);
 
