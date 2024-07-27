@@ -25,7 +25,7 @@ typedef struct __attribute__((packed)) InstrucitonOperandMemory {
         unsigned char rsrc: 4; /* the register used in source */
     };
     /* so in total we have 3 + max(12, 4 + 4) = 3 + 12 = 15 bits */
-} InstrucitonMemory;
+} InstrucitonOperandMemory;
 
 
 typedef enum InstructionCode {
@@ -86,5 +86,15 @@ void emitter_update_labals_size_and_position(Emitter * emitter, TranslationUnit 
  * @param translationUnit the translation unit.
 */
 void emitter_generate_entry_file_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit);
+
+
+/**
+ * Generate the object and external files string.
+ *
+ * @param emitter the emitter.
+ * @param astChecker the ast checker.
+ * @param translationUnit the translation unit.
+*/
+void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit);
 
 #endif /*LABRATORY_C_FINAL_PROJECT_EMITTER*/
