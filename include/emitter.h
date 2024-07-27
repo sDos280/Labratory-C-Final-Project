@@ -5,9 +5,49 @@
 #include "ast_checker.h"
 #include "node.h"
 
+typedef struct __attribute__((packed)) InstrucitonMemory {
+    /* the Instruction memory layout as in the object file*/
+    unsigned char ARS: 3; /* ARS field */
+    unsigned char dst: 4; /* destination adressing mode */
+    unsigned char src: 4; /* source adressing mode */
+    unsigned char code : 4; /* 4 bit for the code */
+    /* so in total we have 3 + 4 + 4 + 4 = 15 bits */
+} InstrucitonMemory;
 
-typedef struct Emitter
-{
+typedef struct __attribute__((packed)) InstrucitonOperandMemory {
+    /* the Instruction memory layout as in the object file*/
+    unsigned char ARS: 3; /* ARS field */
+    union other {
+        unsigned short full: 12; /* for a case of number\labal\external */
+        
+        /* for adressing mode of one registr or more */
+        unsigned char rdst: 4; /* the register used in destination */
+        unsigned char rsrc: 4; /* the register used in source */
+    };
+    /* so in total we have 3 + max(12, 4 + 4) = 3 + 12 = 15 bits */
+} InstrucitonMemory;
+
+
+typedef enum InstructionCode {
+    MOV_CODE,
+    CMP_CODE,
+    ADD_CODE,
+    SUB_CODE,
+    LEA_CODE,
+    CLR_CODE,
+    NOT_CODE,
+    INC_CODE,
+    DEC_CODE,
+    JMP_CODE,
+    BNE_CODE,
+    RED_CODE,
+    PRN_CODE,
+    JSR_CODE,
+    RTS_CODE,
+    STOP_CODE
+}InstructionCode;
+
+typedef struct Emitter {
     String entryFile; /* the .ent file as string */
     String externalFile; /* the .ext file as string */
     String objectFile; /* the .ob file as string */
