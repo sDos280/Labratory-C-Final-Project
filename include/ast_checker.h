@@ -5,10 +5,10 @@
 #include "lexer.h"
 
 typedef enum AddressingMode {
-    AbsoluteAddressing = 0,  /* # then number */
-    DirectAddressing = 1,  /* just a labal */
-    IndirectRegisterAddressing = 2,  /* derefrencing a register */
-    DirectRegisterAddressing = 3  /* just a register */
+    AbsoluteAddressing = 1,          /* 0001 - # then number */
+    DirectAddressing = 2,            /* 0010 - just a labal */
+    IndirectRegisterAddressing = 4,  /* 0100 - derefrencing a register */
+    DirectRegisterAddressing = 8     /* 1000 - just a register */
 }AddressingMode;
 
 typedef enum IdentifierHashCellKind {
