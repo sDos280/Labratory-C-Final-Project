@@ -7,7 +7,7 @@
 
 typedef struct __attribute__((packed)) InstrucitonMemory {
     /* the Instruction memory layout as in the object file*/
-    unsigned int ARS: 3; /* ARS field */
+    unsigned int ARE: 3; /* ARE field */
     unsigned int dst: 4; /* destination adressing mode */
     unsigned int src: 4; /* source adressing mode */
     unsigned int code : 4; /* 4 bit for the code */
@@ -16,7 +16,7 @@ typedef struct __attribute__((packed)) InstrucitonMemory {
 
 typedef struct __attribute__((packed)) InstrucitonOperandMemory {
     /* the Instruction memory layout as in the object file*/
-    unsigned int ARS: 3; /* ARS field */
+    unsigned int ARE: 3; /* ARE field */
     union {
         unsigned int full: 12; /* for a case of number\labal\external */
         
