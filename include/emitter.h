@@ -7,23 +7,23 @@
 
 typedef struct __attribute__((packed)) InstrucitonMemory {
     /* the Instruction memory layout as in the object file*/
-    unsigned char ARS: 3; /* ARS field */
-    unsigned char dst: 4; /* destination adressing mode */
-    unsigned char src: 4; /* source adressing mode */
-    unsigned char code : 4; /* 4 bit for the code */
+    unsigned int ARS: 3; /* ARS field */
+    unsigned int dst: 4; /* destination adressing mode */
+    unsigned int src: 4; /* source adressing mode */
+    unsigned int code : 4; /* 4 bit for the code */
     /* so in total we have 3 + 4 + 4 + 4 = 15 bits */
 } InstrucitonMemory;
 
 typedef struct __attribute__((packed)) InstrucitonOperandMemory {
     /* the Instruction memory layout as in the object file*/
-    unsigned char ARS: 3; /* ARS field */
-    union other {
-        unsigned short full: 12; /* for a case of number\labal\external */
+    unsigned int ARS: 3; /* ARS field */
+    union {
+        unsigned int full: 12; /* for a case of number\labal\external */
         
         /* for adressing mode of one registr or more */
-        unsigned char rdst: 4; /* the register used in destination */
-        unsigned char rsrc: 4; /* the register used in source */
-    };
+        unsigned int rdst: 4; /* the register used in destination */
+        unsigned int rsrc: 4; /* the register used in source */
+    }other;
     /* so in total we have 3 + max(12, 4 + 4) = 3 + 12 = 15 bits */
 } InstrucitonOperandMemory;
 
