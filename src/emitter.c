@@ -92,9 +92,9 @@ static unsigned int calc_labal_size(LabalNode labal){
 static void update_instruction_memory_stuff(Emitter * emitter, 
                                             AstChecker * astChecker, 
                                             InstructionNode node, 
-                                            InstrucitonMemory * instrucitonMemory, 
-                                            InstrucitonOperandMemory * instrucitonFirstOperandMemory,
-                                            InstrucitonOperandMemory * instrucitonSecondOperandMemory,
+                                            InstrucitionMemory * instrucitionMemory, 
+                                            InstrucitionOperandMemory * instrucitionFirstOperandMemory,
+                                            InstrucitionOperandMemory * instrucitionSecondOperandMemory,
                                             int * position) {
     AddressingMode first = AbsoluteAddressing;
     AddressingMode second = AbsoluteAddressing;
@@ -102,22 +102,22 @@ static void update_instruction_memory_stuff(Emitter * emitter,
     IdentifierHashCell * tempCellP = NULL;
 
     /* inisialize memory of struct */
-    instrucitonMemory->ARE = 0;
-    instrucitonMemory->dst = 0;
-    instrucitonMemory->src = 0;
-    instrucitonMemory->code = 0; 
-    instrucitonFirstOperandMemory->ARE = 0;
-    instrucitonFirstOperandMemory->other.full = 0;
-    instrucitonSecondOperandMemory->ARE = 0;
-    instrucitonSecondOperandMemory->other.full = 0;
+    instrucitionMemory->ARE = 0;
+    instrucitionMemory->dst = 0;
+    instrucitionMemory->src = 0;
+    instrucitionMemory->code = 0; 
+    instrucitionFirstOperandMemory->ARE = 0;
+    instrucitionFirstOperandMemory->other.full = 0;
+    instrucitionSecondOperandMemory->ARE = 0;
+    instrucitionSecondOperandMemory->other.full = 0;
     
     /* 0 operand instruction case */
     if (node.firstOperand == NULL && node.secondOperand == NULL){
         /* update instruction memory */
-        instrucitonMemory->ARE = 4; /* 4 = 0b100 */
-        instrucitonMemory->dst = 0;
-        instrucitonMemory->src = 0;
-        instrucitonMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
+        instrucitionMemory->ARE = 4; /* 4 = 0b100 */
+        instrucitionMemory->dst = 0;
+        instrucitionMemory->src = 0;
+        instrucitionMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
         /* NOTE: should add the output here */
 
@@ -129,10 +129,10 @@ static void update_instruction_memory_stuff(Emitter * emitter,
     else if (node.firstOperand != NULL && node.secondOperand == NULL) {
         first = get_addressing_mode_of_operand(node.firstOperand, node.isFirstOperandDerefrenced);
 
-        instrucitonMemory->ARE = 4; /*4 = 0b100 */
-        instrucitonMemory->dst = first;
-        instrucitonMemory->src = 0;
-        instrucitonMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
+        instrucitionMemory->ARE = 4; /*4 = 0b100 */
+        instrucitionMemory->dst = first;
+        instrucitionMemory->src = 0;
+        instrucitionMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
         /* NOTE: should add the output here */
 
@@ -141,21 +141,21 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         switch (first) {
             case AbsoluteAddressing:
-                instrucitonFirstOperandMemory->ARE = 4; /*4 = 0b100 */
+                instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
                 temp = atoi(node.firstOperand->string.data);
-                instrucitonFirstOperandMemory->other.full = ConvertIntTo2Complement(temp);
+                instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(temp);
                 break;
                     
             case DirectAddressing:
                 tempCellP = ast_checker_get_hash_cell_by_string(astChecker, node.firstOperand->string);
                 if (tempCellP != NULL){
                     if (tempCellP->kind == LabalCellKind) {
-                        instrucitonFirstOperandMemory->ARE = 2; /* 4 = 0b010 */
-                        instrucitonFirstOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
+                        instrucitionFirstOperandMemory->ARE = 2; /* 4 = 0b010 */
+                        instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
                     }
                     else /* if (tempCellP->kind == ExternalCellKind) */ {
-                        instrucitonFirstOperandMemory->ARE = 1; /* 1 = 0b001 */
-                        instrucitonFirstOperandMemory->other.full = 0;
+                        instrucitionFirstOperandMemory->ARE = 1; /* 1 = 0b001 */
+                        instrucitionFirstOperandMemory->other.full = 0;
                         /* NOTE: should add the output here */
                     }
                 }
@@ -164,9 +164,9 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                 
             case IndirectRegisterAddressing:
             case DirectRegisterAddressing:
-                instrucitonFirstOperandMemory->ARE = 4; /*4 = 0b100 */
+                instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
                 temp = atoi(node.firstOperand->string.data[1]); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitonFirstOperandMemory->other.rdst = ConvertIntTo2Complement(temp);
+                instrucitionFirstOperandMemory->other.rdst = ConvertIntTo2Complement(temp);
                 break;
                 
             default:
@@ -184,10 +184,10 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         first = get_addressing_mode_of_operand(node.firstOperand, node.isFirstOperandDerefrenced);
         second = get_addressing_mode_of_operand(node.secondOperand, node.isSecondOperandDerefrenced);
 
-        instrucitonMemory->ARE = 4; /*4 = 0b100 */
-        instrucitonMemory->dst = first;
-        instrucitonMemory->src = second;
-        instrucitonMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
+        instrucitionMemory->ARE = 4; /*4 = 0b100 */
+        instrucitionMemory->dst = first;
+        instrucitionMemory->src = second;
+        instrucitionMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
         /* NOTE: should add the output here */
 
@@ -196,21 +196,21 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         switch (first) {
             case AbsoluteAddressing:
-                instrucitonFirstOperandMemory->ARE = 4; /*4 = 0b100 */
+                instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
                 temp = atoi(node.firstOperand->string.data);
-                instrucitonFirstOperandMemory->other.full = ConvertIntTo2Complement(temp);
+                instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(temp);
                 break;
                     
             case DirectAddressing:
                 tempCellP = ast_checker_get_hash_cell_by_string(astChecker, node.firstOperand->string);
                 if (tempCellP != NULL){
                     if (tempCellP->kind == LabalCellKind) {
-                        instrucitonFirstOperandMemory->ARE = 2; /* 4 = 0b010 */
-                        instrucitonFirstOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
+                        instrucitionFirstOperandMemory->ARE = 2; /* 4 = 0b010 */
+                        instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
                     }
                     else /* if (tempCellP->kind == ExternalCellKind) */ {
-                        instrucitonFirstOperandMemory->ARE = 1; /* 1 = 0b001 */
-                        instrucitonFirstOperandMemory->other.full = 0;
+                        instrucitionFirstOperandMemory->ARE = 1; /* 1 = 0b001 */
+                        instrucitionFirstOperandMemory->other.full = 0;
                         /* NOTE: should add the output here */
                     }
                 }
@@ -219,9 +219,9 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                 
             case IndirectRegisterAddressing:
             case DirectRegisterAddressing:
-                instrucitonFirstOperandMemory->ARE = 4; /*4 = 0b100 */
+                instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
                 temp = atoi(node.firstOperand->string.data[1]); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitonFirstOperandMemory->other.rsrc = ConvertIntTo2Complement(temp);
+                instrucitionFirstOperandMemory->other.rsrc = ConvertIntTo2Complement(temp);
                 break;
                 
             default:
@@ -234,21 +234,21 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         switch (second) {
             case AbsoluteAddressing:
-                instrucitonSecondOperandMemory->ARE = 4; /*4 = 0b100 */
+                instrucitionSecondOperandMemory->ARE = 4; /*4 = 0b100 */
                 temp = atoi(node.firstOperand->string.data);
-                instrucitonSecondOperandMemory->other.full = ConvertIntTo2Complement(temp);
+                instrucitionSecondOperandMemory->other.full = ConvertIntTo2Complement(temp);
                 break;
                     
             case DirectAddressing:
                 tempCellP = ast_checker_get_hash_cell_by_string(astChecker, node.firstOperand->string);
                 if (tempCellP != NULL){
                     if (tempCellP->kind == LabalCellKind) {
-                        instrucitonSecondOperandMemory->ARE = 2; /* 4 = 0b010 */
-                        instrucitonSecondOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
+                        instrucitionSecondOperandMemory->ARE = 2; /* 4 = 0b010 */
+                        instrucitionSecondOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
                     }
                     else /* if (tempCellP->kind == ExternalCellKind) */ {
-                        instrucitonSecondOperandMemory->ARE = 1; /* 1 = 0b001 */
-                        instrucitonSecondOperandMemory->other.full = 0;
+                        instrucitionSecondOperandMemory->ARE = 1; /* 1 = 0b001 */
+                        instrucitionSecondOperandMemory->other.full = 0;
                         /* NOTE: should add the output here */
                     }
                 }
@@ -257,9 +257,9 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                 
             case IndirectRegisterAddressing:
             case DirectRegisterAddressing:
-                instrucitonSecondOperandMemory->ARE = 4; /*4 = 0b100 */
+                instrucitionSecondOperandMemory->ARE = 4; /*4 = 0b100 */
                 temp = atoi(node.firstOperand->string.data[1]); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitonSecondOperandMemory->other.rdst = ConvertIntTo2Complement(temp);
+                instrucitionSecondOperandMemory->other.rdst = ConvertIntTo2Complement(temp);
                 break;
                 
             default:
@@ -373,33 +373,19 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
     InstructionNodeList * instructionNodeList = instructionLabalList->labal.instructionNodeList;
     GuidanceNodeList * guidanceNodeList = guidanceLabalList->labal.guidanceNodeList;
     /* firsly, generate code image */
-    InstrucitonMemory instrucitonMemory;
-    InstrucitonOperandMemory instrucitonOperandMemory;
-    
-    AddressingMode first = AbsoluteAddressing;
-    AddressingMode second = AbsoluteAddressing;
+    InstrucitionMemory instrucitionMemory;
+    InstrucitionOperandMemory instrucitionFirstOperandMemory;
+    InstrucitionOperandMemory instrucitionSecondOperandMemory;
     int position = 100;
-    int temp;
-    instrucitonMemory.ARE = 0;
-    instrucitonMemory.dst = 0;
-    instrucitonMemory.src = 0;
-    instrucitonMemory.code = 0;
 
     while (instructionLabalList != NULL){
         while (instructionNodeList != NULL){
-            
-            /* setup some stuff for the current instruciton */
-            first = AbsoluteAddressing;
-            second = AbsoluteAddressing;
-
-            if (instructionNodeList->node.firstOperand != NULL) 
-                first = get_addressing_mode_of_operand(instructionNodeList->node.firstOperand, 
-                                           instructionNodeList->node.isFirstOperandDerefrenced);
-            if (instructionNodeList->node.secondOperand != NULL) 
-                second = get_addressing_mode_of_operand(instructionNodeList->node.secondOperand, 
-                                           instructionNodeList->node.isSecondOperandDerefrenced);
-
-            
+            update_instruction_memory_stuff(emitter, astChecker, 
+                                            instructionNodeList->node, 
+                                            &instrucitionMemory, 
+                                            &instrucitionFirstOperandMemory,
+                                            &instrucitionSecondOperandMemory,
+                                            &position);
 
             instructionNodeList = instructionNodeList->next;
         }
