@@ -5,16 +5,16 @@
 #include "ast_checker.h"
 #include "node.h"
 
-typedef struct __attribute__((packed)) InstrucitonMemory {
+typedef struct __attribute__((packed)) InstrucitionMemory {
     /* the Instruction memory layout as in the object file*/
     unsigned int ARE: 3; /* ARE field */
     unsigned int dst: 4; /* destination adressing mode */
     unsigned int src: 4; /* source adressing mode */
     unsigned int code : 4; /* 4 bit for the code */
     /* so in total we have 3 + 4 + 4 + 4 = 15 bits */
-} InstrucitonMemory;
+} InstrucitionMemory;
 
-typedef struct __attribute__((packed)) InstrucitonOperandMemory {
+typedef struct __attribute__((packed)) InstrucitionOperandMemory {
     /* the Instruction memory layout as in the object file*/
     unsigned int ARE: 3; /* ARE field */
     union {
@@ -25,7 +25,7 @@ typedef struct __attribute__((packed)) InstrucitonOperandMemory {
         unsigned int rsrc: 4; /* the register used in source */
     }other;
     /* so in total we have 3 + max(12, 4 + 4) = 3 + 12 = 15 bits */
-} InstrucitonOperandMemory;
+} InstrucitionOperandMemory;
 
 
 typedef enum InstructionCode {
