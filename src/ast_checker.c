@@ -444,13 +444,13 @@ void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, Translatio
                 error.token = *externalNodeList->node.token;
 
                 error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-            } /*else {  cellPointerTemp->kind == ExternalCellKind */
-                /* a decleration of external twice isn't really a problem, so is no really a problem
-                error.message = string_init_with_data("A Duplicate of this labal was found");
+            } else {  /*cellPointerTemp->kind == ExternalCellKind */
+                /*a decleration of external twice isn't really a problem, in the compiler sense, but it cause problems in the ent file, so*/
+                error.message = string_init_with_data("An external was declared more then once, that causes problem in the .ent file, please remove other declaretion of this external");
                 error.token = *externalNodeList->node.token;
 
                 error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-            }*/
+            }
         }
 
         externalNodeList = externalNodeList->next;
