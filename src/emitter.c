@@ -5,6 +5,10 @@
 #define STARTING_POSITION 100
 #define MAX_POSITION 9999
 
+#define InstructionTokenKindToInstructionCode(kind) (InstructionCode)(kind - MOV)
+/* 0xFFF is a mast for 12 bit */
+#define ConvertIntTo2Complement(value) ((value >= 0)? (value & 0xFFF) : (((~(-value) & 0xFFF) + 1) & 0xFFF))
+
 /**
  * Get the addressing mod of an operand.
  *
@@ -176,5 +180,44 @@ void emitter_generate_entry_file_string(Emitter * emitter, AstChecker * astCheck
         }
 
         entryNodeList = entryNodeList->next;
+    }
+}
+
+void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit){
+    LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
+    LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
+    InstructionNodeList * instructionNodeList = instructionLabalList->labal.instructionNodeList;
+    GuidanceNodeList * guidanceNodeList = guidanceLabalList->labal.guidanceNodeList;
+    /* firsly, generate code image */
+    InstrucitonMemory instrucitonMemory;
+    InstrucitonOperandMemory instrucitonOperandMemory;
+    IdentifierHashCell * tempCellP = NULL;
+    AddressingMode first = AbsoluteAddressing;
+    AddressingMode second = AbsoluteAddressing;
+    int position = 100;
+    int temp;
+    instrucitonMemory.ARS = 0;
+    instrucitonMemory.dst = 0;
+    instrucitonMemory.src = 0;
+    instrucitonMemory.code = 0;
+
+    while (instructionLabalList != NULL){
+        while (instructionNodeList != NULL){
+            /* 0 operand instruction case */
+            if (instructionNodeList->node.firstOperand == NULL && instructionNodeList->node.secondOperand == NULL){
+                /* update instruction memory */
+                instrucitonMemory.ARS = 4; /* 4 = 0b100 */
+                instrucitonMemory.dst = 0;
+                instrucitonMemory.src = 0;
+                instrucitonMemory.code = InstructionTokenKindToInstructionCode(instructionNodeList->node.operation->kind);
+
+                /* update position counter */
+                position++;
+            } 
+
+            instructionNodeList = instructionNodeList->next;
+        }
+        
+        instructionLabalList = instructionLabalList->next;
     }
 }
