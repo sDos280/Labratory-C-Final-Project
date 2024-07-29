@@ -100,6 +100,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
     AddressingMode second = AbsoluteAddressing;
     int temp;
     IdentifierHashCell * tempCellP = NULL;
+    char * tempAtoiS = NULL; /* temp char pointer for storing the value of numbers in a string format */
 
     /* inisialize memory of struct */
     instrucitionMemory->ARE = 0;
@@ -122,7 +123,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         /* NOTE: should add the output here */
 
         /* update position counter */
-        *position++;
+        (*position)++;
     }
 
     /* 1 operand instruction case */
@@ -136,8 +137,8 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         /* NOTE: should add the output here */
 
-        /* update position counter (once for the instruction itself)*/
-        *position++;
+        /* update position counter */
+        (*position)++;
 
         switch (first) {
             case AbsoluteAddressing:
@@ -156,7 +157,11 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                     else /* if (tempCellP->kind == ExternalCellKind) */ {
                         instrucitionFirstOperandMemory->ARE = 1; /* 1 = 0b001 */
                         instrucitionFirstOperandMemory->other.full = 0;
-                        /* NOTE: should add the output here */
+                        tempAtoiS = calloc(10, sizeof(char));
+                        string_add_string(&emitter->externalFile, node.firstOperand->string); /* add the name of entry */
+                        sprintf(tempAtoiS, " %d\n", *position);
+                        string_add_char_pointer(&emitter->externalFile, tempAtoiS);
+                        free(tempAtoiS);
                     }
                 }
                     
@@ -165,7 +170,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
             case IndirectRegisterAddressing:
             case DirectRegisterAddressing:
                 instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
-                temp = atoi(node.firstOperand->string.data[1]); /* on data[0] would be an 'r' so we move one for the number */
+                temp = atoi(node.firstOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
                 instrucitionFirstOperandMemory->other.rdst = ConvertIntTo2Complement(temp);
                 break;
                 
@@ -175,11 +180,11 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         /* NOTE: should add the output here */
 
-        /* update position counter secound time */
-        *position++;
+        /* update position counter secound time for the operand*/
+        (*position)++;
     }
 
-    /* 0 operand instruction case */
+    /* 2 operand instruction case */
     else if (node.firstOperand != NULL && node.secondOperand != NULL) {
         first = get_addressing_mode_of_operand(node.firstOperand, node.isFirstOperandDerefrenced);
         second = get_addressing_mode_of_operand(node.secondOperand, node.isSecondOperandDerefrenced);
@@ -191,85 +196,94 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         /* NOTE: should add the output here */
 
-        /* update position counter (once for the instruction itself)*/
-        *position++;
+        /* update position counter */
+        (*position)++;
 
-        switch (first) {
-            case AbsoluteAddressing:
+        /* check if we got 2 Register Addressing mod */
+        if ((first == IndirectRegisterAddressing ||
+             first == DirectRegisterAddressing) &&
+            (second == IndirectRegisterAddressing ||
+             second == DirectRegisterAddressing)) {
                 instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
-                temp = atoi(node.firstOperand->string.data);
-                instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(temp);
-                break;
-                    
-            case DirectAddressing:
-                tempCellP = ast_checker_get_hash_cell_by_string(astChecker, node.firstOperand->string);
-                if (tempCellP != NULL){
-                    if (tempCellP->kind == LabalCellKind) {
-                        instrucitionFirstOperandMemory->ARE = 2; /* 4 = 0b010 */
-                        instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
-                    }
-                    else /* if (tempCellP->kind == ExternalCellKind) */ {
-                        instrucitionFirstOperandMemory->ARE = 1; /* 1 = 0b001 */
-                        instrucitionFirstOperandMemory->other.full = 0;
-                        /* NOTE: should add the output here */
-                    }
-                }
-                    
-                break;
-                
-            case IndirectRegisterAddressing:
-            case DirectRegisterAddressing:
-                instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
-                temp = atoi(node.firstOperand->string.data[1]); /* on data[0] would be an 'r' so we move one for the number */
+                temp = atoi(node.firstOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
                 instrucitionFirstOperandMemory->other.rsrc = ConvertIntTo2Complement(temp);
-                break;
                 
+                instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
+                temp = atoi(node.secondOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
+                instrucitionFirstOperandMemory->other.rdst = ConvertIntTo2Complement(temp);
+
+                (*position) += 1; /* update position counter (again, we onlt need one instruction) */
+        } else {
+            switch (first) {
+                case AbsoluteAddressing:
+                    instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
+                    temp = atoi(node.firstOperand->string.data);
+                    instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(temp);
+                    break;
+                    
+                case DirectAddressing:
+                    tempCellP = ast_checker_get_hash_cell_by_string(astChecker, node.firstOperand->string);
+                    if (tempCellP != NULL){
+                        if (tempCellP->kind == LabalCellKind) {
+                            instrucitionFirstOperandMemory->ARE = 2; /* 4 = 0b010 */
+                            instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
+                        }
+                        else /* if (tempCellP->kind == ExternalCellKind) */ {
+                            instrucitionFirstOperandMemory->ARE = 1; /* 1 = 0b001 */
+                            instrucitionFirstOperandMemory->other.full = 0;
+                            tempAtoiS = calloc(10, sizeof(char));
+                            string_add_string(&emitter->externalFile, node.firstOperand->string); /* add the name of entry */
+                            sprintf(tempAtoiS, " %d\n", *position);
+                            string_add_char_pointer(&emitter->externalFile, tempAtoiS);
+                            free(tempAtoiS);
+                        }
+                    }
+                    break;
+                    
             default:
                 break;
         }
 
-        /* NOTE: should add the output here */
+            /* NOTE: should add the output here */
 
-        *position++;
+            /* update position counter */
+            (*position)++;
 
-        switch (second) {
-            case AbsoluteAddressing:
-                instrucitionSecondOperandMemory->ARE = 4; /*4 = 0b100 */
-                temp = atoi(node.firstOperand->string.data);
-                instrucitionSecondOperandMemory->other.full = ConvertIntTo2Complement(temp);
-                break;
+            switch (second) {
+                case AbsoluteAddressing:
+                    instrucitionSecondOperandMemory->ARE = 4; /*4 = 0b100 */
+                    temp = atoi(node.secondOperand->string.data);
+                    instrucitionSecondOperandMemory->other.full = ConvertIntTo2Complement(temp);
+                    break;
                     
-            case DirectAddressing:
-                tempCellP = ast_checker_get_hash_cell_by_string(astChecker, node.firstOperand->string);
-                if (tempCellP != NULL){
-                    if (tempCellP->kind == LabalCellKind) {
-                        instrucitionSecondOperandMemory->ARE = 2; /* 4 = 0b010 */
-                        instrucitionSecondOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
+                case DirectAddressing:
+                    tempCellP = ast_checker_get_hash_cell_by_string(astChecker, node.secondOperand->string);
+                    if (tempCellP != NULL){
+                        if (tempCellP->kind == LabalCellKind) {
+                            instrucitionSecondOperandMemory->ARE = 2; /* 4 = 0b010 */
+                            instrucitionSecondOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
+                        }
+                        else /* if (tempCellP->kind == ExternalCellKind) */ {
+                            instrucitionSecondOperandMemory->ARE = 1; /* 1 = 0b001 */
+                            instrucitionSecondOperandMemory->other.full = 0;
+                            tempAtoiS = calloc(10, sizeof(char));
+                            string_add_string(&emitter->externalFile, node.secondOperand->string); /* add the name of entry */
+                            sprintf(tempAtoiS, " %d\n", *position);
+                            string_add_char_pointer(&emitter->externalFile, tempAtoiS);
+                            free(tempAtoiS);
+                        }
                     }
-                    else /* if (tempCellP->kind == ExternalCellKind) */ {
-                        instrucitionSecondOperandMemory->ARE = 1; /* 1 = 0b001 */
-                        instrucitionSecondOperandMemory->other.full = 0;
-                        /* NOTE: should add the output here */
-                    }
-                }
-                    
-                break;
+                    break;
                 
-            case IndirectRegisterAddressing:
-            case DirectRegisterAddressing:
-                instrucitionSecondOperandMemory->ARE = 4; /*4 = 0b100 */
-                temp = atoi(node.firstOperand->string.data[1]); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitionSecondOperandMemory->other.rdst = ConvertIntTo2Complement(temp);
-                break;
-                
-            default:
-                break;
+                default:
+                    break;
+            }
+
+            /* NOTE: should add the output here */
+
+            /* update position counter */
+            (*position)++;
         }
-
-        /* NOTE: should add the output here */
-
-        /* update position counter secound time */
-        *position++;
     }
 }
 
@@ -379,6 +393,8 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
     int position = 100;
 
     while (instructionLabalList != NULL){
+        instructionNodeList = instructionLabalList->labal.instructionNodeList;
+
         while (instructionNodeList != NULL){
             update_instruction_memory_stuff(emitter, astChecker, 
                                             instructionNodeList->node, 
