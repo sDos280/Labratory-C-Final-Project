@@ -8,7 +8,6 @@
 .entry END
 .entry STR
 .extern fn1
-.extern L3
 
 STR:  .string "abcd"
 

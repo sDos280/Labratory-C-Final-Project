@@ -48,6 +48,7 @@ int main(){
 
     string_info(emitter.entryFile);
     string_info(emitter.externalFile);
+    string_info(emitter.objectFile);
     
     emitter_free(&emitter);
     ast_checker_free(&astChecker);
