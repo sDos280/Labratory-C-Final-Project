@@ -9,14 +9,9 @@
 .entry STR
 .extern fn1
 
-STR:  .string "abcd"
-
 MAIN: add r3, LIST
       jsr fn1
 
-LIST: .data 6, -9
-      .data -100
-      
 LOOP: prn #48
       lea STR, r6
       inc r6
@@ -28,7 +23,11 @@ LOOP: prn #48
       clr K
       sub L3, L3
       jmp LOOP
+
 END:  stop
 
+STR:  .string "abcd"
 
+LIST: .data 6, -9
+      .data -100
 K:    .data 31

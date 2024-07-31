@@ -8,6 +8,14 @@
 #define InstructionTokenKindToInstructionCode(kind) (InstructionCode)(kind - MOV)
 /* 0x7FFF is a mask for 15 bit */
 #define ConvertIntTo2Complement(value) ((value >= 0)? (value & 0x7FFF) : (((~(-value) & 0x7FFF) + 1) & 0x7FFF))
+#define InstructionMemoryToBinary(inst) ( \
+    ((inst).ARE & 0x7) |                  \
+    ((inst).dst & 0xF) << 3 |             \
+    ((inst).src & 0xF) << 7 |             \
+    ((inst).code & 0xF) << 11)
+#define InstructionOperandMemoryToBinary(inst) ( \
+    ((inst).ARE & 0x7) |                         \
+    ((inst).other.full & 0xFFF) << 3)
 
 /**
  * Get the addressing mod of an operand.
@@ -130,7 +138,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         instrucitionMemory->src = 0;
         instrucitionMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
-        memcpy(&toWrite, instrucitionMemory, 15); /* copy the bits of the instructionMemory to toWrite*/
+        toWrite = InstructionMemoryToBinary(*instrucitionMemory); /* copy the bits of the instructionMemory to toWrite*/
         tempAtoiS = calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -152,7 +160,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         instrucitionMemory->src = 0;
         instrucitionMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
-        memcpy(&toWrite, instrucitionMemory, 15); /* copy the bits of the instructionMemory to toWrite*/
+        toWrite = InstructionMemoryToBinary(*instrucitionMemory); /* copy the bits of the instructionMemory to toWrite */
         tempAtoiS = calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -195,14 +203,14 @@ static void update_instruction_memory_stuff(Emitter * emitter,
             case DirectRegisterAddressing:
                 instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
                 temp = atoi(node.firstOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitionFirstOperandMemory->other.rdst = ConvertIntTo2Complement(temp);
+                instrucitionFirstOperandMemory->other.rdst = temp;
                 break;
                 
             default:
                 break;
         }
 
-        memcpy(&toWrite, instrucitionFirstOperandMemory, 15); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
+        toWrite = InstructionOperandMemoryToBinary(*instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
         tempAtoiS = calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -221,11 +229,11 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         second = get_addressing_mode_of_operand(node.secondOperand, node.isSecondOperandDerefrenced);
 
         instrucitionMemory->ARE = 4; /*4 = 0b100 */
-        instrucitionMemory->dst = first;
-        instrucitionMemory->src = second;
+        instrucitionMemory->dst = second;
+        instrucitionMemory->src = first;
         instrucitionMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
-        memcpy(&toWrite, instrucitionMemory, 15); /* copy the bits of the instrucitionMemory to toWrite */
+        toWrite = InstructionMemoryToBinary(*instrucitionMemory); /* copy the bits of the instrucitionMemory to toWrite */
         tempAtoiS = calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -249,10 +257,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                 temp = atoi(node.secondOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
                 instrucitionFirstOperandMemory->other.rdst = ConvertIntTo2Complement(temp);
 
-                
-                memcpy(&toWrite, instrucitionFirstOperandMemory, 15); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
-                print_binary(toWrite);
-                printf(" as binary\n");
+                toWrite = InstructionOperandMemoryToBinary(*instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
                 tempAtoiS = calloc(10, sizeof(char));
                 sprintf(tempAtoiS, "%d ", *position);
                 string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -288,12 +293,21 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                         }
                     }
                     break;
+                
+                case DirectRegisterAddressing:
+                case IndirectRegisterAddressing:
+                    instrucitionFirstOperandMemory->ARE = 4; /* 4 = 0b100 */
+                    instrucitionFirstOperandMemory->other.rdst = 0;
+                    temp = atoi(node.firstOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
+                    instrucitionFirstOperandMemory->other.rsrc = temp;
+                    break;
                     
             default:
                 break;
-        }
 
-            memcpy(&toWrite, instrucitionFirstOperandMemory, 15); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
+            }
+
+            toWrite = InstructionOperandMemoryToBinary(*instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
             tempAtoiS = calloc(10, sizeof(char));
             sprintf(tempAtoiS, "%d ", *position);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -335,7 +349,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                     break;
             }
 
-            memcpy(&toWrite, instrucitionSecondOperandMemory, 15); /* copy the bits of the instrucitionSecondOperandMemory to toWrite */
+            toWrite = InstructionOperandMemoryToBinary(*instrucitionSecondOperandMemory); /* copy the bits of the instrucitionSecondOperandMemory to toWrite */
             tempAtoiS = calloc(10, sizeof(char));
             sprintf(tempAtoiS, "%d ", *position);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
