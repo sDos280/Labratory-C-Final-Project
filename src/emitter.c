@@ -140,7 +140,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         toWrite = InstructionMemoryToBinary(*instrucitionMemory); /* copy the bits of the instructionMemory to toWrite*/
         tempAtoiS = calloc(10, sizeof(char));
-        sprintf(tempAtoiS, "%d ", *position);
+        sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
         sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
@@ -162,7 +162,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         toWrite = InstructionMemoryToBinary(*instrucitionMemory); /* copy the bits of the instructionMemory to toWrite */
         tempAtoiS = calloc(10, sizeof(char));
-        sprintf(tempAtoiS, "%d ", *position);
+        sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
         sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
@@ -212,7 +212,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         toWrite = InstructionOperandMemoryToBinary(*instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
         tempAtoiS = calloc(10, sizeof(char));
-        sprintf(tempAtoiS, "%d ", *position);
+        sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
         sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
@@ -235,7 +235,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         toWrite = InstructionMemoryToBinary(*instrucitionMemory); /* copy the bits of the instrucitionMemory to toWrite */
         tempAtoiS = calloc(10, sizeof(char));
-        sprintf(tempAtoiS, "%d ", *position);
+        sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
         sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
@@ -259,7 +259,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
                 toWrite = InstructionOperandMemoryToBinary(*instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
                 tempAtoiS = calloc(10, sizeof(char));
-                sprintf(tempAtoiS, "%d ", *position);
+                sprintf(tempAtoiS, "%04d ", *position);
                 string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
                 memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
                 sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
@@ -309,7 +309,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
             toWrite = InstructionOperandMemoryToBinary(*instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
             tempAtoiS = calloc(10, sizeof(char));
-            sprintf(tempAtoiS, "%d ", *position);
+            sprintf(tempAtoiS, "%04d ", *position);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
             memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
             sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
@@ -359,7 +359,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
             toWrite = InstructionOperandMemoryToBinary(*instrucitionSecondOperandMemory); /* copy the bits of the instrucitionSecondOperandMemory to toWrite */
             tempAtoiS = calloc(10, sizeof(char));
-            sprintf(tempAtoiS, "%d ", *position);
+            sprintf(tempAtoiS, "%04d ", *position);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
             memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
             sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
