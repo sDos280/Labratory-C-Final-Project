@@ -5,7 +5,7 @@
 #include "ast_checker.h"
 #include "node.h"
 
-typedef struct __attribute__((packed)) InstrucitionMemory {
+typedef struct InstrucitionMemory {
     /* the Instruction memory layout as in the object file*/
     unsigned int ARE: 3; /* ARE field */
     unsigned int dst: 4; /* destination adressing mode */
@@ -14,17 +14,19 @@ typedef struct __attribute__((packed)) InstrucitionMemory {
     /* so in total we have 3 + 4 + 4 + 4 = 15 bits */
 } InstrucitionMemory;
 
-typedef struct __attribute__((packed)) InstrucitionOperandMemory {
+typedef struct InstrucitionOperandMemory {
     /* the Instruction memory layout as in the object file*/
     unsigned int ARE: 3; /* ARE field */
     union {
         unsigned int full: 12; /* for a case of number\labal\external */
         
         /* for adressing mode of one registr or more */
-        unsigned int rdst: 4; /* the register used in destination */
-        unsigned int rsrc: 4; /* the register used in source */
+        struct {
+        unsigned int rdst: 3; /* the register used in destination */
+        unsigned int rsrc: 3; /* the register used in source */
+        }reg;
     }other;
-    /* so in total we have 3 + max(12, 4 + 4) = 3 + 12 = 15 bits */
+    /* so in total we have 3 + max(12, 3 + 3) = 3 + 12 = 15 bits */
 } InstrucitionOperandMemory;
 
 
