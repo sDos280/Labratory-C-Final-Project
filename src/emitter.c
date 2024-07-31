@@ -143,7 +143,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         sprintf(tempAtoiS, "%d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
-        sprintf(tempAtoiS, "%o\n", toWrite & 0x7FFF);
+        sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
         free(tempAtoiS);
 
@@ -165,7 +165,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         sprintf(tempAtoiS, "%d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
-        sprintf(tempAtoiS, "%o\n", toWrite & 0x7FFF);
+        sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
         free(tempAtoiS);
 
@@ -203,7 +203,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
             case DirectRegisterAddressing:
                 instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
                 temp = atoi(node.firstOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitionFirstOperandMemory->other.rdst = temp;
+                instrucitionFirstOperandMemory->other.reg.rdst = temp;
                 break;
                 
             default:
@@ -215,7 +215,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         sprintf(tempAtoiS, "%d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
-        sprintf(tempAtoiS, "%o\n", toWrite & 0x7FFF);
+        sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
         free(tempAtoiS);
 
@@ -238,7 +238,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         sprintf(tempAtoiS, "%d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
-        sprintf(tempAtoiS, "%o\n", toWrite & 0x7FFF);
+        sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
         free(tempAtoiS);
 
@@ -253,16 +253,16 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                 instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
 
                 temp = atoi(node.firstOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitionFirstOperandMemory->other.rsrc = ConvertIntTo2Complement(temp);
+                instrucitionFirstOperandMemory->other.reg.rsrc = ConvertIntTo2Complement(temp);
                 temp = atoi(node.secondOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitionFirstOperandMemory->other.rdst = ConvertIntTo2Complement(temp);
+                instrucitionFirstOperandMemory->other.reg.rdst = ConvertIntTo2Complement(temp);
 
                 toWrite = InstructionOperandMemoryToBinary(*instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
                 tempAtoiS = calloc(10, sizeof(char));
                 sprintf(tempAtoiS, "%d ", *position);
                 string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
                 memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
-                sprintf(tempAtoiS, "%o\n", toWrite & 0x7FFF);
+                sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
                 string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
                 free(tempAtoiS);
 
@@ -297,9 +297,9 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                 case DirectRegisterAddressing:
                 case IndirectRegisterAddressing:
                     instrucitionFirstOperandMemory->ARE = 4; /* 4 = 0b100 */
-                    instrucitionFirstOperandMemory->other.rdst = 0;
+                    instrucitionFirstOperandMemory->other.reg.rdst = 0;
                     temp = atoi(node.firstOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
-                    instrucitionFirstOperandMemory->other.rsrc = temp;
+                    instrucitionFirstOperandMemory->other.reg.rsrc = temp;
                     break;
                     
             default:
@@ -312,7 +312,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
             sprintf(tempAtoiS, "%d ", *position);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
             memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
-            sprintf(tempAtoiS, "%o\n", toWrite & 0x7FFF);
+            sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
             free(tempAtoiS);
 
@@ -345,6 +345,14 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                     }
                     break;
                 
+                case DirectRegisterAddressing:
+                case IndirectRegisterAddressing:
+                    instrucitionSecondOperandMemory->ARE = 4; /* 4 = 0b100 */
+                    temp = atoi(node.secondOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
+                    instrucitionSecondOperandMemory->other.reg.rdst = temp;
+                    instrucitionSecondOperandMemory->other.reg.rsrc = 0;
+                    break;
+                
                 default:
                     break;
             }
@@ -354,7 +362,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
             sprintf(tempAtoiS, "%d ", *position);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
             memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
-            sprintf(tempAtoiS, "%o\n", toWrite & 0x7FFF);
+            sprintf(tempAtoiS, "%05o\n", toWrite & 0x7FFF);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
             free(tempAtoiS);
 
