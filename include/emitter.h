@@ -99,4 +99,13 @@ void emitter_generate_entry_file_string(Emitter * emitter, AstChecker * astCheck
 */
 void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit);
 
+/**
+ * Generate and emit all the emitter files.
+ *
+ * @param emitter the emitter.
+ * @param astChecker the ast checker.
+ * @param translationUnit the translation unit.
+*/
+void emitter_emit(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit);
+
 #endif /*LABRATORY_C_FINAL_PROJECT_EMITTER*/

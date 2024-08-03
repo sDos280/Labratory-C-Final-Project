@@ -98,7 +98,7 @@ static unsigned int calc_labal_size(LabalNode labal){
 }
 
 /**
- * Emitte to the instruction stuff to the emitter files
+ * Emit to the instruction stuff to the emitter files
  *
  * @param emitter the emitter.
  * @param astChecker the astChecker.
