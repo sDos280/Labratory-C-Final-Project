@@ -41,9 +41,10 @@ void lexer_init_char_pointer(Lexer * lexer, char * sourceString){
     string_add_char(&lexer->string, EOF);
 }
 
-void lexer_init_file(Lexer *lexer, char * filePath){
+bool lexer_init_file(Lexer *lexer, char * filePath){
     FILE *file;
     char ch;
+    bool out = true;
 
     /* curate the file path string */
     char * filePathCurated = calloc((strlen(filePath) + 3) + 1, sizeof(char));
@@ -63,6 +64,7 @@ void lexer_init_file(Lexer *lexer, char * filePath){
     file = fopen(lexer->filePath, "r");
     if (file == NULL) {
         printf("%sLexer Error:%s couldn't open \"%s\".\n", RED_COLOR, RESET_COLOR, lexer->filePath);
+        out = false;
     } else {
         while ((ch = fgetc(file)) != EOF) {
             string_add_char(&lexer->string, ch);
@@ -78,6 +80,8 @@ void lexer_init_file(Lexer *lexer, char * filePath){
 
     if (file != NULL)
         fclose(file);
+
+    return out
 }
 
 void lexer_init_from_string(Lexer *lexer, char * filePath, String string){

@@ -28,8 +28,9 @@ void lexer_init_char_pointer(Lexer *lexer, char *sourceString);
 /**
  * Initializes the lexer with the file.
  * @param filePath the file path.
+ * @return true if was successful else false.
  */
-void lexer_init_file(Lexer *lexer, char * filePath);
+bool lexer_init_file(Lexer *lexer, char * filePath);
 
 /**
  * Initializes the lexer with passed string.
