@@ -1,6 +1,18 @@
 #include "../include/emitter.h"
 #include "../include/ast_checker.h"
 #include "../include/string_util.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+#define RED_COLOR   "\x1B[1;91m"
+#define GRN_COLOR   "\x1B[32m"
+#define YEL_COLOR   "\x1B[33m"
+#define BLU_COLOR   "\x1B[34m"
+#define MAG_COLOR   "\x1B[35m"
+#define CYN_COLOR   "\x1B[36m"
+#define WHT_COLOR   "\x1B[37m"
+#define RESET_COLOR "\x1B[0m"
+
 
 #define STARTING_POSITION 100
 #define MAX_POSITION 9999
@@ -466,7 +478,7 @@ void emitter_generate_entry_file_string(Emitter * emitter, AstChecker * astCheck
     }
 }
 
-void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit){
+void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit, char * instrucitonLines, char * guidanceLines){
     LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
     LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
     InstructionNodeList * instructionNodeList = instructionLabalList->labal.instructionNodeList;
@@ -492,6 +504,8 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
         
         instructionLabalList = instructionLabalList->next;
     }
+
+    (*instrucitonLines) = position - 100;
 
     while (guidanceLabalList != NULL){
         guidanceNodeList = guidanceLabalList->labal.guidanceNodeList;
@@ -544,5 +558,46 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
         }
         
         guidanceLabalList = guidanceLabalList->next;
+    }
+
+    (*guidanceLines) = position - *instrucitonLines - 100;
+}
+
+void emitter_emit(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit, char * filePath){
+    FILE * file;
+    char * filePathCurated;
+    int instrucitonLines = 0;
+    int guidanceLines = 0;
+
+    emitter_generate_object_and_external_files_string(emitter, astChecker, translationUnit, &instrucitonLines, &guidanceLines);
+    
+    if (emitter->errorHandler.errorList == NULL && string_length(emitter->externalFile) != 0) {
+        filePathCurated = calloc((strlen(filePath) + 4) + 1, sizeof(char));
+        strcpy(filePathCurated, filePath);
+        strcat(filePathCurated, ".ext");
+
+        file = fopen(filePathCurated, "w");
+        
+        if (file == NULL) {
+            printf("%sEmitter Error:%s couldn't create %s.ext \"%s\".\n", RED_COLOR, RESET_COLOR, filePath);
+        } else {
+            fprintf(file, emitter->externalFile.data);
+            fclose(file);
+        }
+    }
+
+    if (emitter->errorHandler.errorList == NULL && string_length(emitter->entryFile) != 0) {\
+        filePathCurated = calloc((strlen(filePath) + 4) + 1, sizeof(char));
+        strcpy(filePathCurated, filePath);
+        strcat(filePathCurated, ".ent");
+
+        file = fopen(filePath, "w");
+        
+        if (file == NULL) {
+            printf("%sEmitter Error:%s couldn't create %s.ent \"%s\".\n", RED_COLOR, RESET_COLOR, filePath);
+        } else {
+            fprintf(file, emitter->entryFile.data);
+            fclose(file);
+        }
     }
 }
