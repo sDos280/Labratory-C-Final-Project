@@ -98,9 +98,7 @@ void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit
         astChecker->size++;
         externalNodeList = externalNodeList->next;
     }
-
-    printf("size: %d\n", astChecker->size);
-
+    
     /* allocate the hash memory */
     astChecker->hash = calloc(astChecker->size, sizeof(IdentifierHashCell));
 
