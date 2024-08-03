@@ -81,7 +81,7 @@ bool lexer_init_file(Lexer *lexer, char * filePath){
     if (file != NULL)
         fclose(file);
 
-    return out
+    return out;
 }
 
 void lexer_init_from_string(Lexer *lexer, char * filePath, String string){

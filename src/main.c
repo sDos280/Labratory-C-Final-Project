@@ -1,46 +1,73 @@
 #include "stdint.h"
-#include "../include/error_handler.h"
 #include "../include/lexer.h"
+#include "../include/preprocessor.h"
+#include "../include/parser.h"
+#include "../include/ast_checker.h"
+#include "../include/emitter.h"
 #include "../include/string_util.h"
 
 int main(){
-    Lexer lexer;
+    Lexer lexerPreprocess;
+    Lexer lexerPostprocess;
+    Preprocessor preprocessor;
+    TranslationUnit translationUnit;
+    AstChecker astChecker;
+    Emitter emitter;
 
-    lexer_init_char_pointer(&lexer, "*,:##**,,-556,252:++6546");
-    lexer_peek_separator(&lexer);
-    lexer_peek_separator(&lexer);
-    lexer_peek_separator(&lexer);
-    lexer_peek_separator(&lexer);
-    lexer_peek_separator(&lexer);
-    lexer_peek_separator(&lexer);
-    lexer_peek_separator(&lexer);
-    lexer_peek_separator(&lexer);
-    lexer_peek_separator(&lexer);
-    lexer_peek_number(&lexer);
-    lexer_peek_separator(&lexer);
-    lexer_peek_number(&lexer);
-    lexer_peek_separator(&lexer);
-    lexer_peek_number(&lexer);
-    lexer_peek_number(&lexer);
+    /* preprocess lexer pass */
+    if (lexer_init_file(&lexerPreprocess, "test1") == true) {
+        lexer_lex(&lexerPreprocess);
+        error_handler_flush_error_list(&lexerPreprocess.errorHandler);
 
-    lexer_print_token_list(&lexer);
-    error_handler_flush_error_list(&lexer.errorHandler);
+        if (lexerPreprocess.errorHandler.errorList == NULL) {
+            /* preprocesser pass */
+            preprocessor_init(&preprocessor, lexerPreprocess, "test1");
+            preprocessor_preprocess(&preprocessor, lexerPreprocess.string);
+            error_handler_flush_error_list(&preprocessor.errorHandler);
 
-    error_handler_free_error_list(&lexer.errorHandler);
-    lexer_free(&lexer);
+            if (preprocessor.errorHandler.errorList == NULL) {
+                /* postprocess lexer pass */
+                lexer_init_from_string(&lexerPostprocess, preprocessor.errorHandler.filePath, preprocessor.string);
+                lexer_lex(&lexerPostprocess);
+                error_handler_flush_error_list(&lexerPostprocess.errorHandler);
 
+                if (lexerPostprocess.errorHandler.errorList == NULL) {
+                    /* parser pass */
+                    parser_init_translation_unit(&translationUnit, lexerPostprocess);
+                    parser_parse_translation_unit(&translationUnit);
+                    error_handler_flush_error_list(&translationUnit.errorHandler);
+
+                    if (translationUnit.errorHandler.errorList == NULL) {
+                        /* ast check pass */
+                        ast_checker_init(&astChecker, &translationUnit, lexerPostprocess);
+                        ast_checker_check_translation_unit(&astChecker, &translationUnit);
+                        error_handler_flush_error_list(&astChecker.errorHandler);
+
+                        if (astChecker.errorHandler.errorList == NULL) {
+                            /* emitter chekc pass*/
+                            emitter_init(&emitter, lexerPostprocess);
+                            emitter_update_labals_size_and_position(&emitter, &translationUnit);
+                            emitter_generate_entry_file_string(&emitter, &astChecker, &translationUnit);
+                            emitter_emit(&emitter, &astChecker, &translationUnit, "test1");
+                            error_handler_flush_error_list(&emitter.errorHandler);
+
+                            emitter_free(&emitter);
+                        }
+
+                        ast_checker_free(&astChecker);
+                    }
+
+                    parser_free_translation_unit(&translationUnit);
+                }
+
+                lexer_free(&lexerPostprocess);
+            }
+
+            preprocessor_free(&preprocessor);
+        }
+    }
+
+    lexer_free(&lexerPreprocess);
+    
     return 0;
 }
-
-/*void main(){
-    lexer_init("; adasdfasdf asdf \n");
-    peek_comment();
-    peek_next_line();
-    print_token_list();
-}*/
-
-/*void main(){
-    String str1 = string_init_with_data("Pleld");
-    String str2 = string_init_with_data("Pleld");
-    printf("%d\n", string_equals(str1, str2));
-}*/
