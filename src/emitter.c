@@ -97,21 +97,18 @@ static unsigned int calc_labal_size(LabalNode labal){
     return out;
 }
 
-void print_binary(unsigned int number)
-{
-    if (number >> 1) {
-        print_binary(number >> 1);
-    }
-    putc((number & 1) ? '1' : '0', stdout);
-}
-
-
+/**
+ * Emitte to the instruction stuff to the emitter files
+ *
+ * @param emitter the emitter.
+ * @param astChecker the astChecker.
+ * @param node the current node to emitte.
+ * @param position a pointer to the position counter.
+ * @note also update the external fill staff.
+*/
 static void update_instruction_memory_stuff(Emitter * emitter, 
                                             AstChecker * astChecker, 
-                                            InstructionNode node, 
-                                            InstrucitionMemory * instrucitionMemory, 
-                                            InstrucitionOperandMemory * instrucitionFirstOperandMemory,
-                                            InstrucitionOperandMemory * instrucitionSecondOperandMemory,
+                                            InstructionNode node,
                                             int * position) {
     AddressingMode first = AbsoluteAddressing;
     AddressingMode second = AbsoluteAddressing;
@@ -119,26 +116,29 @@ static void update_instruction_memory_stuff(Emitter * emitter,
     unsigned int toWrite = 0;
     IdentifierHashCell * tempCellP = NULL;
     char * tempAtoiS = NULL; /* temp char pointer for storing the value of numbers in a string format */
+    InstrucitionMemory instrucitionMemory;
+    InstrucitionOperandMemory instrucitionFirstOperandMemory;
+    InstrucitionOperandMemory instrucitionSecondOperandMemory;
 
     /* inisialize memory of struct */
-    instrucitionMemory->ARE = 0;
-    instrucitionMemory->dst = 0;
-    instrucitionMemory->src = 0;
-    instrucitionMemory->code = 0; 
-    instrucitionFirstOperandMemory->ARE = 0;
-    instrucitionFirstOperandMemory->other.full = 0;
-    instrucitionSecondOperandMemory->ARE = 0;
-    instrucitionSecondOperandMemory->other.full = 0;
+    instrucitionMemory.ARE = 0;
+    instrucitionMemory.dst = 0;
+    instrucitionMemory.src = 0;
+    instrucitionMemory.code = 0; 
+    instrucitionFirstOperandMemory.ARE = 0;
+    instrucitionFirstOperandMemory.other.full = 0;
+    instrucitionSecondOperandMemory.ARE = 0;
+    instrucitionSecondOperandMemory.other.full = 0;
     
     /* 0 operand instruction case */
     if (node.firstOperand == NULL && node.secondOperand == NULL){
         /* update instruction memory */
-        instrucitionMemory->ARE = 4; /* 4 = 0b100 */
-        instrucitionMemory->dst = 0;
-        instrucitionMemory->src = 0;
-        instrucitionMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
+        instrucitionMemory.ARE = 4; /* 4 = 0b100 */
+        instrucitionMemory.dst = 0;
+        instrucitionMemory.src = 0;
+        instrucitionMemory.code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
-        toWrite = InstructionMemoryToBinary(*instrucitionMemory); /* copy the bits of the instructionMemory to toWrite*/
+        toWrite = InstructionMemoryToBinary(instrucitionMemory); /* copy the bits of the instructionMemory to toWrite*/
         tempAtoiS = calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -155,12 +155,12 @@ static void update_instruction_memory_stuff(Emitter * emitter,
     else if (node.firstOperand != NULL && node.secondOperand == NULL) {
         first = get_addressing_mode_of_operand(node.firstOperand, node.isFirstOperandDerefrenced);
 
-        instrucitionMemory->ARE = 4; /*4 = 0b100 */
-        instrucitionMemory->dst = first;
-        instrucitionMemory->src = 0;
-        instrucitionMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
+        instrucitionMemory.ARE = 4; /*4 = 0b100 */
+        instrucitionMemory.dst = first;
+        instrucitionMemory.src = 0;
+        instrucitionMemory.code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
-        toWrite = InstructionMemoryToBinary(*instrucitionMemory); /* copy the bits of the instructionMemory to toWrite */
+        toWrite = InstructionMemoryToBinary(instrucitionMemory); /* copy the bits of the instructionMemory to toWrite */
         tempAtoiS = calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -174,21 +174,21 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
         switch (first) {
             case AbsoluteAddressing:
-                instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
+                instrucitionFirstOperandMemory.ARE = 4; /*4 = 0b100 */
                 temp = atoi(node.firstOperand->string.data);
-                instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(temp);
+                instrucitionFirstOperandMemory.other.full = ConvertIntTo2Complement(temp);
                 break;
                     
             case DirectAddressing:
                 tempCellP = ast_checker_get_hash_cell_by_string(astChecker, node.firstOperand->string);
                 if (tempCellP != NULL){
                     if (tempCellP->kind == LabalCellKind) {
-                        instrucitionFirstOperandMemory->ARE = 2; /* 4 = 0b010 */
-                        instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
+                        instrucitionFirstOperandMemory.ARE = 2; /* 4 = 0b010 */
+                        instrucitionFirstOperandMemory.other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
                     }
                     else /* if (tempCellP->kind == ExternalCellKind) */ {
-                        instrucitionFirstOperandMemory->ARE = 1; /* 1 = 0b001 */
-                        instrucitionFirstOperandMemory->other.full = 0;
+                        instrucitionFirstOperandMemory.ARE = 1; /* 1 = 0b001 */
+                        instrucitionFirstOperandMemory.other.full = 0;
                         tempAtoiS = calloc(10, sizeof(char));
                         string_add_string(&emitter->externalFile, node.firstOperand->string); /* add the name of entry */
                         sprintf(tempAtoiS, " %d\n", *position);
@@ -201,16 +201,16 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                 
             case IndirectRegisterAddressing:
             case DirectRegisterAddressing:
-                instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
+                instrucitionFirstOperandMemory.ARE = 4; /*4 = 0b100 */
                 temp = atoi(node.firstOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitionFirstOperandMemory->other.reg.rdst = temp;
+                instrucitionFirstOperandMemory.other.reg.rdst = temp;
                 break;
                 
             default:
                 break;
         }
 
-        toWrite = InstructionOperandMemoryToBinary(*instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
+        toWrite = InstructionOperandMemoryToBinary(instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
         tempAtoiS = calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -228,12 +228,12 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         first = get_addressing_mode_of_operand(node.firstOperand, node.isFirstOperandDerefrenced);
         second = get_addressing_mode_of_operand(node.secondOperand, node.isSecondOperandDerefrenced);
 
-        instrucitionMemory->ARE = 4; /*4 = 0b100 */
-        instrucitionMemory->dst = second;
-        instrucitionMemory->src = first;
-        instrucitionMemory->code = InstructionTokenKindToInstructionCode(node.operation->kind);
+        instrucitionMemory.ARE = 4; /*4 = 0b100 */
+        instrucitionMemory.dst = second;
+        instrucitionMemory.src = first;
+        instrucitionMemory.code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
-        toWrite = InstructionMemoryToBinary(*instrucitionMemory); /* copy the bits of the instrucitionMemory to toWrite */
+        toWrite = InstructionMemoryToBinary(instrucitionMemory); /* copy the bits of the instrucitionMemory to toWrite */
         tempAtoiS = calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -250,14 +250,14 @@ static void update_instruction_memory_stuff(Emitter * emitter,
              first == DirectRegisterAddressing) &&
             (second == IndirectRegisterAddressing ||
              second == DirectRegisterAddressing)) {
-                instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
+                instrucitionFirstOperandMemory.ARE = 4; /*4 = 0b100 */
 
                 temp = atoi(node.firstOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitionFirstOperandMemory->other.reg.rsrc = ConvertIntTo2Complement(temp);
+                instrucitionFirstOperandMemory.other.reg.rsrc = ConvertIntTo2Complement(temp);
                 temp = atoi(node.secondOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
-                instrucitionFirstOperandMemory->other.reg.rdst = ConvertIntTo2Complement(temp);
+                instrucitionFirstOperandMemory.other.reg.rdst = ConvertIntTo2Complement(temp);
 
-                toWrite = InstructionOperandMemoryToBinary(*instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
+                toWrite = InstructionOperandMemoryToBinary(instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
                 tempAtoiS = calloc(10, sizeof(char));
                 sprintf(tempAtoiS, "%04d ", *position);
                 string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -270,21 +270,21 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         } else {
             switch (first) {
                 case AbsoluteAddressing:
-                    instrucitionFirstOperandMemory->ARE = 4; /*4 = 0b100 */
+                    instrucitionFirstOperandMemory.ARE = 4; /*4 = 0b100 */
                     temp = atoi(node.firstOperand->string.data);
-                    instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(temp);
+                    instrucitionFirstOperandMemory.other.full = ConvertIntTo2Complement(temp);
                     break;
                     
                 case DirectAddressing:
                     tempCellP = ast_checker_get_hash_cell_by_string(astChecker, node.firstOperand->string);
                     if (tempCellP != NULL){
                         if (tempCellP->kind == LabalCellKind) {
-                            instrucitionFirstOperandMemory->ARE = 2; /* 4 = 0b010 */
-                            instrucitionFirstOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
+                            instrucitionFirstOperandMemory.ARE = 2; /* 4 = 0b010 */
+                            instrucitionFirstOperandMemory.other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
                         }
                         else /* if (tempCellP->kind == ExternalCellKind) */ {
-                            instrucitionFirstOperandMemory->ARE = 1; /* 1 = 0b001 */
-                            instrucitionFirstOperandMemory->other.full = 0;
+                            instrucitionFirstOperandMemory.ARE = 1; /* 1 = 0b001 */
+                            instrucitionFirstOperandMemory.other.full = 0;
                             tempAtoiS = calloc(10, sizeof(char));
                             string_add_string(&emitter->externalFile, node.firstOperand->string); /* add the name of entry */
                             sprintf(tempAtoiS, " %d\n", *position);
@@ -296,10 +296,10 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                 
                 case DirectRegisterAddressing:
                 case IndirectRegisterAddressing:
-                    instrucitionFirstOperandMemory->ARE = 4; /* 4 = 0b100 */
-                    instrucitionFirstOperandMemory->other.reg.rdst = 0;
+                    instrucitionFirstOperandMemory.ARE = 4; /* 4 = 0b100 */
+                    instrucitionFirstOperandMemory.other.reg.rdst = 0;
                     temp = atoi(node.firstOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
-                    instrucitionFirstOperandMemory->other.reg.rsrc = temp;
+                    instrucitionFirstOperandMemory.other.reg.rsrc = temp;
                     break;
                     
             default:
@@ -307,7 +307,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
             }
 
-            toWrite = InstructionOperandMemoryToBinary(*instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
+            toWrite = InstructionOperandMemoryToBinary(instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
             tempAtoiS = calloc(10, sizeof(char));
             sprintf(tempAtoiS, "%04d ", *position);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -321,21 +321,21 @@ static void update_instruction_memory_stuff(Emitter * emitter,
 
             switch (second) {
                 case AbsoluteAddressing:
-                    instrucitionSecondOperandMemory->ARE = 4; /*4 = 0b100 */
+                    instrucitionSecondOperandMemory.ARE = 4; /*4 = 0b100 */
                     temp = atoi(node.secondOperand->string.data);
-                    instrucitionSecondOperandMemory->other.full = ConvertIntTo2Complement(temp);
+                    instrucitionSecondOperandMemory.other.full = ConvertIntTo2Complement(temp);
                     break;
                     
                 case DirectAddressing:
                     tempCellP = ast_checker_get_hash_cell_by_string(astChecker, node.secondOperand->string);
                     if (tempCellP != NULL){
                         if (tempCellP->kind == LabalCellKind) {
-                            instrucitionSecondOperandMemory->ARE = 2; /* 4 = 0b010 */
-                            instrucitionSecondOperandMemory->other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
+                            instrucitionSecondOperandMemory.ARE = 2; /* 4 = 0b010 */
+                            instrucitionSecondOperandMemory.other.full = ConvertIntTo2Complement(tempCellP->value.labal->position);
                         }
                         else /* if (tempCellP->kind == ExternalCellKind) */ {
-                            instrucitionSecondOperandMemory->ARE = 1; /* 1 = 0b001 */
-                            instrucitionSecondOperandMemory->other.full = 0;
+                            instrucitionSecondOperandMemory.ARE = 1; /* 1 = 0b001 */
+                            instrucitionSecondOperandMemory.other.full = 0;
                             tempAtoiS = calloc(10, sizeof(char));
                             string_add_string(&emitter->externalFile, node.secondOperand->string); /* add the name of entry */
                             sprintf(tempAtoiS, " %d\n", *position);
@@ -347,17 +347,17 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                 
                 case DirectRegisterAddressing:
                 case IndirectRegisterAddressing:
-                    instrucitionSecondOperandMemory->ARE = 4; /* 4 = 0b100 */
+                    instrucitionSecondOperandMemory.ARE = 4; /* 4 = 0b100 */
                     temp = atoi(node.secondOperand->string.data + 1); /* on data[0] would be an 'r' so we move one for the number */
-                    instrucitionSecondOperandMemory->other.reg.rdst = temp;
-                    instrucitionSecondOperandMemory->other.reg.rsrc = 0;
+                    instrucitionSecondOperandMemory.other.reg.rdst = temp;
+                    instrucitionSecondOperandMemory.other.reg.rsrc = 0;
                     break;
                 
                 default:
                     break;
             }
 
-            toWrite = InstructionOperandMemoryToBinary(*instrucitionSecondOperandMemory); /* copy the bits of the instrucitionSecondOperandMemory to toWrite */
+            toWrite = InstructionOperandMemoryToBinary(instrucitionSecondOperandMemory); /* copy the bits of the instrucitionSecondOperandMemory to toWrite */
             tempAtoiS = calloc(10, sizeof(char));
             sprintf(tempAtoiS, "%04d ", *position);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
@@ -472,9 +472,6 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
     InstructionNodeList * instructionNodeList = instructionLabalList->labal.instructionNodeList;
     GuidanceNodeList * guidanceNodeList = guidanceLabalList->labal.guidanceNodeList;
     /* firsly, generate code image */
-    InstrucitionMemory instrucitionMemory;
-    InstrucitionOperandMemory instrucitionFirstOperandMemory;
-    InstrucitionOperandMemory instrucitionSecondOperandMemory;
     TokenRefrenceList * copyNumbers = NULL;
     int position = 100;
     int temp;
@@ -487,10 +484,7 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
 
         while (instructionNodeList != NULL){
             update_instruction_memory_stuff(emitter, astChecker, 
-                                            instructionNodeList->node, 
-                                            &instrucitionMemory, 
-                                            &instrucitionFirstOperandMemory,
-                                            &instrucitionSecondOperandMemory,
+                                            instructionNodeList->node,
                                             &position);
 
             instructionNodeList = instructionNodeList->next;
@@ -510,7 +504,7 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
                     temp = atoi(copyNumbers->token->string.data);
                     toWrite = ConvertIntTo2Complement(temp);
                     tempAtoiS = calloc(10, sizeof(char));
-                    sprintf(tempAtoiS, "%04d ", position);
+                    sprintf(tempAtoiS, "%04d", position);
                     string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
                     memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
                     sprintf(tempAtoiS, " %05o\n", toWrite & 0x7FFF);
@@ -528,7 +522,7 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
                     temp = (int)string_get_char(guidanceNodeList->node.stringNode.token->string, index);
                     toWrite = ConvertIntTo2Complement(temp);
                     tempAtoiS = calloc(10, sizeof(char));
-                    sprintf(tempAtoiS, "%04d ", position);
+                    sprintf(tempAtoiS, "%04d", position);
                     string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
                     memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
                     sprintf(tempAtoiS, " %05o\n", toWrite & 0x7FFF);
@@ -538,7 +532,7 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
 
                 /* add the \0 char */
                 tempAtoiS = calloc(10, sizeof(char));
-                sprintf(tempAtoiS, "%04d ", position);
+                sprintf(tempAtoiS, "%04d", position);
                 string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
                 memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
                 sprintf(tempAtoiS, " %05o\n", 0);
