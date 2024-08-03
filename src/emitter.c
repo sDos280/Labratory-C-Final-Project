@@ -475,7 +475,12 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
     InstrucitionMemory instrucitionMemory;
     InstrucitionOperandMemory instrucitionFirstOperandMemory;
     InstrucitionOperandMemory instrucitionSecondOperandMemory;
+    TokenRefrenceList * copyNumbers = NULL;
     int position = 100;
+    int temp;
+    unsigned int toWrite = 0;
+    char * tempAtoiS = NULL; /* temp char pointer for storing the value of numbers in a string format */
+    int index;
 
     while (instructionLabalList != NULL){
         instructionNodeList = instructionLabalList->labal.instructionNodeList;
@@ -492,5 +497,58 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
         }
         
         instructionLabalList = instructionLabalList->next;
+    }
+
+    while (guidanceLabalList != NULL){
+        guidanceNodeList = guidanceLabalList->labal.guidanceNodeList;
+
+        while (guidanceNodeList != NULL){
+            if (guidanceNodeList->kind == DataNodeKind){
+                copyNumbers = guidanceNodeList->node.dataNode.numbers;
+                
+                while (copyNumbers != NULL) {
+                    temp = atoi(copyNumbers->token->string.data);
+                    toWrite = ConvertIntTo2Complement(temp);
+                    tempAtoiS = calloc(10, sizeof(char));
+                    sprintf(tempAtoiS, "%04d ", position);
+                    string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
+                    memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
+                    sprintf(tempAtoiS, " %05o\n", toWrite & 0x7FFF);
+                    string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
+                    free(tempAtoiS);
+
+                    position++; /* update position */
+                    copyNumbers = copyNumbers->next;
+                }
+                
+            } else /*if (guidanceNodeList->kind == StringNodeKind)*/ {
+                for (index = 1 /* 1 because 0 is the \" */;
+                     index < string_length(guidanceNodeList->node.stringNode.token->string) - 1 /* because the last on is also \" */; 
+                     index++, position++ /* update position */) {
+                    temp = (int)string_get_char(guidanceNodeList->node.stringNode.token->string, index);
+                    toWrite = ConvertIntTo2Complement(temp);
+                    tempAtoiS = calloc(10, sizeof(char));
+                    sprintf(tempAtoiS, "%04d ", position);
+                    string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
+                    memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
+                    sprintf(tempAtoiS, " %05o\n", toWrite & 0x7FFF);
+                    string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
+                    free(tempAtoiS);
+                }
+
+                /* add the \0 char */
+                tempAtoiS = calloc(10, sizeof(char));
+                sprintf(tempAtoiS, "%04d ", position);
+                string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
+                memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
+                sprintf(tempAtoiS, " %05o\n", 0);
+                string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
+                free(tempAtoiS);
+            }
+
+            guidanceNodeList = guidanceNodeList->next;
+        }
+        
+        guidanceLabalList = guidanceLabalList->next;
     }
 }
