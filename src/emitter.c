@@ -478,7 +478,7 @@ void emitter_generate_entry_file_string(Emitter * emitter, AstChecker * astCheck
     }
 }
 
-void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit, char * instrucitonLines, char * guidanceLines){
+void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit, int * instrucitonLines, int * guidanceLines){
     LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
     LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
     InstructionNodeList * instructionNodeList = instructionLabalList->labal.instructionNodeList;
@@ -552,6 +552,8 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
                 sprintf(tempAtoiS, " %05o\n", 0);
                 string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add memory as an oct number */
                 free(tempAtoiS);
+
+                position++; /* update position, the \0 line */
             }
 
             guidanceNodeList = guidanceNodeList->next;
@@ -568,6 +570,7 @@ void emitter_emit(Emitter * emitter, AstChecker * astChecker, TranslationUnit * 
     char * filePathCurated;
     int instrucitonLines = 0;
     int guidanceLines = 0;
+    char * temp;
 
     emitter_generate_object_and_external_files_string(emitter, astChecker, translationUnit, &instrucitonLines, &guidanceLines);
     
@@ -579,25 +582,49 @@ void emitter_emit(Emitter * emitter, AstChecker * astChecker, TranslationUnit * 
         file = fopen(filePathCurated, "w");
         
         if (file == NULL) {
-            printf("%sEmitter Error:%s couldn't create %s.ext \"%s\".\n", RED_COLOR, RESET_COLOR, filePath);
+            printf("%sEmitter Error:%s couldn't create the \"%s.ext\" file.\n", RED_COLOR, RESET_COLOR, filePath);
         } else {
-            fprintf(file, emitter->externalFile.data);
+            fprintf(file, "%s", emitter->externalFile.data);
             fclose(file);
         }
+
+        free(filePathCurated);
     }
 
-    if (emitter->errorHandler.errorList == NULL && string_length(emitter->entryFile) != 0) {\
+    if (emitter->errorHandler.errorList == NULL && string_length(emitter->entryFile) != 0) {
         filePathCurated = calloc((strlen(filePath) + 4) + 1, sizeof(char));
         strcpy(filePathCurated, filePath);
         strcat(filePathCurated, ".ent");
 
-        file = fopen(filePath, "w");
+         file = fopen(filePathCurated, "w");
         
         if (file == NULL) {
-            printf("%sEmitter Error:%s couldn't create %s.ent \"%s\".\n", RED_COLOR, RESET_COLOR, filePath);
+            printf("%sEmitter Error:%s couldn't create the \"%s.ent\" file.", RED_COLOR, RESET_COLOR, filePath);
         } else {
-            fprintf(file, emitter->entryFile.data);
+            fprintf(file, "%s", emitter->entryFile.data);
             fclose(file);
         }
+
+        free(filePathCurated);
+    }
+
+    if (emitter->errorHandler.errorList == NULL) {
+        filePathCurated = calloc((strlen(filePath) + 3) + 1, sizeof(char));
+        strcpy(filePathCurated, filePath);
+        strcat(filePathCurated, ".ob");
+
+         file = fopen(filePathCurated, "w");
+        
+        if (file == NULL) {
+            printf("%sEmitter Error:%s couldn't create the \"%s.ob\" file.", RED_COLOR, RESET_COLOR, filePath);
+        } else {
+            temp = calloc(20, sizeof(char));
+            sprintf(temp, " %d %d\n", instrucitonLines, guidanceLines); /* add the top header of numebr of lines */
+            fprintf(file, "%s", temp);
+            fprintf(file, "%s", emitter->objectFile.data);
+            fclose(file);
+        }
+
+        free(filePathCurated);
     }
 }

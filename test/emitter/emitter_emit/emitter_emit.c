@@ -13,16 +13,14 @@ int main(){
     TranslationUnit translationUnit;
     AstChecker astChecker;
     Emitter emitter;
-    int temp1;
-    int temp2;
 
     /* preprocess lexer pass */
-    lexer_init_file(&lexerPreprocess, "test2");
+    lexer_init_file(&lexerPreprocess, "test1");
     lexer_lex(&lexerPreprocess);
     error_handler_flush_error_list(&lexerPreprocess.errorHandler);
     
     /* preprocesser pass */
-    preprocessor_init(&preprocessor, lexerPreprocess, "test2");
+    preprocessor_init(&preprocessor, lexerPreprocess, "test1");
     preprocessor_preprocess(&preprocessor, lexerPreprocess.string);
     error_handler_flush_error_list(&preprocessor.errorHandler);
 
@@ -45,7 +43,7 @@ int main(){
     emitter_init(&emitter, lexerPostprocess);
     emitter_update_labals_size_and_position(&emitter, &translationUnit);
     emitter_generate_entry_file_string(&emitter, &astChecker, &translationUnit);
-    emitter_generate_object_and_external_files_string(&emitter, &astChecker, &translationUnit, &temp1, &temp2);
+    emitter_emit(&emitter, &astChecker, &translationUnit, "test1");
     error_handler_flush_error_list(&emitter.errorHandler);
 
     string_info(emitter.entryFile);

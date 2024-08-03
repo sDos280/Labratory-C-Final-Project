@@ -99,7 +99,7 @@ void emitter_generate_entry_file_string(Emitter * emitter, AstChecker * astCheck
  * @param instrucitonLines the pointer to the instrucitonLines counter.
  * @param guidanceLines the pointer to the guidanceLines counter.
 */
-void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit, char * instrucitonLines, char * guidanceLines);
+void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit, int * instrucitonLines, int * guidanceLines);
 
 /**
  * Generate and emit all the emitter files.
