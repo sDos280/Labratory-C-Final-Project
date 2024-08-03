@@ -29,7 +29,7 @@ void preprocessor_init(Preprocessor * preprocessor, Lexer lexer, char * filePath
     /* preprocessor->errorHandler = (ErrorHandler){0}; */
     preprocessor->tokens = lexer.tokens;
 
-    error_handler_init(&preprocessor->errorHandler, &lexer.string, filePathCurated);
+    error_handler_init(&preprocessor->errorHandler, lexer.string, filePathCurated);
 }
 
 void preprocessor_free(Preprocessor * preprocessor){
@@ -295,4 +295,6 @@ void preprocessor_preprocess(Preprocessor * preprocessor, String source){
     writeDataToFile(file, preprocessor->string);
 
     fclose(file);
+
+    preprocessor->errorHandler.string = preprocessor->string; /* update string data because size may have changed */
 }

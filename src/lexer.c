@@ -35,7 +35,7 @@ void lexer_init_char_pointer(Lexer * lexer, char * sourceString){
     lexer->tokens = NULL;
 
     /* initialize lexer error handler */
-    error_handler_init(&lexer->errorHandler, &lexer->string, lexer->filePath);
+    error_handler_init(&lexer->errorHandler, lexer->string, lexer->filePath);
 
     /* add EOF to the end of the buffer so it would follow the convention */
     string_add_char(&lexer->string, EOF);
@@ -58,7 +58,7 @@ bool lexer_init_file(Lexer *lexer, char * filePath){
     lexer->tokens = NULL;
 
     /* initialize lexer error handler */
-    error_handler_init(&lexer->errorHandler, &lexer->string, lexer->filePath);
+    error_handler_init(&lexer->errorHandler, lexer->string, lexer->filePath);
 
     /* Open the file for reading */
     file = fopen(lexer->filePath, "r");
@@ -95,7 +95,7 @@ void lexer_init_from_string(Lexer *lexer, char * filePath, String string){
     lexer->tokens = NULL;
 
     /* initialize lexer error handler */
-    error_handler_init(&lexer->errorHandler, &lexer->string, lexer->filePath);
+    error_handler_init(&lexer->errorHandler, lexer->string, lexer->filePath);
 
     lexer->index = 0;
     lexer->indexInLine = 0;
@@ -603,4 +603,6 @@ void lexer_lex(Lexer * lexer){
             lexer_peek_char(lexer); /* we would continue to lex in any case, to find more lexer errors */
         }
     }
+
+    lexer->errorHandler.string = lexer->string; /* update string data because size may have changed */
 }

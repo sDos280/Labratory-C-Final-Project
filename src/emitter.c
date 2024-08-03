@@ -389,7 +389,7 @@ void emitter_init(Emitter * emitter, Lexer lexer){
     emitter->externalFile = string_init();
     emitter->objectFile = string_init();
 
-    error_handler_init(&emitter->errorHandler, &lexer.string, lexer.filePath);
+    error_handler_init(&emitter->errorHandler, lexer.string, lexer.filePath);
 }
 
 void emitter_free(Emitter * emitter){

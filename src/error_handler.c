@@ -21,7 +21,7 @@ int countDigits(int value)
     return result;
 }
 
-void error_handler_init(ErrorHandler * handler, String * string, char * filePath){
+void error_handler_init(ErrorHandler * handler, String string, char * filePath){
     handler->string = string;
     handler->filePath = filePath;
     handler->errorList = NULL;
@@ -107,8 +107,8 @@ void error_handler_flush_error_list(ErrorHandler * handler){
             line = 1;
 
             /* move index to the first index in the line that the token is inside */
-            while (string_get_char(*handler->string, index) != '\0' && line != current->error.tokenError.token.line){
-                if (index != 0 && string_get_char(*handler->string, index - 1) == '\n'){
+            while (string_get_char(handler->string, index) != '\0' && line != current->error.tokenError.token.line){
+                if (index != 0 && string_get_char(handler->string, index - 1) == '\n'){
                     line++;
                     if (line == current->error.tokenError.token.line)
                         break; /* we break now because we already got the wanted index so we don't want index++ to happen*/
@@ -120,10 +120,10 @@ void error_handler_flush_error_list(ErrorHandler * handler){
             printf("%s:%d:%d: %s%s%s: %s\n", handler->filePath, current->error.tokenError.token.line, current->error.tokenError.token.indexInLine + 1, RED_COLOR, caller_string, RESET_COLOR, current->error.tokenError.message.data);
             printf("    %u | ", line);
 
-            while (string_get_char(*handler->string, index) != '\0' && string_get_char(*handler->string, index) != '\n'){ 
+            while (string_get_char(handler->string, index) != '\0' && string_get_char(handler->string, index) != '\n'){ 
                 if (index == current->error.tokenError.token.index) printf("%s", RED_COLOR);
                 if (index == current->error.tokenError.token.index + string_length(current->error.tokenError.token.string)) printf("%s", RESET_COLOR);
-                putchar(string_get_char(*handler->string, index));
+                putchar(string_get_char(handler->string, index));
                 index++;
             }
             printf("%s", RESET_COLOR);
@@ -159,8 +159,8 @@ void error_handler_flush_error_list(ErrorHandler * handler){
             line = 1;
 
             /* move index to the first index in the line that the char is inside */
-            while (string_get_char(*handler->string, index) != '\0' && line != current->error.charError.line){
-                if (index != 0 && string_get_char(*handler->string, index - 1) == '\n'){
+            while (string_get_char(handler->string, index) != '\0' && line != current->error.charError.line){
+                if (index != 0 && string_get_char(handler->string, index - 1) == '\n'){
                     line++;
                     if (line == current->error.charError.line)
                         break; /* we break now because we already got the wanted index so we don't want index++ to happen*/
@@ -173,9 +173,9 @@ void error_handler_flush_error_list(ErrorHandler * handler){
             printf("%s:%d:%d: %s%s%s: %s\n", handler->filePath, current->error.tokenError.token.line, current->error.tokenError.token.indexInLine + 1, RED_COLOR, caller_string, RESET_COLOR, current->error.charError.message.data);
             printf("    %u | ", line);
             
-            while (string_get_char(*handler->string, index) != '\0' && string_get_char(*handler->string, index) != '\n'){
+            while (string_get_char(handler->string, index) != '\0' && string_get_char(handler->string, index) != '\n'){
                 if (index == current->error.tokenError.token.index) printf("%s", RED_COLOR);
-                putchar(string_get_char(*handler->string, index));
+                putchar(string_get_char(handler->string, index));
                 if (index == current->error.tokenError.token.index) printf("%s", RESET_COLOR);
                 index++;
             }

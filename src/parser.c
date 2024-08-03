@@ -100,7 +100,7 @@ void parser_init_translation_unit(TranslationUnit * translationUnit, Lexer lexer
 
     translationUnit->tokens = lexer.tokens;
 
-    error_handler_init(&translationUnit->errorHandler, &lexer.string, lexer.filePath);
+    error_handler_init(&translationUnit->errorHandler, lexer.string, lexer.filePath);
 }
 
 void parser_free_translation_unit(TranslationUnit * translationUnit){
