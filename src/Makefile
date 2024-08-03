@@ -43,4 +43,4 @@ valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind.out.txt ./$(APPNAME)
 
 clean:
-	rm -f ./*.o ../utils/*.o $(APPNAME)
+	rm -f ./*.o ../utils/*.o valgrind.out.txt $(APPNAME)

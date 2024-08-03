@@ -102,7 +102,7 @@ void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit
     /* allocate the hash memory */
     astChecker->hash = calloc(astChecker->size, sizeof(IdentifierHashCell));
 
-    error_handler_init(&astChecker->errorHandler, lexer.string, lexer.filePath);
+    error_handler_init(&astChecker->errorHandler, &lexer.string, lexer.filePath);
 }
 
 void ast_checker_free(AstChecker * astChecker){
