@@ -481,8 +481,8 @@ void emitter_generate_entry_file_string(Emitter * emitter, AstChecker * astCheck
 void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChecker * astChecker, TranslationUnit * translationUnit, int * instrucitonLines, int * guidanceLines){
     LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
     LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
-    InstructionNodeList * instructionNodeList = instructionLabalList->labal.instructionNodeList;
-    GuidanceNodeList * guidanceNodeList = guidanceLabalList->labal.guidanceNodeList;
+    InstructionNodeList * instructionNodeList = (instructionLabalList != NULL)? instructionLabalList->labal.instructionNodeList : NULL;
+    GuidanceNodeList * guidanceNodeList = (guidanceLabalList != NULL)? guidanceLabalList->labal.guidanceNodeList : NULL;
     /* firsly, generate code image */
     TokenRefrenceList * copyNumbers = NULL;
     int position = 100;
