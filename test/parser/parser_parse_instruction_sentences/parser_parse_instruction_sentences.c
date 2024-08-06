@@ -18,8 +18,8 @@ int main(){
     error_handler_flush_error_list(&lexerPreprocess.errorHandler);
     
     /* preprocesser pass */
-    preprocessor_init(&preprocessor, lexerPreprocess);
-    preprocessor_preprocess(&preprocessor, lexerPreprocess.string, "test1");
+    preprocessor_init(&preprocessor, lexerPreprocess, "test1");
+    preprocessor_preprocess(&preprocessor, lexerPreprocess.string);
     error_handler_flush_error_list(&preprocessor.errorHandler);
 
     /* postprocess lexer pass */
