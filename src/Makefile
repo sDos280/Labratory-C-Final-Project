@@ -40,7 +40,7 @@ _char_util.o: ../utils/char_util.c
 
 # valgrind
 valgrind:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind.out.txt ./$(APPNAME)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind.out.txt ./$(APPNAME) $(ARGS)
 
 clean:
 	rm -f ./*.o ../utils/*.o valgrind.out.txt $(APPNAME)

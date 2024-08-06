@@ -11,17 +11,17 @@
 
 MAIN: add r3, LIST
       jsr fn1
-
-LOOP: prn #48
+ hello
+LOOP: prn #-26
       lea STR, r6
       inc r6
       mov *r6, L3
       sub r1, r4
       cmp r3, #-6
       bne END
-      add r7, *r6 
+      add r7, *r6  hello
       clr K
-      sub L3, #5
+      sub #5, L3
       jmp LOOP
 
 END:  stop
@@ -32,3 +32,9 @@ LIST: .data 6, -9
       .data -100
 
 K:    .data 31
+
+macr hello   
+hi every one
+sub 3, HHLD
+endmacr  
+
