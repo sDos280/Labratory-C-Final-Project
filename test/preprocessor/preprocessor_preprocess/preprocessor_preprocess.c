@@ -11,8 +11,8 @@ int main(){
     lexer_lex(&lexer);
     error_handler_flush_error_list(&lexer.errorHandler);
     
-    preprocessor_init(&preprocessor, lexer);
-    preprocessor_preprocess(&preprocessor, lexer.string, "test1");
+    preprocessor_init(&preprocessor, lexer, "test1");
+    preprocessor_preprocess(&preprocessor, lexer.string);
     error_handler_flush_error_list(&preprocessor.errorHandler);
 
     lexer_free(&lexer);
