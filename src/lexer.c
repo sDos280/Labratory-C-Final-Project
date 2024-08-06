@@ -43,7 +43,7 @@ void lexer_init_char_pointer(Lexer * lexer, char * sourceString){
 
 bool lexer_init_file(Lexer *lexer, char * filePath){
     FILE *file;
-    char ch;
+    char ch = EOF;
     bool out = true;
 
     /* curate the file path string */
