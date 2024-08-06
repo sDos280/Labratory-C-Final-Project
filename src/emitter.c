@@ -202,8 +202,8 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                         instrucitionFirstOperandMemory.ARE = 1; /* 1 = 0b001 */
                         instrucitionFirstOperandMemory.other.full = 0;
                         tempAtoiS = calloc(10, sizeof(char));
-                        string_add_string(&emitter->externalFile, node.firstOperand->string); /* add the name of entry */
-                        sprintf(tempAtoiS, " %d\n", *position);
+                        string_add_string(&emitter->externalFile, node.firstOperand->string); /* add the name of external */
+                        sprintf(tempAtoiS, " %04d\n", *position);
                         string_add_char_pointer(&emitter->externalFile, tempAtoiS);
                         free(tempAtoiS);
                     }
@@ -298,8 +298,8 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                             instrucitionFirstOperandMemory.ARE = 1; /* 1 = 0b001 */
                             instrucitionFirstOperandMemory.other.full = 0;
                             tempAtoiS = calloc(10, sizeof(char));
-                            string_add_string(&emitter->externalFile, node.firstOperand->string); /* add the name of entry */
-                            sprintf(tempAtoiS, " %d\n", *position);
+                            string_add_string(&emitter->externalFile, node.firstOperand->string); /* add the name of external */
+                            sprintf(tempAtoiS, " %04d\n", *position);
                             string_add_char_pointer(&emitter->externalFile, tempAtoiS);
                             free(tempAtoiS);
                         }
@@ -349,8 +349,8 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                             instrucitionSecondOperandMemory.ARE = 1; /* 1 = 0b001 */
                             instrucitionSecondOperandMemory.other.full = 0;
                             tempAtoiS = calloc(10, sizeof(char));
-                            string_add_string(&emitter->externalFile, node.secondOperand->string); /* add the name of entry */
-                            sprintf(tempAtoiS, " %d\n", *position);
+                            string_add_string(&emitter->externalFile, node.secondOperand->string); /* add the name of external */
+                            sprintf(tempAtoiS, " %04d\n", *position);
                             string_add_char_pointer(&emitter->externalFile, tempAtoiS);
                             free(tempAtoiS);
                         }
