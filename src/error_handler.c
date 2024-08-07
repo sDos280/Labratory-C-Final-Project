@@ -61,6 +61,8 @@ void error_handler_push_char_error(ErrorHandler * handler, ErrorCaller caller, C
         while (last->next != NULL){
             last = last->next;
         }
+
+        last->next = toAdd;
     }
 }
 
