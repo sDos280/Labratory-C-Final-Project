@@ -2,8 +2,10 @@
 #include "../include/string_util.h"
 
 #define MULTIPLIER (37)
-#define HIGHST_INTEGER_IN_COMPILER  (signed int)(((2 << (14-1))) -1)
-#define LOWEST_INTEGER_IN_COMPILER (signed int)(-(2 << (14-1)))
+#define HIGHST_INTEGER_IN_15_BIT  (signed int)(((2 << (14-1))) -1)
+#define LOWEST_INTEGER_IN_15_BIT (signed int)(-(2 << (14-1)))
+#define HIGHST_INTEGER_IN_12_BIT  (signed int)(((2 << (11-1))) -1)
+#define LOWEST_INTEGER_IN_12_BIT (signed int)(-(2 << (11-1)))
 
 /**
  * Get the addressing mod of an operand, if the grammar is wrond raise an error.
@@ -15,9 +17,26 @@
 */
 static AddressingMode get_addressing_mode_of_operand(AstChecker * astChecker, Token * operand_token, bool isDerefrenced){
     TokenError error;
+    int value; 
+    
     if (operand_token->kind == NUMBER) {
         if (isDerefrenced == true){
             error.message = string_init_with_data("A Number can't be derefrenced");
+            error.token = *operand_token;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+        }
+
+        value = atoi(operand_token->string.data);
+
+        /* check of the number is too high\low */
+        if (value > HIGHST_INTEGER_IN_12_BIT){
+            error.message = string_init_with_data("This number is too high");
+            error.token = *operand_token;
+
+            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+        }else if (value < LOWEST_INTEGER_IN_12_BIT){
+            error.message = string_init_with_data("This number is too low");
             error.token = *operand_token;
 
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
@@ -173,12 +192,12 @@ void ast_checker_check_data_guidance_sentence(AstChecker * astChecker, DataNode 
 
     while (numbers != NULL){
         value = atoi(numbers->token->string.data);
-        if (value > HIGHST_INTEGER_IN_COMPILER){
+        if (value > HIGHST_INTEGER_IN_15_BIT){
             error.message = string_init_with_data("This number is too high");
             error.token = *numbers->token;
 
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-        }else if (value < LOWEST_INTEGER_IN_COMPILER){
+        }else if (value < LOWEST_INTEGER_IN_15_BIT){
             error.message = string_init_with_data("This number is too low");
             error.token = *numbers->token;
 
@@ -207,6 +226,15 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
         isSourceDerefrenced = node.isFirstOperandDerefrenced;
         destination = node.secondOperand;
         isDestinationDerefrenced = node.isSecondOperandDerefrenced;
+    }
+
+    /* check for a currect grammar operand */
+    if (node.firstOperand != NULL && node.secondOperand != NULL) {
+        AM = get_addressing_mode_of_operand(astChecker, source, isSourceDerefrenced);
+        AM = get_addressing_mode_of_operand(astChecker, destination, isDestinationDerefrenced);
+    } 
+    if (node.firstOperand != NULL && node.secondOperand == NULL){
+        AM = get_addressing_mode_of_operand(astChecker, destination, isDestinationDerefrenced);
     }
 
     if (node.operation->kind == CMP){

@@ -35,3 +35,15 @@ f:
     cmp fg, a
     cmp ad, f
     cmp f, ad
+
+    ; test max/min for number in instruction
+    prn #2046
+    prn #2047
+    prn #2048
+    prn #2049
+    prn 2049
+    prn #-2047
+    prn #-2048
+    prn #-2049
+    prn #-2050
+    prn -2050

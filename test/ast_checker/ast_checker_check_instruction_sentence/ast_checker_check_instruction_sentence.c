@@ -5,63 +5,13 @@
 #include "../../../include/ast_checker.h"
 #include "../../../include/string_util.h"
 
-static void print_labal(LabalNode labal){
-    InstructionNodeList * copyI = labal.instructionNodeList;
-    GuidanceNodeList * copyG = labal.guidanceNodeList;
-    TokenRefrenceList * list = NULL;
-
-    printf("labal size: %d\n", labal.size);
-    printf("labal position: %d\n", labal.position);
-
-    if (labal.labal != NULL){
-        printf("%s:\n", labal.labal->string.data);
-    }
-
-    while (copyI != NULL){
-        printf("    %s", copyI->node.operation->string.data);
-
-        if (copyI->node.firstOperand != NULL)
-            printf(" %s", copyI->node.firstOperand->string.data);
-    
-        if (copyI->node.secondOperand != NULL)
-            printf(", %s", copyI->node.secondOperand->string.data);
-
-        printf("\n");
-        copyI = copyI->next;
-    }
-
-    while (copyG != NULL){
-        if (copyG->kind == DataNodeKind){
-            printf("    .data ");
-            
-            list = copyG->node.dataNode.numbers;
-
-            while (list != NULL){
-                printf("%d", atoi(list->token->string.data));
-                if (list->next != NULL) printf(", ");
-                list = list->next;
-            }
-
-            printf("\n");
-        } else if (copyG->kind == StringNodeKind){
-            if (copyG->node.stringNode.token != NULL)
-                printf("    .string %s\n", copyG->node.stringNode.token->string.data);
-        }
-
-        copyG = copyG->next;
-    }
-}
-
 int main(){
     Lexer lexerPreprocess;
     Lexer lexerPostprocess;
     Preprocessor preprocessor;
     TranslationUnit translationUnit;
     AstChecker astChecker;
-    ExternalNodeList * externalNodeList = NULL;
-    EntryNodeList * entryNodeList = NULL;
     LabalNodeList * instructionLabalList = NULL;
-    LabalNodeList * guidanceLabalList = NULL;
 
     /* preprocess lexer pass */
     lexer_init_file(&lexerPreprocess, "test1");
@@ -87,10 +37,7 @@ int main(){
     ast_checker_init(&astChecker, &translationUnit, lexerPostprocess);
     ast_checker_check_duplicate_identifiers(&astChecker, &translationUnit);
 
-    externalNodeList = translationUnit.externalNodeList;
-    entryNodeList = translationUnit.entryNodeList;
     instructionLabalList = translationUnit.instructionLabalList;
-    guidanceLabalList = translationUnit.guidanceLabalList;
 
     while (instructionLabalList != NULL){
         while (instructionLabalList->labal.instructionNodeList != NULL){
