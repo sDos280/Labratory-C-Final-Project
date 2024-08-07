@@ -381,6 +381,7 @@ void lexer_peek_number(Lexer * lexer){
 
 void lexer_peek_string(Lexer * lexer){
     bool wasCloserStringFound = false;
+    bool wasNewLineFound = false;
     int index = lexer->index;
     int line = lexer->line;
     int indexInLine = lexer->indexInLine;
@@ -401,10 +402,28 @@ void lexer_peek_string(Lexer * lexer){
             wasCloserStringFound = true;
         }
 
+        if (lexer->ch == '\n'){
+            wasNewLineFound = true; break; /* we immidiatly break because \n can't be a part of a string */
+        }
+
         string_add_char(&token.string, lexer->ch);
         lexer_peek_char(lexer);
         
         if (wasCloserStringFound == true) break;
+    }
+
+    if (wasNewLineFound == true){
+        /* a new line was found be for a string closer was found, so we raise en error */
+        token.kind = ErrorToken;
+
+        error.ch = '\"';
+        error.index = index;
+        error.indexInLine = indexInLine;
+        error.line = line;
+        error.message = string_init_with_data("no string closer was found on this line");
+
+        error_handler_push_char_error(&lexer->errorHandler, LexerErrorKind, error);
+        return; /* there is no need to continue looking for new problems in the string if this was found */
     }
 
     if (wasCloserStringFound == false){
