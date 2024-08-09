@@ -332,10 +332,12 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
     instruction.isFirstOperandDerefrenced = false;
     instruction.secondOperand = NULL;
     instruction.isSecondOperandDerefrenced = false;
+    instruction.hasParserError = false;
     firstOperand.Operand = NULL;
     firstOperand.isOperandDerefrenced = false;
     secondOperand.Operand = NULL;
     secondOperand.isOperandDerefrenced = false;
+    bool wasError = false;
     
 
     if (translationUnit->tokens != NULL && 
@@ -364,6 +366,9 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        instruction.hasParserError = true;
+
         return instruction;
     }
 
@@ -378,13 +383,18 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
     /* parse operands */
     firstOperand = parser_parse_instruction_operand(translationUnit, &wasErrorInOperand);
 
-    if (wasErrorInOperand == true) return instruction; /* there is no need to raise any errors since parser_parse_instruction_operand already done that */
+    if (wasErrorInOperand == true) {
+        instruction.hasParserError = true;
+        return instruction; /* there is no need to raise any errors since parser_parse_instruction_operand already done that */
+    }
+    
 
     instruction.firstOperand = firstOperand.Operand;
     instruction.isFirstOperandDerefrenced = firstOperand.isOperandDerefrenced;
 
     /* check if a one operand instruction, if it is, just return */
     if (translationUnit->tokens != NULL && (translationUnit->tokens->token.kind == EOL || translationUnit->tokens->token.kind == EOFT)){
+        instruction.hasParserError |= wasErrorInOperand;
         return instruction;
     }
 
@@ -395,6 +405,9 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        instruction.hasParserError = true;
+
         return instruction;
     }
 
@@ -402,8 +415,11 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
 
     secondOperand = parser_parse_instruction_operand(translationUnit, &wasErrorInOperand);
 
-    if (wasErrorInOperand == true) return instruction; /* there is no need to raise any errors since parser_parse_instruction_operand already done that */
-
+    if (wasErrorInOperand == true) {
+        instruction.hasParserError = true;
+        return instruction; /* there is no need to raise any errors since parser_parse_instruction_operand already done that */
+    }
+    
     instruction.secondOperand = secondOperand.Operand;
     instruction.isSecondOperandDerefrenced = secondOperand.isOperandDerefrenced;
 
@@ -414,8 +430,13 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        instruction.hasParserError = true;
+
         return instruction;
     }
+
+    instruction.hasParserError |= wasErrorInOperand;
 
     return instruction;
 }

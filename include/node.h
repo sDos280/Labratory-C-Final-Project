@@ -51,6 +51,8 @@ typedef struct InstructionNode {
     bool isFirstOperandDerefrenced; /* true if the first operand is derefrenced else false */
     Token * secondOperand; /* the second operand token */
     bool isSecondOperandDerefrenced; /* true if the second operand is derefrenced else false */
+    
+    bool hasParserError; /* true if got a parser error, else, false */ 
 }InstructionNode;
 
 typedef struct InstructionNodeList {
