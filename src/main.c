@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
             lexer_lex(&lexerPreprocess);
             error_handler_flush_error_list(&lexerPreprocess.errorHandler);
 
-            if (lexerPreprocess.errorHandler.errorList == NULL) {
+            /*if (lexerPreprocess.errorHandler.errorList == NULL)*/ {
                 /* preprocesser pass */
                 preprocessor_init(&preprocessor, lexerPreprocess, argv[i]);
                 preprocessor_preprocess(&preprocessor, lexerPreprocess.string);
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
                     lexer_lex(&lexerPostprocess);
                     error_handler_flush_error_list(&lexerPostprocess.errorHandler);
 
-                    if (lexerPostprocess.errorHandler.errorList == NULL) {
+                    /*if (lexerPostprocess.errorHandler.errorList == NULL)*/ {
                         /* parser pass */
                         parser_init_translation_unit(&translationUnit, lexerPostprocess);
                         parser_parse_translation_unit(&translationUnit);
