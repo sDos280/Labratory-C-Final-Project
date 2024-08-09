@@ -370,9 +370,9 @@ void lexer_peek_number(Lexer * lexer){
 
             error_handler_push_char_error(&lexer->errorHandler, LexerErrorKind, error);
 
-            string_free(token.string);
+            token.kind = ErrorToken; /* update the token kind */
 
-            return; /* there is no need to add the tokens since it's invalid*/
+            /*return;  we eed to add a token even if it's invalid*/
         }
     }
 
@@ -414,8 +414,6 @@ void lexer_peek_string(Lexer * lexer){
 
     if (wasNewLineFound == true){
         /* a new line was found be for a string closer was found, so we raise en error */
-        token.kind = ErrorToken;
-
         error.ch = '\"';
         error.index = index;
         error.indexInLine = indexInLine;
@@ -423,13 +421,14 @@ void lexer_peek_string(Lexer * lexer){
         error.message = string_init_with_data("no string closer was found on this line");
 
         error_handler_push_char_error(&lexer->errorHandler, LexerErrorKind, error);
-        return; /* there is no need to continue looking for new problems in the string if this was found */
+
+        token.kind = ErrorToken; /* update the token kind */
+
+        /*return;  we eed to add a token even if it's invalid*/
     }
 
     if (wasCloserStringFound == false){
         /* there isn't a known non operative instruction that match the one that we know, so we raise an error */
-        token.kind = ErrorToken;
-
         error.ch = '\"';
         error.index = index;
         error.indexInLine = indexInLine;
@@ -437,6 +436,10 @@ void lexer_peek_string(Lexer * lexer){
         error.message = string_init_with_data("no string closer was found");
 
         error_handler_push_char_error(&lexer->errorHandler, LexerErrorKind, error);
+
+        token.kind = ErrorToken; /* update the token kind */
+
+        /*return;  we eed to add a token even if it's invalid*/
     }
 
     add_token(lexer, token);
