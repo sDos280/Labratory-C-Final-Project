@@ -5,6 +5,7 @@
 #include "../include/consts.h"
 #include "../include/error_handler.h"
 #include "../include/lexer.h"
+#include "../include/safe_allocations.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -21,7 +22,7 @@
 
 
 void lexer_init_char_pointer(Lexer * lexer, char * sourceString){
-    char * filePathCurated = calloc(strlen("from_string.as") + 1, sizeof(char));
+    char * filePathCurated = safe_calloc(strlen("from_string.as") + 1, sizeof(char));
 
     lexer->string = string_init_with_data(sourceString);
     lexer->index = 0;
@@ -47,7 +48,7 @@ bool lexer_init_file(Lexer *lexer, char * filePath){
     bool out = true;
 
     /* curate the file path string */
-    char * filePathCurated = calloc((strlen(filePath) + 3) + 1, sizeof(char));
+    char * filePathCurated = safe_calloc((strlen(filePath) + 3) + 1, sizeof(char));
     strcpy(filePathCurated, filePath);
     strcat(filePathCurated, ".as");
 
@@ -88,7 +89,7 @@ void lexer_init_from_string(Lexer *lexer, char * filePath, String string){
     lexer->string = string_init();
     string_add_string(&lexer->string, string);
     
-    lexer->filePath = calloc(strlen(filePath) + 1, sizeof(char));
+    lexer->filePath = safe_calloc(strlen(filePath) + 1, sizeof(char));
     strcpy(lexer->filePath, filePath);
 
     /* lexer->errorHandler = (ErrorHandler){0}; */
@@ -234,7 +235,7 @@ void lexer_print_token_list(Lexer * lexer){
 }
 
 static void add_token(Lexer * lexer, Token token){
-    TokenList * toAdd = malloc(sizeof(TokenList));
+    TokenList * toAdd = safe_malloc(sizeof(TokenList));
     toAdd->token = token;
     toAdd->next = NULL;
 
@@ -572,7 +573,7 @@ void lexer_peek_end_of_file(Lexer *lexer){
     int indexInLine = lexer->indexInLine;
     Token token;
 
-    char *temp = (char *)malloc(2 * sizeof(char));
+    char *temp = (char *)safe_malloc(2 * sizeof(char));
 
     temp[0] = (char)EOF;
     temp[1] = '\0';

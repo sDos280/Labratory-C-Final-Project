@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "../include/safe_allocations.h"
 
 #define RED_COLOR   "\x1B[1;91m"

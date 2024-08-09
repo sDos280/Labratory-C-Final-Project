@@ -1,4 +1,5 @@
 #include "../include/error_handler.h"
+#include "../include/safe_allocations.h"
 
 #define RED_COLOR   "\x1B[1;91m"
 #define GRN_COLOR   "\x1B[32m"
@@ -28,7 +29,7 @@ void error_handler_init(ErrorHandler * handler, String string, char * filePath){
 }
 
 void error_handler_push_token_error(ErrorHandler * handler, ErrorCaller caller, TokenError error){
-    ErrorList * toAdd = malloc(sizeof(ErrorList));
+    ErrorList * toAdd = safe_malloc(sizeof(ErrorList));
     toAdd->error.tokenError = error;
     toAdd->kind = TokenErrorKind;
     toAdd->caller = caller;
@@ -47,7 +48,7 @@ void error_handler_push_token_error(ErrorHandler * handler, ErrorCaller caller, 
 }
 
 void error_handler_push_char_error(ErrorHandler * handler, ErrorCaller caller, CharError error){
-    ErrorList * toAdd = malloc(sizeof(ErrorList));
+    ErrorList * toAdd = safe_malloc(sizeof(ErrorList));
     toAdd->error.charError = error;
     toAdd->kind = CharErrorKind;
     toAdd->caller = caller;

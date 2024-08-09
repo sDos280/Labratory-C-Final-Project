@@ -1,3 +1,4 @@
+#include "../include/safe_allocations.h"
 #include "../include/emitter.h"
 #include "../include/ast_checker.h"
 #include "../include/string_util.h"
@@ -151,7 +152,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         instrucitionMemory.code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
         toWrite = InstructionMemoryToBinary(instrucitionMemory); /* copy the bits of the instructionMemory to toWrite*/
-        tempAtoiS = calloc(10, sizeof(char));
+        tempAtoiS = safe_calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
@@ -173,7 +174,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         instrucitionMemory.code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
         toWrite = InstructionMemoryToBinary(instrucitionMemory); /* copy the bits of the instructionMemory to toWrite */
-        tempAtoiS = calloc(10, sizeof(char));
+        tempAtoiS = safe_calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
@@ -201,7 +202,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                     else /* if (tempCellP->kind == ExternalCellKind) */ {
                         instrucitionFirstOperandMemory.ARE = 1; /* 1 = 0b001 */
                         instrucitionFirstOperandMemory.other.full = 0;
-                        tempAtoiS = calloc(10, sizeof(char));
+                        tempAtoiS = safe_calloc(10, sizeof(char));
                         string_add_string(&emitter->externalFile, node.firstOperand->string); /* add the name of external */
                         sprintf(tempAtoiS, " %04d\n", *position);
                         string_add_char_pointer(&emitter->externalFile, tempAtoiS);
@@ -223,7 +224,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         }
 
         toWrite = InstructionOperandMemoryToBinary(instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
-        tempAtoiS = calloc(10, sizeof(char));
+        tempAtoiS = safe_calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
@@ -246,7 +247,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
         instrucitionMemory.code = InstructionTokenKindToInstructionCode(node.operation->kind);
 
         toWrite = InstructionMemoryToBinary(instrucitionMemory); /* copy the bits of the instrucitionMemory to toWrite */
-        tempAtoiS = calloc(10, sizeof(char));
+        tempAtoiS = safe_calloc(10, sizeof(char));
         sprintf(tempAtoiS, "%04d ", *position);
         string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
         memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
@@ -270,7 +271,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                 instrucitionFirstOperandMemory.other.reg.rdst = ConvertIntTo2Complement(temp);
 
                 toWrite = InstructionOperandMemoryToBinary(instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
-                tempAtoiS = calloc(10, sizeof(char));
+                tempAtoiS = safe_calloc(10, sizeof(char));
                 sprintf(tempAtoiS, "%04d ", *position);
                 string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
                 memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
@@ -297,7 +298,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                         else /* if (tempCellP->kind == ExternalCellKind) */ {
                             instrucitionFirstOperandMemory.ARE = 1; /* 1 = 0b001 */
                             instrucitionFirstOperandMemory.other.full = 0;
-                            tempAtoiS = calloc(10, sizeof(char));
+                            tempAtoiS = safe_calloc(10, sizeof(char));
                             string_add_string(&emitter->externalFile, node.firstOperand->string); /* add the name of external */
                             sprintf(tempAtoiS, " %04d\n", *position);
                             string_add_char_pointer(&emitter->externalFile, tempAtoiS);
@@ -320,7 +321,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
             }
 
             toWrite = InstructionOperandMemoryToBinary(instrucitionFirstOperandMemory); /* copy the bits of the instrucitionFirstOperandMemory to toWrite */
-            tempAtoiS = calloc(10, sizeof(char));
+            tempAtoiS = safe_calloc(10, sizeof(char));
             sprintf(tempAtoiS, "%04d ", *position);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
             memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
@@ -348,7 +349,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
                         else /* if (tempCellP->kind == ExternalCellKind) */ {
                             instrucitionSecondOperandMemory.ARE = 1; /* 1 = 0b001 */
                             instrucitionSecondOperandMemory.other.full = 0;
-                            tempAtoiS = calloc(10, sizeof(char));
+                            tempAtoiS = safe_calloc(10, sizeof(char));
                             string_add_string(&emitter->externalFile, node.secondOperand->string); /* add the name of external */
                             sprintf(tempAtoiS, " %04d\n", *position);
                             string_add_char_pointer(&emitter->externalFile, tempAtoiS);
@@ -370,7 +371,7 @@ static void update_instruction_memory_stuff(Emitter * emitter,
             }
 
             toWrite = InstructionOperandMemoryToBinary(instrucitionSecondOperandMemory); /* copy the bits of the instrucitionSecondOperandMemory to toWrite */
-            tempAtoiS = calloc(10, sizeof(char));
+            tempAtoiS = safe_calloc(10, sizeof(char));
             sprintf(tempAtoiS, "%04d ", *position);
             string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
             memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
@@ -464,7 +465,7 @@ void emitter_generate_entry_file_string(Emitter * emitter, AstChecker * astCheck
         
         if (temp != NULL){
             if (temp->wasEntryAdded == false){
-                tempAtoiS = calloc(10, sizeof(char));
+                tempAtoiS = safe_calloc(10, sizeof(char));
                 string_add_string(&emitter->entryFile, entryNodeList->node.token->string); /* add the name of entry */
                 sprintf(tempAtoiS, " %d\n", temp->value.labal->position);
                 string_add_char_pointer(&emitter->entryFile, tempAtoiS);
@@ -517,7 +518,7 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
                 while (copyNumbers != NULL) {
                     temp = atoi(copyNumbers->token->string.data);
                     toWrite = ConvertIntTo2Complement(temp);
-                    tempAtoiS = calloc(10, sizeof(char));
+                    tempAtoiS = safe_calloc(10, sizeof(char));
                     sprintf(tempAtoiS, "%04d", position);
                     string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
                     memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
@@ -535,7 +536,7 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
                      index++, position++ /* update position */) {
                     temp = (int)string_get_char(guidanceNodeList->node.stringNode.token->string, index);
                     toWrite = ConvertIntTo2Complement(temp);
-                    tempAtoiS = calloc(10, sizeof(char));
+                    tempAtoiS = safe_calloc(10, sizeof(char));
                     sprintf(tempAtoiS, "%04d", position);
                     string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
                     memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
@@ -545,7 +546,7 @@ void emitter_generate_object_and_external_files_string(Emitter * emitter, AstChe
                 }
 
                 /* add the \0 char */
-                tempAtoiS = calloc(10, sizeof(char));
+                tempAtoiS = safe_calloc(10, sizeof(char));
                 sprintf(tempAtoiS, "%04d", position);
                 string_add_char_pointer(&emitter->objectFile, tempAtoiS); /* add the position */
                 memset(tempAtoiS, 0, sizeof(char) * 10); /* reset the tempAtoiS buffer */
@@ -575,7 +576,7 @@ void emitter_emit(Emitter * emitter, AstChecker * astChecker, TranslationUnit * 
     emitter_generate_object_and_external_files_string(emitter, astChecker, translationUnit, &instrucitonLines, &guidanceLines);
     
     if (emitter->errorHandler.errorList == NULL && string_length(emitter->externalFile) != 0) {
-        filePathCurated = calloc((strlen(filePath) + 4) + 1, sizeof(char));
+        filePathCurated = safe_calloc((strlen(filePath) + 4) + 1, sizeof(char));
         strcpy(filePathCurated, filePath);
         strcat(filePathCurated, ".ext");
 
@@ -592,7 +593,7 @@ void emitter_emit(Emitter * emitter, AstChecker * astChecker, TranslationUnit * 
     }
 
     if (emitter->errorHandler.errorList == NULL && string_length(emitter->entryFile) != 0) {
-        filePathCurated = calloc((strlen(filePath) + 4) + 1, sizeof(char));
+        filePathCurated = safe_calloc((strlen(filePath) + 4) + 1, sizeof(char));
         strcpy(filePathCurated, filePath);
         strcat(filePathCurated, ".ent");
 
@@ -609,7 +610,7 @@ void emitter_emit(Emitter * emitter, AstChecker * astChecker, TranslationUnit * 
     }
 
     if (emitter->errorHandler.errorList == NULL) {
-        filePathCurated = calloc((strlen(filePath) + 3) + 1, sizeof(char));
+        filePathCurated = safe_calloc((strlen(filePath) + 3) + 1, sizeof(char));
         strcpy(filePathCurated, filePath);
         strcat(filePathCurated, ".ob");
 
@@ -618,7 +619,7 @@ void emitter_emit(Emitter * emitter, AstChecker * astChecker, TranslationUnit * 
         if (file == NULL) {
             printf("%sEmitter Error:%s couldn't create the \"%s.ob\" file.", RED_COLOR, RESET_COLOR, filePath);
         } else {
-            temp = calloc(20, sizeof(char));
+            temp = safe_calloc(20, sizeof(char));
             sprintf(temp, " %d %d\n", instrucitonLines, guidanceLines); /* add the top header of numebr of lines */
             fprintf(file, "%s", temp);
             fprintf(file, "%s", emitter->objectFile.data);

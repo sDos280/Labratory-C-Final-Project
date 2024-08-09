@@ -1,3 +1,4 @@
+#include "../include/safe_allocations.h"
 #include "../include/ast_checker.h"
 #include "../include/string_util.h"
 
@@ -119,7 +120,7 @@ void ast_checker_init(AstChecker * astChecker, TranslationUnit * translationUnit
     }
     
     /* allocate the hash memory */
-    astChecker->hash = calloc(astChecker->size, sizeof(IdentifierHashCell));
+    astChecker->hash = safe_calloc(astChecker->size, sizeof(IdentifierHashCell));
 
     error_handler_init(&astChecker->errorHandler, lexer.string, lexer.filePath);
 }

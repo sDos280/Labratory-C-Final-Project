@@ -1,3 +1,4 @@
+#include "../include/safe_allocations.h"
 #include "../include/preprocessor.h"
 
 #define RED_COLOR   "\x1B[1;91m"
@@ -20,7 +21,7 @@ static void writeDataToFile(FILE *file, String data) {
 
 void preprocessor_init(Preprocessor * preprocessor, Lexer lexer, char * filePath){
     /* curate the file path string */
-    char * filePathCurated = calloc((strlen(filePath) + 3) + 1, sizeof(char));
+    char * filePathCurated = safe_calloc((strlen(filePath) + 3) + 1, sizeof(char));
     strcpy(filePathCurated, filePath);
     strcat(filePathCurated, ".am");
     
@@ -195,7 +196,7 @@ void preprocessor_generate_macro_list(Preprocessor * preprocessor, String source
 }
 
 void preprocessor_add_macro_to_macro_list(Preprocessor * preprocessor, Macro macro){
-    MacroList * toAdd = malloc(sizeof(MacroList));
+    MacroList * toAdd = safe_malloc(sizeof(MacroList));
     toAdd->macro = macro;
     toAdd->next = NULL;
 

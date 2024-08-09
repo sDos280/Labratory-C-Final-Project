@@ -7,8 +7,11 @@ APPNAME = ac # ac = AsemblyCompiler
 .PHONY: clean main valgrind
 
 # compiler targets
-main: error_handler.o ast_checker.o lexer.o preprocessor.o parser.o emitter.o error_handler.o main.o string_util.o _char_util.o
+main: error_handler.o safe_allocations.o ast_checker.o lexer.o preprocessor.o parser.o emitter.o error_handler.o main.o string_util.o _char_util.o
 	$(CC) $(LDFLAGS) -o $(APPNAME) $^
+
+safe_allocations.o: safe_allocations.c
+	$(CC) $(CXXFLAGS) -c $< -o $@
 
 error_handler.o: error_handler.c
 	$(CC) $(CXXFLAGS) -c $< -o $@

@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdbool.h>
+#include "../include/safe_allocations.h"
 #include "../include/string_util.h"
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -12,7 +13,7 @@ String string_init(){
     String str;
     str.size = 8; /* just a nice number, 2^3*/
     str.index = 0; /* we setup the string data to have no data so the first chari n the buffer will be \0*/
-    str.data = (char *)calloc(8, sizeof(char));
+    str.data = (char *)safe_calloc(8, sizeof(char));
 
     return str;
 }
@@ -27,7 +28,7 @@ String string_init_with_data(char * data){
 
     str.size = MAX(power_2_ceil(strlen(data) + 1), 8); /* strlen(data) for the data itself and + 1 for \0*/
     str.index = strlen(data);
-    str.data = (char *)calloc(str.size, sizeof(char));
+    str.data = (char *)safe_calloc(str.size, sizeof(char));
 
     for (i = 0; i < str.index; i++){
         str.data[i] = data[i];
@@ -43,7 +44,7 @@ void string_add_char(String *str, char ch){
     if (str->index + 1 == str->size) /* check if we got to the end (check if we currently don't have enough memory to add a char for the string)*/
     {
         str->size *= 2;
-        str->data = realloc(str->data, str->size * 2); /* double the buffer size*/
+        str->data = safe_realloc(str->data, str->size * 2); /* double the buffer size*/
         
     }
 
@@ -69,7 +70,7 @@ void string_add_char_pointer(String * str, char * toAdd){
             str->size *= 2;
         }
 
-        str->data = realloc(str->data, str->size * 2); /* double the buffer size*/
+        str->data = safe_realloc(str->data, str->size * 2); /* double the buffer size*/
     }
 
     for (i = 0; i < strlen(toAdd); i++){

@@ -1,3 +1,4 @@
+#include "../include/safe_allocations.h"
 #include "../include/node.h"
 #include "../include/parser.h"
 
@@ -13,7 +14,7 @@ static void add_token_refrence_to_the_token_refrence_list(TokenRefrenceList ** l
     if (list == NULL) return;
 
     head = *list;
-    toAdd = malloc(sizeof(TokenRefrenceList));
+    toAdd = safe_malloc(sizeof(TokenRefrenceList));
     toAdd->token = Token;
     toAdd->next = NULL;
 
@@ -272,7 +273,7 @@ GuidanceNodeList * parser_parse_guidance_sentences(TranslationUnit * translation
             translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
         } else if (translationUnit->tokens != NULL && (translationUnit->tokens->token.kind == DATA_INS || translationUnit->tokens->token.kind == STRING_INS)){
             if (guidanceList == NULL){ /* no sentence was added yet */
-                guidanceList = malloc(sizeof(GuidanceNodeList));
+                guidanceList = safe_malloc(sizeof(GuidanceNodeList));
                 guidanceList->next = NULL;
 
                 if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == DATA_INS){
@@ -285,7 +286,7 @@ GuidanceNodeList * parser_parse_guidance_sentences(TranslationUnit * translation
 
                 guidanceListLast = &guidanceList;
             } else { /* at least one sentence was added */
-                (*guidanceListLast)->next = malloc(sizeof(GuidanceNodeList));
+                (*guidanceListLast)->next = safe_malloc(sizeof(GuidanceNodeList));
                 guidanceListLast = &((*guidanceListLast)->next); /* update guidanceListLast to the last allocated node */
                 (*guidanceListLast)->next = NULL;
 
@@ -444,12 +445,12 @@ InstructionNodeList * parser_parse_instruction_sentences(TranslationUnit * trans
                    translationUnit->tokens->token.kind == RTS ||
                    translationUnit->tokens->token.kind == STOP)){
             if (instructionList == NULL){ /* no sentence was added yet */
-                instructionList = malloc(sizeof(InstructionNodeList));
+                instructionList = safe_malloc(sizeof(InstructionNodeList));
                 instructionList->next = NULL;
                 instructionList->node = parser_parse_instruction_sentence(translationUnit);
                 instructionListLast = &instructionList;
             } else { /* at least one sentence was added */
-                (*instructionListLast)->next = malloc(sizeof(InstructionNodeList));
+                (*instructionListLast)->next = safe_malloc(sizeof(InstructionNodeList));
                 instructionListLast = &((*instructionListLast)->next); /* update guidanceListLast to the last allocated node */
                 (*instructionListLast)->next = NULL;
 
@@ -691,24 +692,24 @@ void parser_parse_translation_unit(TranslationUnit * translationUnit){
             translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
         } else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EXTERN_INS){
             if (externalNodeList == NULL){
-                externalNodeList = malloc(sizeof(ExternalNodeList));
+                externalNodeList = safe_malloc(sizeof(ExternalNodeList));
                 externalNodeList->next = NULL;
                 externalNodeList->node = parser_parse_external_sentence(translationUnit);
                 externalNodeListLast = &externalNodeList;
             }else{
-                (*externalNodeListLast)->next = malloc(sizeof(ExternalNodeList));
+                (*externalNodeListLast)->next = safe_malloc(sizeof(ExternalNodeList));
                 externalNodeListLast = &(*externalNodeListLast)->next;
                 (*externalNodeListLast)->next = NULL;
                 (*externalNodeListLast)->node = parser_parse_external_sentence(translationUnit);
             }
         } else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == ENTRY_INS){
             if (entryNodeList == NULL){
-                entryNodeList = malloc(sizeof(EntryNodeList));
+                entryNodeList = safe_malloc(sizeof(EntryNodeList));
                 entryNodeList->next = NULL;
                 entryNodeList->node = parser_parse_entry_sentence(translationUnit);
                 entryNodeListLast = &entryNodeList;
             }else{
-                (*entryNodeListLast)->next = malloc(sizeof(EntryNodeList));
+                (*entryNodeListLast)->next = safe_malloc(sizeof(EntryNodeList));
                 entryNodeListLast = &(*entryNodeListLast)->next;
                 (*entryNodeListLast)->next = NULL;
                 (*entryNodeListLast)->node = parser_parse_entry_sentence(translationUnit);
@@ -736,12 +737,12 @@ void parser_parse_translation_unit(TranslationUnit * translationUnit){
         if (wasLabalFound == true){
             if (labal.instructionNodeList != NULL){
                 if (instructionLabalList == NULL){ 
-                    instructionLabalList = malloc(sizeof(LabalNodeList));
+                    instructionLabalList = safe_malloc(sizeof(LabalNodeList));
                     instructionLabalList->next = NULL;
                     instructionLabalList->labal = labal;
                     instructionLabalListLast = &instructionLabalList;
                 } else {
-                    (*instructionLabalListLast)->next = malloc(sizeof(LabalNodeList));
+                    (*instructionLabalListLast)->next = safe_malloc(sizeof(LabalNodeList));
                     instructionLabalListLast = &(*instructionLabalListLast)->next;
                     (*instructionLabalListLast)->next = NULL;
                     (*instructionLabalListLast)->labal = labal;
@@ -750,12 +751,12 @@ void parser_parse_translation_unit(TranslationUnit * translationUnit){
 
             if (labal.guidanceNodeList != NULL){
                 if (guidanceLabalList == NULL){ 
-                    guidanceLabalList = malloc(sizeof(LabalNodeList));
+                    guidanceLabalList = safe_malloc(sizeof(LabalNodeList));
                     guidanceLabalList->next = NULL;
                     guidanceLabalList->labal = labal;
                     guidanceLabalListLast = &guidanceLabalList;
                 } else {
-                    (*guidanceLabalListLast)->next = malloc(sizeof(LabalNodeList));
+                    (*guidanceLabalListLast)->next = safe_malloc(sizeof(LabalNodeList));
                     guidanceLabalListLast = &(*guidanceLabalListLast)->next;
                     (*guidanceLabalListLast)->next = NULL;
                     (*guidanceLabalListLast)->labal = labal;
