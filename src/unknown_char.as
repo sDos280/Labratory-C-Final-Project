@@ -1,7 +1,7 @@
 ; file unkown_char
 
 .entry STR
-.extern  ; there is also an error here
+.extern  
 
 .testThis
 
