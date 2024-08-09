@@ -15,6 +15,8 @@ typedef enum NodeKind {
 
 typedef struct EntryNode {
     Token * token;  /* the token (labal) that is reference as entry */
+
+    bool hasParserError; /* true if got a parser error, else, false */ 
 }EntryNode;
 
 typedef struct EntryNodeList {
@@ -24,6 +26,8 @@ typedef struct EntryNodeList {
 
 typedef struct ExternalNode {
     Token * token;  /* the token (labal) that is reference as external */
+
+    bool hasParserError; /* true if got a parser error, else, false */ 
 }ExternalNode;
 
 typedef struct ExternalNodeList {
@@ -33,10 +37,14 @@ typedef struct ExternalNodeList {
 
 typedef struct DataNode {
     TokenRefrenceList * numbers; /* the number in the data node */
+
+    bool hasParserError; /* true if got a parser error, else, false */ 
 }DataNode;
 
 typedef struct StringNode {
     Token * token; /* the that is the string */
+
+    bool hasParserError; /* true if got a parser error, else, false */ 
 }StringNode;
 
 typedef struct InstructionOperand {

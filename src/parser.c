@@ -148,6 +148,7 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
     DataNode dataNode;
     TokenError error;
     dataNode.numbers = NULL;
+    dataNode.hasParserError = false;
 
     if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != DATA_INS){
         error.message = string_init_with_data("No .data was found here");
@@ -156,6 +157,9 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        dataNode.hasParserError = true;
+        
         return dataNode;
     }
 
@@ -181,6 +185,9 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
                 error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
                 parser_move_to_last_end_of_line(translationUnit);
+
+                dataNode.hasParserError = true;
+
                 return dataNode;
             }
         } else {
@@ -190,6 +197,9 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
             error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
             parser_move_to_last_end_of_line(translationUnit);
+
+            dataNode.hasParserError = true;
+
             return dataNode;
         }
     }
@@ -201,6 +211,8 @@ DataNode parser_parse_data_guidance_sentence(TranslationUnit * translationUnit){
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        dataNode.hasParserError = true;
     }
 
     return dataNode;
@@ -221,6 +233,7 @@ StringNode parser_parse_string_guidance_sentence(TranslationUnit * translationUn
     StringNode stringNode;
     TokenError error;
     stringNode.token = NULL;
+    stringNode.hasParserError = false;
 
     if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != STRING_INS){
         error.message = string_init_with_data("No .string was found here");
@@ -229,6 +242,9 @@ StringNode parser_parse_string_guidance_sentence(TranslationUnit * translationUn
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        stringNode.hasParserError = true;
+
         return stringNode;
     }
 
@@ -241,6 +257,9 @@ StringNode parser_parse_string_guidance_sentence(TranslationUnit * translationUn
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        stringNode.hasParserError = true;
+
         return stringNode;
     }
 
@@ -254,6 +273,9 @@ StringNode parser_parse_string_guidance_sentence(TranslationUnit * translationUn
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        stringNode.hasParserError = true;
+
         return stringNode;
     }
 
@@ -332,11 +354,11 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
     instruction.isFirstOperandDerefrenced = false;
     instruction.secondOperand = NULL;
     instruction.isSecondOperandDerefrenced = false;
-    instruction.hasParserError = false;
     firstOperand.Operand = NULL;
     firstOperand.isOperandDerefrenced = false;
     secondOperand.Operand = NULL;
     secondOperand.isOperandDerefrenced = false;
+    instruction.hasParserError = false;
     bool wasError = false;
     
 
@@ -499,6 +521,7 @@ EntryNode parser_parse_entry_sentence(TranslationUnit * translationUnit){
     EntryNode node;
     TokenError error;
     node.token = NULL;
+    node.hasParserError = false;
 
     if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != ENTRY_INS){
         error.message = string_init_with_data("No .entry was found here");
@@ -507,6 +530,9 @@ EntryNode parser_parse_entry_sentence(TranslationUnit * translationUnit){
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        node.hasParserError = true;
+
         return node;
     }
 
@@ -519,6 +545,9 @@ EntryNode parser_parse_entry_sentence(TranslationUnit * translationUnit){
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+        
+        node.hasParserError = true;
+
         return node;
     }
 
@@ -532,6 +561,9 @@ EntryNode parser_parse_entry_sentence(TranslationUnit * translationUnit){
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        node.hasParserError = true;
+
         return node;
     }
 
@@ -544,6 +576,7 @@ ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit){
     ExternalNode node;
     TokenError error;
     node.token = NULL;
+    node.hasParserError = false;
 
     if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != EXTERN_INS){
         error.message = string_init_with_data("No .external was found here");
@@ -552,6 +585,9 @@ ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit){
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        node.hasParserError = true;
+
         return node;
     }
 
@@ -564,6 +600,9 @@ ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit){
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        node.hasParserError = true;
+
         return node;
     }
 
@@ -577,6 +616,9 @@ ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit){
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
         parser_move_to_last_end_of_line(translationUnit);
+
+        node.hasParserError = true;
+
         return node;
     }
 
