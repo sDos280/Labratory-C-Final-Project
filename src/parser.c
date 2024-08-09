@@ -643,7 +643,7 @@ LabalNode parser_parse_labal(TranslationUnit * translationUnit){
         return labal;
     }
 
-    if (translationUnit->tokens != NULL && 
+    else if (translationUnit->tokens != NULL && 
        (translationUnit->tokens->token.kind == STRING_INS ||
         translationUnit->tokens->token.kind == DATA_INS)){
         labal.guidanceNodeList = parser_parse_guidance_sentences(translationUnit);
@@ -651,15 +651,16 @@ LabalNode parser_parse_labal(TranslationUnit * translationUnit){
         labal.size = 0; /* not yet initialized */
         labal.position = 0; /* not yet initialized */
         return labal;
-    }
+    } 
 
-    if (translationUnit->tokens != NULL){
+    else {
         error.message = string_init_with_data("No instraction/guidance was found here");
-        error.token = translationUnit->tokens->token;
+        error.token = (wasLabalIdentifierFound == true)? *labal.labal : translationUnit->tokens->token;
 
         error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
 
-        parser_move_to_last_end_of_line(translationUnit);
+        /*parser_move_to_last_end_of_line(translationUnit); we moved all over the \n token to get to here (from the labal identifier while loop)
+         so there is no need to do the same here */
         return labal;
     }
 
