@@ -46,7 +46,7 @@ funcCall:   lea stringTwo, *r6
             sub r1, *r4
             cmp r3, #-6
             bne loopLabel
-            add r7, *r6
+labelThree: add r7, *r6
 
 
 
@@ -82,8 +82,7 @@ funcOneLocal: clr r2
 
 .entry funcOneLocal
 
-labelFive:   mov r6, labelFive
-              stop
+labelFive:   .data 100, 200, 300
 
 .extern externalLabel3
 .extern externalLabel4
@@ -95,7 +94,7 @@ funcTwoLocal: clr r5
               sub r4, r5
               jsr funcOneLocal
                   sub *r4, r5
-    jsr funcTwo
+funcTwo: jsr funcTwo
     inc r1
 
 
@@ -108,13 +107,9 @@ funcTwoLocal: clr r5
               stop
 
 labelOne:     .data 256, -512, 1024, -2048
-              prn stringThree
 
 stringThree:  .string "String inside the data section."
-
-              mov r2, *r3
-              prn r4
-
+.extern funcTwo
 funcThreeLocal: jsr funcOneLocal
                 prn *r6
                 clr r2
@@ -127,7 +122,7 @@ funcThreeLocal: jsr funcOneLocal
     clr *r5
                 stop
 
-labelSix:    mov r1, *r3
+labelSix:   mov r1, *r3
     add r2, r3
     sub r4, *r5
     cmp r6, r7
@@ -142,7 +137,7 @@ labelSix:    mov r1, *r3
               add r5, r6
               sub r7, r1
               jsr funcOneLocal
-              dec r2
+funcThree: dec r2
               prn *r3
               mov labelOne, r5
               jsr funcThreeLocal
@@ -152,21 +147,16 @@ labelSix:    mov r1, *r3
 labelTwo:     .data 5500, -5600, 5700, -5800, 5900
 
 .extern externalLabel6
+.extern funcTwo
 
-mov r2, stringFour
-
-stringFour:   .string "Another interleaved string test."
-
-              prn labelTwo
+stringFour:   prn labelTwo
               add r3, *r4
 
-labelFour:    .data 800, -900, 1000, -1100, 1200, -1300
-              mov r2, *r5
+labelFour:   mov r2, *r5
               sub r7, r6
               prn r6
 
 .extern externalLabel7
-.extern funcFour
 .extern funcFour
 
                   add r1, *r2

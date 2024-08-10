@@ -46,7 +46,7 @@ funcCall:   lea stringTwo, *r6
             sub r1, *r4
             cmp r3, #-6
             bne loopLabel
-            add r7, *r6
+labelThree: add r7, *r6
 
 
 
@@ -84,9 +84,6 @@ funcOneLocal: clr r2
 
 labelFive:   .data 100, 200, 300
 
-              mov r6, labelFive
-              stop
-
 .extern externalLabel3
 .extern externalLabel4
 .entry funcTwoLocal
@@ -97,7 +94,7 @@ funcTwoLocal: clr r5
               sub r4, r5
               jsr funcOneLocal
                   sub *r4, r5
-    jsr funcTwo
+funcTwo: jsr funcTwo
     inc r1
 
 
@@ -110,13 +107,9 @@ funcTwoLocal: clr r5
               stop
 
 labelOne:     .data 256, -512, 1024, -2048
-              prn stringThree
 
 stringThree:  .string "String inside the data section."
-
-              mov r2, *r3
-              prn r4
-
+.extern funcTwo
 funcThreeLocal: jsr funcOneLocal
                 prn *r6
                 clr r2
@@ -129,9 +122,7 @@ funcThreeLocal: jsr funcOneLocal
     clr *r5
                 stop
 
-labelSix:     .data 400, 500, 600  
-
-    mov r1, *r3
+labelSix:   mov r1, *r3
     add r2, r3
     sub r4, *r5
     cmp r6, r7
@@ -146,7 +137,7 @@ labelSix:     .data 400, 500, 600
               add r5, r6
               sub r7, r1
               jsr funcOneLocal
-              dec r2
+funcThree: dec r2
               prn *r3
               mov labelOne, r5
               jsr funcThreeLocal
@@ -154,26 +145,18 @@ labelSix:     .data 400, 500, 600
               prn r6
 
 labelTwo:     .data 5500, -5600, 5700, -5800, 5900
-                  mov r2, *r3
-    prn r4
-    clr *r5
 
 .extern externalLabel6
+.extern funcTwo
 
-mov r2, stringFour
-
-stringFour:   .string "Another interleaved string test."
-
-              prn labelTwo
+stringFour:   prn labelTwo
               add r3, *r4
 
-labelFour:    .data 800, -900, 1000, -1100, 1200, -1300
-              mov r2, *r5
+labelFour:   mov r2, *r5
               sub r7, r6
               prn r6
 
 .extern externalLabel7
-.extern funcFour
 .extern funcFour
 
                   add r1, *r2
