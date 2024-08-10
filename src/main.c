@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
         /* preprocess lexer pass */
         if (lexer_init_file(&lexerPreprocess, argv[i]) == true) {
             lexer_lex(&lexerPreprocess);
-            /*error_handler_flush_error_list(&lexerPreprocess.errorHandler);*/
+            /*error_handler_flush_error_list(&lexerPreprocess.errorHandler); there is no need to print the pre-preprocesser lexer errors */
 
             /*if (lexerPreprocess.errorHandler.errorList == NULL)*/ {
                 /* preprocesser pass */
