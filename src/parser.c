@@ -103,6 +103,11 @@ static InstructionOperand parser_parse_instruction_operand(TranslationUnit * tra
     return out;
 }
 
+/**
+ * Parse and add en entry node to the transtion unit entry list
+ *
+ * @param translationUnit the translation unit.
+*/
 static void parse_and_add_entry_to_translationUnit(TranslationUnit * translationUnit){
     EntryNodeList * copy = NULL;
 
@@ -123,6 +128,12 @@ static void parse_and_add_entry_to_translationUnit(TranslationUnit * translation
     }
 }
 
+
+/**
+ * Parse and add en external node to the transtion unit external list
+ *
+ * @param translationUnit the translation unit.
+*/
 static void parse_and_add_external_to_translationUnit(TranslationUnit * translationUnit){
     ExternalNodeList * copy = NULL;
 
