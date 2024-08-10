@@ -8,7 +8,7 @@ APPNAME = $(current_dir)
 .PHONY: clean main valgrind
 
 # compiler targets
-$(current_dir): ../../../src/error_handler.c ../../../src/lexer.c ../../../src/preprocessor.c ../../../src/parser.c ../../../utils/string_util.c ../../../utils/char_util.c
+$(current_dir): ../../../src/safe_allocations.c ../../../src/error_handler.c ../../../src/lexer.c ../../../src/preprocessor.c ../../../src/parser.c ../../../utils/string_util.c ../../../utils/char_util.c
 	$(CC) $(LDFLAGS) $(CXXFLAGS) -o $(APPNAME) $^ $(current_dir).c
 
 clean:

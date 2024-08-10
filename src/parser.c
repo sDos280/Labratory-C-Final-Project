@@ -133,15 +133,8 @@ void parser_free_translation_unit(TranslationUnit * translationUnit){
     }
 
     while (translationUnit->labals != NULL) { /* for each labal in translation unit */
-        while (translationUnit->labals->labal.nodes != NULL) { /* for each node in the labal */
-            copy = translationUnit->labals->labal.nodes->next;
-
-            if (translationUnit->labals->labal.nodes->node.kind == DataNodeKind)
-                parser_free_data_guidance_sentence(translationUnit->labals->labal.nodes->node.node.dataNode);
-            
-            free(translationUnit->labals->labal.nodes);
-            translationUnit->labals->labal.nodes = copy;
-        }
+        parser_free_sentences (translationUnit->labals->labal.nodes);
+        translationUnit->labals = translationUnit->labals->next;
     }
 
     /* free the error handler */
@@ -792,7 +785,10 @@ Sentences * parser_parse_sentences(TranslationUnit * translationUnit){
              translationUnit->tokens->token.kind == EXTERN_INS || 
              translationUnit->tokens->token.kind == EOL)) 
     {
-        if (translationUnit->tokens->token.kind == EOL) translationUnit->tokens = translationUnit->tokens->next;
+        if (translationUnit->tokens->token.kind == EOL) {
+            translationUnit->tokens = translationUnit->tokens->next; /* there is no sentance on this line so we just move forward */
+            continue;
+        }
 
         sent = parser_parse_sentence(translationUnit);
 
@@ -810,6 +806,20 @@ Sentences * parser_parse_sentences(TranslationUnit * translationUnit){
     }
 
     return out;
+}
+
+void parser_free_sentences(Sentences * sentences){
+    Sentences * copy = sentences;
+
+    while (sentences != NULL){
+        copy = sentences->next;
+
+        if (sentences->node.kind == DataNodeKind)
+            parser_free_data_guidance_sentence(sentences->node.node.dataNode);
+        
+        free(sentences);
+        sentences = copy;
+    }
 }
 
 LabalNode parser_parse_labal(TranslationUnit * translationUnit){
@@ -917,8 +927,6 @@ LabalNode parser_parse_labal(TranslationUnit * translationUnit){
 }
 
 void parser_parse_translation_unit(TranslationUnit * translationUnit){
-    ExternalNodeList ** externalNodeListLast = &translationUnit->externalNodeList;
-    EntryNodeList ** entryNodeListLast = &translationUnit->entryNodeList;
     LabalNodeList * labalList = NULL;
     LabalNodeList ** labalListLast = NULL;
     TokenError error;
@@ -935,7 +943,7 @@ void parser_parse_translation_unit(TranslationUnit * translationUnit){
             translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
         } 
         
-        else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EXTERN_INS || translationUnit->tokens->token.kind == ENTRY_INS){
+        else if (translationUnit->tokens != NULL && (translationUnit->tokens->token.kind == EXTERN_INS || translationUnit->tokens->token.kind == ENTRY_INS)){
             parser_parse_sentence(translationUnit); /* this would automatically parser the external\entry node and add it to the list of all */
         }
 

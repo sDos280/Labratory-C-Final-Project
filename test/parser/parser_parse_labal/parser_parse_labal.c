@@ -5,8 +5,7 @@
 #include "../../../include/string_util.h"
 
 static void print_labal(LabalNode labal){
-    InstructionNodeList * copyI = labal.instructionNodeList;
-    GuidanceNodeList * copyG = labal.guidanceNodeList;
+    Sentences * copy = labal.nodes;
     TokenRefrenceList * list = NULL;
 
     printf("labal size: %d\n", labal.size);
@@ -16,24 +15,23 @@ static void print_labal(LabalNode labal){
         printf("%s:\n", labal.labal->string.data);
     }
 
-    while (copyI != NULL){
-        printf("    %s", copyI->node.operation->string.data);
+    while (copy != NULL){
+        if (copy->node.kind == InstructionNodeKind){
+            printf("    %s", copy->node.node.instructionNode.operation->string.data);
 
-        if (copyI->node.firstOperand != NULL)
-            printf(" %s", copyI->node.firstOperand->string.data);
-    
-        if (copyI->node.secondOperand != NULL)
-            printf(", %s", copyI->node.secondOperand->string.data);
+            if (copy->node.node.instructionNode.firstOperand != NULL)
+                printf(" %s", copy->node.node.instructionNode.firstOperand->string.data);
+        
+            if (copy->node.node.instructionNode.secondOperand != NULL)
+                printf(", %s", copy->node.node.instructionNode.secondOperand->string.data);
 
-        printf("\n");
-        copyI = copyI->next;
-    }
-
-    while (copyG != NULL){
-        if (copyG->kind == DataNodeKind){
+            printf("\n");
+        }
+        
+        if (copy->node.kind == DataNodeKind){
             printf("    .data ");
             
-            list = copyG->node.dataNode.numbers;
+            list = copy->node.node.dataNode.numbers;
 
             while (list != NULL){
                 printf("%d", atoi(list->token->string.data));
@@ -42,12 +40,22 @@ static void print_labal(LabalNode labal){
             }
 
             printf("\n");
-        } else if (copyG->kind == StringNodeKind){
-            if (copyG->node.stringNode.token != NULL)
-                printf("    .string %s\n", copyG->node.stringNode.token->string.data);
+        } 
+        
+        if (copy->node.kind == StringNodeKind){
+            if (copy->node.node.stringNode.token != NULL)
+                printf("    .string %s\n", copy->node.node.stringNode.token->string.data);
         }
 
-        copyG = copyG->next;
+        if (copy->node.kind == ExternalNodeKind){
+            printf("    .extern %s\n", copy->node.node.externalNode.token->string.data);
+        }
+
+        if (copy->node.kind == EntryNodeKind){
+            printf("    .entry %s\n", copy->node.node.entryNode.token->string.data);
+        }
+
+        copy = copy->next;
     }
 }
 
@@ -64,8 +72,8 @@ int main(){
     error_handler_flush_error_list(&lexerPreprocess.errorHandler);
     
     /* preprocesser pass */
-    preprocessor_init(&preprocessor, lexerPreprocess);
-    preprocessor_preprocess(&preprocessor, lexerPreprocess.string, "test1");
+    preprocessor_init(&preprocessor, lexerPreprocess, "test1");
+    preprocessor_preprocess(&preprocessor, lexerPreprocess.string);
     error_handler_flush_error_list(&preprocessor.errorHandler);
 
     /* postprocess lexer pass */
@@ -83,9 +91,8 @@ int main(){
     lexer_free(&lexerPreprocess);
     lexer_free(&lexerPostprocess);
     preprocessor_free(&preprocessor);
-    parser_free_instruction_sentences(labal.instructionNodeList);
-    parser_free_guidance_sentences(labal.guidanceNodeList);
     parser_free_translation_unit(&translationUnit);
+    parser_free_sentences(labal.nodes);
 
     return 0;
 }

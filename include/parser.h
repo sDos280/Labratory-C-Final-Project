@@ -122,6 +122,14 @@ Sentence parser_parse_sentence(TranslationUnit * translationUnit);
 Sentences * parser_parse_sentences(TranslationUnit * translationUnit);
 
 /**
+ * Free the (memory of) a sentences struct
+ *
+ * @param translationUnit the translation unit.
+ * @return the Sentence node 
+*/
+void parser_free_sentences(Sentences * sentences);
+
+/**
  * Parse labal
  *
  * @param translationUnit the translation unit.
