@@ -85,6 +85,16 @@ static InstructionOperand parser_parse_instruction_operand(TranslationUnit * tra
         return out;
     }
 
+    if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == IDENTIFIER && out.isOperandDerefrenced == true){
+        error.message = string_init_with_data("A Labal can't be derefrenced");
+        error.token = translationUnit->tokens->token;
+
+        error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+        parser_move_to_last_end_of_line(translationUnit);
+        return out;
+    }
+
     out.Operand = &translationUnit->tokens->token; /* the token is identifier/register */
     translationUnit->tokens = translationUnit->tokens->next; /* move over the identifier/register token */
 
