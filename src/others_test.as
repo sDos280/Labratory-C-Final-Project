@@ -7,7 +7,8 @@
 .extern externalLabel1
 .entry loopLabel
 
-startLabel: mov r1, *r2
+startLabel: 
+mov r1, *r2
             prn stringOne
             lea labelOne, r3
 
@@ -19,6 +20,7 @@ startLabel: mov r1, *r2
 
 
                 add r1, *r2
+                
     cmp r3, #-15
     bne funcCall
             prn r2
@@ -33,7 +35,7 @@ startLabel: mov r1, *r2
 stringOne:  .string "Initial string test."
 dataOne:    .data 1, -1, 3767, -3767
 
-.extern funcTwo
+
 .entry funcCall
 .extern externalLabel2
 
@@ -69,7 +71,7 @@ loopLabel:  prn #48
             dec r3
             jmp loopLabel
 
-.extern funcThree
+.entry funcThree
 
 funcOneLocal: clr r2
               lea stringOne, r3
@@ -84,7 +86,7 @@ funcOneLocal: clr r2
 
 labelFive:   .data 100, 200, 300
 
-.extern externalLabel3
+.extern externalLabel
 .extern externalLabel4
 .entry funcTwoLocal
 
@@ -109,7 +111,6 @@ funcTwo: jsr funcTwo
 labelOne:     .data 256, -512, 1024, -2048
 
 stringThree:  .string "String inside the data section."
-.extern funcTwo
 funcThreeLocal: jsr funcOneLocal
                 prn *r6
                 clr r2
@@ -147,7 +148,7 @@ funcThree: dec r2
 labelTwo:     .data 5500, -5600, 5700, -5800, 5900
 
 .extern externalLabel6
-.extern funcTwo
+.entry funcTwo
 
 stringFour:   prn labelTwo
               add r3, *r4
