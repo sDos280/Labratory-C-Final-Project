@@ -41,3 +41,9 @@ testComment: jmp PRINT ; this is ok
 thisIsOk: 
           add #454, *r3
     bne XYZ
+
+4) אין לרשום שני שורות extern/entry בעלות אותו identifier, לפיכך הדוגמה הבאה אסורה ותגרום להופעת שגיאה על ידי התוכנה:
+.extern id1
+.extern id1
+.entry id2
+.entry id2
