@@ -475,8 +475,8 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
 InstructionNodeList * parser_parse_instruction_sentences(TranslationUnit * translationUnit){
     InstructionNodeList * instructionList = NULL;
     InstructionNodeList ** instructionListLast = &instructionList; /* the last node in the instructionList */
-    ExternalNodeList ** externalNodeListLast = NULL;
-    EntryNodeList ** entryNodeListLast = NULL;
+    ExternalNodeList ** externalNodeListLast = &translationUnit->externalNodeList;
+    EntryNodeList ** entryNodeListLast = &translationUnit->entryNodeList;
 
     while (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != EOFT){
         if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOL){
