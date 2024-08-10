@@ -668,6 +668,120 @@ ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit){
     return node;
 }
 
+Sentence parser_parse_sentence(TranslationUnit * translationUnit){
+    TokenError error;
+    Sentence out;
+    out.kind = 0;
+    out.hasParserError = false;
+    out.size = 0; /* we woun't update that here */
+    out.position = 0;
+
+    if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == DATA_INS){
+        out.kind = DataNodeKind;
+        out.node.dataNode = parser_parse_data_guidance_sentence(translationUnit);
+        out.hasParserError = out.node.dataNode.hasParserError;
+    } 
+    
+    else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == STRING_INS){
+        out.kind = StringNodeKind;
+        out.node.stringNode = parser_parse_string_guidance_sentence(translationUnit);
+        out.hasParserError = out.node.stringNode.hasParserError;
+    }
+
+    else if (translationUnit->tokens != NULL && 
+            (translationUnit->tokens->token.kind == MOV ||
+             translationUnit->tokens->token.kind == CMP ||
+             translationUnit->tokens->token.kind == ADD ||
+             translationUnit->tokens->token.kind == SUB ||
+             translationUnit->tokens->token.kind == LEA ||
+             translationUnit->tokens->token.kind == CLR ||
+             translationUnit->tokens->token.kind == NOT ||
+             translationUnit->tokens->token.kind == INC ||
+             translationUnit->tokens->token.kind == DEC ||
+             translationUnit->tokens->token.kind == JMP ||
+             translationUnit->tokens->token.kind == BNE ||
+             translationUnit->tokens->token.kind == RED ||
+             translationUnit->tokens->token.kind == PRN ||
+             translationUnit->tokens->token.kind == JSR ||
+             translationUnit->tokens->token.kind == RTS ||
+             translationUnit->tokens->token.kind == STOP)){
+        out.kind = InstructionNodeKind;
+        out.node.instructionNode = parser_parse_instruction_sentence(translationUnit);
+        out.hasParserError = out.node.instructionNode.hasParserError;
+    }
+
+    else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == ENTRY_INS) {
+        out.kind = EntryNodeKind;
+        out.node.entryNode = parser_parse_entry_sentence(translationUnit);
+        out.hasParserError = out.node.entryNode.hasParserError;
+    }
+
+    else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EXTERN_INS) {
+        out.kind = ExternalNodeKind;
+        out.node.externalNode = parser_parse_external_sentence(translationUnit);
+        out.hasParserError = out.node.externalNode.hasParserError;
+    } 
+
+    else {
+        error.message = string_init_with_data("No sentnce starter was found here");
+        error.token = translationUnit->tokens->token;
+
+        error_handler_push_token_error(&translationUnit->errorHandler, ParserErrorKind, error);
+
+        parser_move_to_last_end_of_line(translationUnit);
+    }
+
+    return out;
+}
+
+Sentences * parser_parse_sentences(TranslationUnit * translationUnit){
+    Sentences * out = NULL;
+    Sentences ** last = &out;
+    Sentence sent;
+
+    while (translationUnit->tokens != NULL && (
+             translationUnit->tokens->token.kind == DATA_INS ||
+             translationUnit->tokens->token.kind == STRING_INS ||
+             translationUnit->tokens->token.kind == MOV ||
+             translationUnit->tokens->token.kind == CMP ||
+             translationUnit->tokens->token.kind == ADD ||
+             translationUnit->tokens->token.kind == SUB ||
+             translationUnit->tokens->token.kind == LEA ||
+             translationUnit->tokens->token.kind == CLR ||
+             translationUnit->tokens->token.kind == NOT ||
+             translationUnit->tokens->token.kind == INC ||
+             translationUnit->tokens->token.kind == DEC ||
+             translationUnit->tokens->token.kind == JMP ||
+             translationUnit->tokens->token.kind == BNE ||
+             translationUnit->tokens->token.kind == RED ||
+             translationUnit->tokens->token.kind == PRN ||
+             translationUnit->tokens->token.kind == JSR ||
+             translationUnit->tokens->token.kind == RTS ||
+             translationUnit->tokens->token.kind == STOP ||
+             translationUnit->tokens->token.kind == ENTRY_INS ||
+             translationUnit->tokens->token.kind == EXTERN_INS || 
+             translationUnit->tokens->token.kind == EOL)) 
+    {
+        if (translationUnit->tokens->token.kind == EOL) translationUnit->tokens = translationUnit->tokens->next;
+
+        sent = parser_parse_sentence(translationUnit);
+
+        if (out == NULL){
+            out = safe_malloc(sizeof(Sentences));
+            out->next = NULL;
+            out->node = sent;
+            last = &out;
+        }else{
+            (*last)->next = safe_malloc(sizeof(Sentences));
+            last = &(*last)->next;
+            (*last)->next = NULL;
+            (*last)->node = sent;
+        }    
+    }
+
+    return out;
+}
+
 LabalNode parser_parse_labal(TranslationUnit * translationUnit){
     LabalNode labal;
     TokenError error;

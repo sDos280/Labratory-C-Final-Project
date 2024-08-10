@@ -6,11 +6,11 @@
 #include "token.h"
 
 typedef enum NodeKind {
-    EntryNodeKind,
-    ExternalNodeKind,
     DataNodeKind,
     StringNodeKind,
-    InstructionNodeKind
+    InstructionNodeKind,
+    EntryNodeKind,
+    ExternalNodeKind
 }NodeKind;
 
 typedef struct EntryNode {
@@ -77,6 +77,26 @@ typedef struct GuidanceNodeList {
     NodeKind kind; /* the node type */
     struct GuidanceNodeList * next; /* the next node */
 }GuidanceNodeList;
+
+typedef struct Sentence { /* Sentence = one node */
+    union {
+        DataNode dataNode;
+        StringNode stringNode;
+        InstructionNode instructionNode;
+        EntryNode entryNode;
+        ExternalNode externalNode;
+    }node; /* the current node */
+
+    NodeKind kind; /* the node kind */
+    bool hasParserError; /* true if got a parser error in the coresponding node else, false */ 
+    unsigned int size; /* the size of the node */
+    unsigned int position; /* the position of the node in its respective image */
+}Sentence;
+
+typedef struct Sentences {
+    Sentence node; /* current sentence */
+    struct Sentences * next; /* the next sentence in the sequence */
+}Sentences;
 
 typedef struct LabalNode {
     Token * labal; /* the labal identifier, for guidence node list that doesn't have a labal, that would be NULL */

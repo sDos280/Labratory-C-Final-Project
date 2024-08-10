@@ -64,6 +64,7 @@ GuidanceNodeList * parser_parse_guidance_sentences(TranslationUnit * translation
 */
 void parser_free_guidance_sentences(GuidanceNodeList * guidanceList);
 
+
 /**
  * Parse an instruction sentence
  *
@@ -103,6 +104,22 @@ EntryNode parser_parse_entry_sentence(TranslationUnit * translationUnit);
  * @return the external node 
 */
 ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit);
+
+/**
+ * Parse a sentence
+ *
+ * @param translationUnit the translation unit.
+ * @return the Sentence node 
+*/
+Sentence parser_parse_sentence(TranslationUnit * translationUnit);
+
+/**
+ * Parse a sentences
+ *
+ * @param translationUnit the translation unit.
+ * @return the Sentences node 
+*/
+Sentences * parser_parse_sentences(TranslationUnit * translationUnit);
 
 /**
  * Parse labal
