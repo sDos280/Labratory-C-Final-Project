@@ -115,30 +115,33 @@ void parser_init_translation_unit(TranslationUnit * translationUnit, Lexer lexer
 
 void parser_free_translation_unit(TranslationUnit * translationUnit){
     void * copy;
+
     /* free translationUnit's lists */
+
     while (translationUnit->externalNodeList != NULL)
     {
         copy = translationUnit->externalNodeList->next;
         free(translationUnit->externalNodeList);
         translationUnit->externalNodeList = copy;
     }
+
     while (translationUnit->entryNodeList != NULL)
     {
         copy = translationUnit->entryNodeList->next;
         free(translationUnit->entryNodeList);
         translationUnit->entryNodeList = copy;
     }
-    while (translationUnit->instructionLabalList != NULL){
-        parser_free_instruction_sentences(translationUnit->instructionLabalList->labal.instructionNodeList);
-        copy = translationUnit->instructionLabalList->next;
-        free(translationUnit->instructionLabalList);
-        translationUnit->instructionLabalList = copy;
-    }
-    while (translationUnit->guidanceLabalList != NULL){
-        parser_free_guidance_sentences(translationUnit->guidanceLabalList->labal.guidanceNodeList);
-        copy = translationUnit->guidanceLabalList->next;
-        free(translationUnit->guidanceLabalList);
-        translationUnit->guidanceLabalList = copy;
+
+    while (translationUnit->labals != NULL) { /* for each labal in translation unit */
+        while (translationUnit->labals->labal.nodes != NULL) { /* for each node in the labal */
+            copy = translationUnit->labals->labal.nodes->next;
+
+            if (translationUnit->labals->labal.nodes->node.kind == DataNodeKind)
+                parser_free_data_guidance_sentence(translationUnit->labals->labal.nodes->node.node.dataNode);
+            
+            free(translationUnit->labals->labal.nodes);
+            translationUnit->labals->labal.nodes = copy;
+        }
     }
 
     /* free the error handler */
