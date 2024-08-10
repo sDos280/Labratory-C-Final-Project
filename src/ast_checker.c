@@ -396,12 +396,15 @@ void ast_checker_check_labal(AstChecker * astChecker, LabalNode node){
     }
 
     while (copyI != NULL){
-        ast_checker_check_instruction_sentence(astChecker, copyI->node);
+        if (copyI->node.hasParserError == false) /* there is only a need for a check of that kind in no parser error was found */
+            ast_checker_check_instruction_sentence(astChecker, copyI->node);
         copyI = copyI->next;
     }
 
     while (copyG != NULL){
-        if (copyG->kind == DataNodeKind) ast_checker_check_data_guidance_sentence(astChecker, copyG->node.dataNode);
+        if ((copyG->kind == DataNodeKind && copyG->node.dataNode.hasParserError == false) || 
+            (copyG->kind == StringNodeKind && copyG->node.stringNode.hasParserError == false)) /* there is only a need for a check of that kind in no parser error was found */
+            if (copyG->kind == DataNodeKind) ast_checker_check_data_guidance_sentence(astChecker, copyG->node.dataNode);
         copyG = copyG->next;
     }
 }
@@ -454,29 +457,31 @@ void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, Translatio
     }
 
     while (externalNodeList != NULL){
-        cellPointerTemp = ast_checker_get_hash_cell_by_string(astChecker, externalNodeList->node.token->string);
+        if (externalNodeList->node.hasParserError == false) /* there is only a need to add the external if no parser error was found */ {
+            cellPointerTemp = ast_checker_get_hash_cell_by_string(astChecker, externalNodeList->node.token->string);
         
-        if (cellPointerTemp == NULL){
-            /* this external identifier wasn't added yet so we add it*/
-            cell.key = &externalNodeList->node.token->string;
-            cell.kind = ExternalCellKind;
-            cell.value.external = &externalNodeList->node;
-        
-            temp = ast_checker_set_hash_cell_by_string(astChecker, cell);
-        }else {
-            /* this external identifier was added already */
+            if (cellPointerTemp == NULL) {
+                /* this external identifier wasn't added yet so we add it*/
+                cell.key = &externalNodeList->node.token->string;
+                cell.kind = ExternalCellKind;
+                cell.value.external = &externalNodeList->node;
+            
+                temp = ast_checker_set_hash_cell_by_string(astChecker, cell);
+            } else {
+                /* this external identifier was added already */
+ 
+                if (cellPointerTemp->kind == LabalCellKind) {
+                    error.message = string_init_with_data("An identifier can't be declare as a labal and also an external");
+                    error.token = *externalNodeList->node.token;
 
-            if (cellPointerTemp->kind == LabalCellKind){
-                error.message = string_init_with_data("An identifier can't be declare as a labal and also an external");
-                error.token = *externalNodeList->node.token;
+                    error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+                } else {  /*cellPointerTemp->kind == ExternalCellKind */
+                    /*a decleration of external twice isn't really a problem, in the compiler sense, but it cause problems in the ent file, so*/
+                    error.message = string_init_with_data("An external was declared more then once, that causes problem in the .ent file, please remove other declaretion of this external");
+                    error.token = *externalNodeList->node.token;
 
-                error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-            } else {  /*cellPointerTemp->kind == ExternalCellKind */
-                /*a decleration of external twice isn't really a problem, in the compiler sense, but it cause problems in the ent file, so*/
-                error.message = string_init_with_data("An external was declared more then once, that causes problem in the .ent file, please remove other declaretion of this external");
-                error.token = *externalNodeList->node.token;
-
-                error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+                    error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+                }
             }
         }
 
@@ -484,22 +489,25 @@ void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, Translatio
     }
 
     while (entryNodeList != NULL){
-        cellPointerTemp = ast_checker_get_hash_cell_by_string(astChecker, entryNodeList->node.token->string);
-
-        if (cellPointerTemp == NULL){
-            error.message = string_init_with_data("No labal was found for this entry");
-            error.token = *entryNodeList->node.token;
-
-            error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-        }else {
-            if (cellPointerTemp->kind == ExternalCellKind){
-                error.message = string_init_with_data("An entry can't be also an external");
-                error.token = *externalNodeList->node.token;
+        if (entryNodeList->node.hasParserError == false) /* there is only a need to add the external if no parser error was found */ {
+            cellPointerTemp = ast_checker_get_hash_cell_by_string(astChecker, entryNodeList->node.token->string);
+        
+            if (cellPointerTemp == NULL){
+                error.message = string_init_with_data("No labal was found for this entry");
+                error.token = *entryNodeList->node.token;
 
                 error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-            } /*else { cellPointerTemp->kind == LabalCellKind 
-            }*/
+            }else {
+                if (cellPointerTemp->kind == ExternalCellKind){
+                    error.message = string_init_with_data("An entry can't be also an external");
+                    error.token = *externalNodeList->node.token;
+
+                    error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
+                } /*else { cellPointerTemp->kind == LabalCellKind 
+                }*/
+            }
         }
+        
 
         entryNodeList = entryNodeList->next;
     }
