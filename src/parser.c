@@ -104,35 +104,42 @@ static InstructionOperand parser_parse_instruction_operand(TranslationUnit * tra
 }
 
 static void parse_and_add_entry_to_translationUnit(TranslationUnit * translationUnit){
+    EntryNodeList * copy = NULL;
 
     if (translationUnit->entryNodeList == NULL){
         translationUnit->entryNodeList = safe_malloc(sizeof(EntryNodeList));
         translationUnit->entryNodeList->next = NULL;
         translationUnit->entryNodeList->node = parser_parse_entry_sentence(translationUnit);
     } else {
-        while (translationUnit->entryNodeList->next != NULL){
-            translationUnit->entryNodeList = translationUnit->entryNodeList->next;
+        copy = translationUnit->entryNodeList;
+
+        while (copy->next != NULL){
+            copy = copy->next;
         }
 
-        translationUnit->entryNodeList->next = safe_malloc(sizeof(EntryNodeList));
-        translationUnit->entryNodeList->next->next = NULL;
-        translationUnit->entryNodeList->next->node = parser_parse_entry_sentence(translationUnit);
+        copy->next = safe_malloc(sizeof(EntryNodeList));
+        copy->next->next = NULL;
+        copy->next->node = parser_parse_entry_sentence(translationUnit);
     }
 }
 
 static void parse_and_add_external_to_translationUnit(TranslationUnit * translationUnit){
+    ExternalNodeList * copy = NULL;
+
     if (translationUnit->externalNodeList == NULL){
         translationUnit->externalNodeList = safe_malloc(sizeof(ExternalNodeList));
         translationUnit->externalNodeList->next = NULL;
         translationUnit->externalNodeList->node = parser_parse_external_sentence(translationUnit);
     } else {
-        while (translationUnit->externalNodeList->next != NULL){
-            translationUnit->externalNodeList = translationUnit->externalNodeList->next;
+        copy = translationUnit->externalNodeList;
+
+        while (copy->next != NULL){
+            copy = copy->next;
         }
 
-        translationUnit->externalNodeList->next = safe_malloc(sizeof(ExternalNodeList));
-        translationUnit->externalNodeList->next->next = NULL;
-        translationUnit->externalNodeList->next->node = parser_parse_external_sentence(translationUnit);
+        copy->next = safe_malloc(sizeof(ExternalNodeList));
+        copy->next->next = NULL;
+        copy->next->node = parser_parse_external_sentence(translationUnit);
     }
 }
 
@@ -869,9 +876,4 @@ void parser_parse_translation_unit(TranslationUnit * translationUnit){
 
     translationUnit->guidanceLabalList = guidanceLabalList;
     translationUnit->instructionLabalList = instructionLabalList;
-
-    while (translationUnit->externalNodeList != NULL){
-        printf(".extern %s\n", translationUnit->externalNodeList->node.token->string.data);
-        translationUnit->externalNodeList = translationUnit->externalNodeList->next;
-    }
 }
