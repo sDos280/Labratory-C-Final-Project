@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
         /* preprocess lexer pass */
         if (lexer_init_file(&lexerPreprocess, argv[i]) == true) {
             lexer_lex(&lexerPreprocess);
-            error_handler_flush_error_list(&lexerPreprocess.errorHandler);
+            /*error_handler_flush_error_list(&lexerPreprocess.errorHandler);*/
 
             /*if (lexerPreprocess.errorHandler.errorList == NULL)*/ {
                 /* preprocesser pass */
@@ -39,13 +39,13 @@ int main(int argc, char *argv[]) {
                         parser_parse_translation_unit(&translationUnit);
                         error_handler_flush_error_list(&translationUnit.errorHandler);
 
-                        if (translationUnit.errorHandler.errorList == NULL) {
+                        /*if (translationUnit.errorHandler.errorList == NULL)*/ {
                             /* ast check pass */
                             ast_checker_init(&astChecker, &translationUnit, lexerPostprocess);
                             ast_checker_check_translation_unit(&astChecker, &translationUnit);
                             error_handler_flush_error_list(&astChecker.errorHandler);
 
-                            if (astChecker.errorHandler.errorList == NULL) {
+                            if (astChecker.errorHandler.errorList == NULL && translationUnit.errorHandler.errorList == NULL) {
                                 /* emitter chekc pass*/
                                 emitter_init(&emitter, lexerPostprocess);
                                 emitter_update_labals_size_and_position(&emitter, &translationUnit);
