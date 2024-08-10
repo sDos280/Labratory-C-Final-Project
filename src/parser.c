@@ -475,6 +475,8 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
 InstructionNodeList * parser_parse_instruction_sentences(TranslationUnit * translationUnit){
     InstructionNodeList * instructionList = NULL;
     InstructionNodeList ** instructionListLast = &instructionList; /* the last node in the instructionList */
+    ExternalNodeList ** externalNodeListLast = NULL;
+    EntryNodeList ** entryNodeListLast = NULL;
 
     while (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != EOFT){
         if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOL){
@@ -508,7 +510,37 @@ InstructionNodeList * parser_parse_instruction_sentences(TranslationUnit * trans
 
                 (*instructionListLast)->node = parser_parse_instruction_sentence(translationUnit);
             }
-        } else {
+        } 
+        
+        else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == ENTRY_INS){
+            if (translationUnit->entryNodeList == NULL){
+                translationUnit->entryNodeList = safe_malloc(sizeof(EntryNodeList));
+                translationUnit->entryNodeList->next = NULL;
+                translationUnit->entryNodeList->node = parser_parse_entry_sentence(translationUnit);
+                entryNodeListLast = &translationUnit->entryNodeList;
+            }else{
+                (*entryNodeListLast)->next = safe_malloc(sizeof(EntryNodeList));
+                entryNodeListLast = &(*entryNodeListLast)->next;
+                (*entryNodeListLast)->next = NULL;
+                (*entryNodeListLast)->node = parser_parse_entry_sentence(translationUnit);
+            }
+        }
+
+        else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EXTERN_INS){
+            if (translationUnit->externalNodeList == NULL){
+                translationUnit->externalNodeList = safe_malloc(sizeof(ExternalNodeList));
+                translationUnit->externalNodeList->next = NULL;
+                translationUnit->externalNodeList->node = parser_parse_external_sentence(translationUnit);
+                externalNodeListLast = &translationUnit->externalNodeList;
+            }else{
+                (*externalNodeListLast)->next = safe_malloc(sizeof(ExternalNodeList));
+                externalNodeListLast = &(*externalNodeListLast)->next;
+                (*externalNodeListLast)->next = NULL;
+                (*externalNodeListLast)->node = parser_parse_external_sentence(translationUnit);
+            }
+        }
+
+        else {
             break; /* the end of the grammer*/ 
         }
     }
@@ -741,10 +773,8 @@ LabalNode parser_parse_labal(TranslationUnit * translationUnit){
 }
 
 void parser_parse_translation_unit(TranslationUnit * translationUnit){
-    ExternalNodeList * externalNodeList = NULL;
-    ExternalNodeList ** externalNodeListLast = NULL;
-    EntryNodeList * entryNodeList = NULL;
-    EntryNodeList ** entryNodeListLast = NULL;
+    ExternalNodeList ** externalNodeListLast = &translationUnit->externalNodeList;
+    EntryNodeList ** entryNodeListLast = &translationUnit->entryNodeList;
     LabalNodeList * instructionLabalList = NULL;
     LabalNodeList ** instructionLabalListLast = NULL;
     LabalNodeList * guidanceLabalList = NULL;
@@ -763,11 +793,11 @@ void parser_parse_translation_unit(TranslationUnit * translationUnit){
         if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOL){
             translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
         } else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EXTERN_INS){
-            if (externalNodeList == NULL){
-                externalNodeList = safe_malloc(sizeof(ExternalNodeList));
-                externalNodeList->next = NULL;
-                externalNodeList->node = parser_parse_external_sentence(translationUnit);
-                externalNodeListLast = &externalNodeList;
+            if (translationUnit->externalNodeList == NULL){
+                translationUnit->externalNodeList = safe_malloc(sizeof(ExternalNodeList));
+                translationUnit->externalNodeList->next = NULL;
+                translationUnit->externalNodeList->node = parser_parse_external_sentence(translationUnit);
+                externalNodeListLast = &translationUnit->externalNodeList;
             }else{
                 (*externalNodeListLast)->next = safe_malloc(sizeof(ExternalNodeList));
                 externalNodeListLast = &(*externalNodeListLast)->next;
@@ -775,11 +805,11 @@ void parser_parse_translation_unit(TranslationUnit * translationUnit){
                 (*externalNodeListLast)->node = parser_parse_external_sentence(translationUnit);
             }
         } else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == ENTRY_INS){
-            if (entryNodeList == NULL){
-                entryNodeList = safe_malloc(sizeof(EntryNodeList));
-                entryNodeList->next = NULL;
-                entryNodeList->node = parser_parse_entry_sentence(translationUnit);
-                entryNodeListLast = &entryNodeList;
+            if (translationUnit->entryNodeList == NULL){
+                translationUnit->entryNodeList = safe_malloc(sizeof(EntryNodeList));
+                translationUnit->entryNodeList->next = NULL;
+                translationUnit->entryNodeList->node = parser_parse_entry_sentence(translationUnit);
+                entryNodeListLast = &translationUnit->entryNodeList;
             }else{
                 (*entryNodeListLast)->next = safe_malloc(sizeof(EntryNodeList));
                 entryNodeListLast = &(*entryNodeListLast)->next;
@@ -844,8 +874,6 @@ void parser_parse_translation_unit(TranslationUnit * translationUnit){
         }
     }
 
-    translationUnit->entryNodeList = entryNodeList;
-    translationUnit->externalNodeList = externalNodeList;
     translationUnit->guidanceLabalList = guidanceLabalList;
     translationUnit->instructionLabalList = instructionLabalList;
 }
