@@ -1,9 +1,10 @@
 ; file unkown_char
 
 .entry STR
-.extern  ; there is also an error here
+.extern  
 
 .testThis
 
-MAIN: - add r3, LIST  "
+MAIN: add r3, r3
+     - add r3, LIST  "
       jsr fn1   []
