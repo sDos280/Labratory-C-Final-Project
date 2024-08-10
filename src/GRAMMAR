@@ -9,38 +9,60 @@ number_list_end:
 
 data_guidance_sentence:
     : ".data" number_list_end
+    ;
 
 string_guidance_sentence:
     : ".string" '\"' ... '\"' '\n'
+    ;
 
 entry_guidance_sentence:
     : ".entry" IDENTIFIER '\n'
+    ;
 
 extern_guidance_sentecne:
     : ".extern" IDENTIFIER '\n'
-
-guidance_sentence:
-    : data_guidance_sentece
-    : string_guidance_sentece
-    : entry_guidance_sentece
-    : extern_guidance_sentece
-    : IDENTIFIER ':' data_guidance_sentece
-    : IDENTIFIER ':' string_guidance_sentece
     ;
 
-sentence:
+empty_sentence:
+    : '\n'
+    ;
+
+guidance_sentences_list:
     : data_guidance_sentece
     | string_guidance_sentece
-    | instruction_sentence
     | entry_guidance_sentece
     | extern_guidance_sentece
-    ; empty_sentence
+    | empty_sentence
+    | data_guidance_sentece, guidance_sentences_list
+    | string_guidance_sentece, guidance_sentences_list
+    | entry_guidance_sentece, guidance_sentences_list
+    | extern_guidance_sentece, guidance_sentences_list
+    | empty_sentence, guidance_sentences_list
+    ;
 
-sentences:
-    : sentence
-    ; sentences, sentence
-    
-    :
-labal:
-    : IDENTIFIER ':' sentences
-    ; sentences
+guidance_sentences_list_full:
+    : guidance_sentences_list
+    | IDENTIFIER ':' guidance_sentences_list
+    ;
+
+instruction_sentences_list:
+    : ins operator ',' operator '\n' 
+    | ins operator '\n' 
+    | ins '\n' 
+    | ins operator ',' operator '\n' , instruction_sentences_list
+    | ins operator '\n' , instruction_sentences_list
+    | ins '\n' , instruction_sentences_list
+    ;
+
+instruction_sentences_list_full:
+    : IDENTIFIER ':' instruction_sentences_list
+    ;
+
+translation_unit:
+    : guidance_sentences_list_full    , translation_unit
+    | instruction_sentences_list_full , translation_unit
+    | empty_sentence                  , translation_unit
+    | guidance_sentences_list_full    , translation_unit
+    | instruction_sentences_list_full , translation_unit
+    | empty_sentence                  , translation_unit
+    ;
