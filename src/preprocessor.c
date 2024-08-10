@@ -41,11 +41,12 @@ void preprocessor_free(Preprocessor * preprocessor){
 
     /* free the macro list */
     while (preprocessor->macroList != NULL){
+        current = preprocessor->macroList;
+
         /* free the macro expansion */
         string_free(current->macro.expansion);
 
         /* move over to the next macro and save a "copy" of the current */
-        current = preprocessor->macroList;
         preprocessor->macroList = preprocessor->macroList->next;
 
         /* free the current macro */
@@ -59,14 +60,14 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
     Macro macro;
     TokenError error;
 
-    int expansion_start;
-    int expansion_end;
+    int expansion_start = 0;
+    int expansion_end = 0;
     
-    int start;
-    int end;
+    int start = 0;
+    int end = 0;
 
-    MacroList * macroList;
-    TokenList * copy;
+    MacroList * macroList = NULL;
+    TokenList * copy = NULL;
 
     bool wasGoodEndMacroFound = false;
     bool wasEndMacroFound = false;
