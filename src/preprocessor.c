@@ -275,7 +275,12 @@ void preprocessor_preprocess_to_source(Preprocessor * preprocessor, String sourc
                 i++;
             }
         } else {
-            string_add_char(&preprocessor->string, string_get_char(source, i));
+            if (string_get_char(source, i) == '\t') {
+                string_add_char_pointer(&preprocessor->string, "    "); /* 4 spaces instead of tab */
+            }else {
+                string_add_char(&preprocessor->string, string_get_char(source, i));
+            }
+            
             i++;
         }
     }
