@@ -113,8 +113,7 @@ typedef struct LabalNodeList {
 typedef struct TranslationUnit {
     ExternalNodeList * externalNodeList; /* the list of all the external nodes */
     EntryNodeList * entryNodeList; /* the list of all the entry nodes */
-    LabalNodeList * instructionLabalList; /* the instructions labal list */
-    LabalNodeList * guidanceLabalList; /* the guidance labal list */
+    LabalNodeList * labals; /* the labals list */
 
     ErrorHandler errorHandler; /* the error handler of the translation unit */
     TokenList * tokens; /* the token list refrence from the lexer */

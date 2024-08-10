@@ -106,8 +106,7 @@ static InstructionOperand parser_parse_instruction_operand(TranslationUnit * tra
 void parser_init_translation_unit(TranslationUnit * translationUnit, Lexer lexer){
     translationUnit->externalNodeList = NULL;
     translationUnit->entryNodeList = NULL;
-    translationUnit->instructionLabalList = NULL;
-    translationUnit->guidanceLabalList = NULL;
+    translationUnit->labals = NULL;
 
     translationUnit->tokens = lexer.tokens;
 
@@ -917,15 +916,12 @@ LabalNode parser_parse_labal(TranslationUnit * translationUnit){
 void parser_parse_translation_unit(TranslationUnit * translationUnit){
     ExternalNodeList ** externalNodeListLast = &translationUnit->externalNodeList;
     EntryNodeList ** entryNodeListLast = &translationUnit->entryNodeList;
-    LabalNodeList * instructionLabalList = NULL;
-    LabalNodeList ** instructionLabalListLast = NULL;
-    LabalNodeList * guidanceLabalList = NULL;
-    LabalNodeList ** guidanceLabalListLast = NULL;
+    LabalNodeList * labalList = NULL;
+    LabalNodeList ** labalListLast = NULL;
     TokenError error;
     LabalNode labal;
     bool wasLabalFound = false;
-    labal.guidanceNodeList = NULL;
-    labal.instructionNodeList = NULL;
+    labal.nodes = NULL;
     labal.labal = NULL;
     labal.position = 0;
     labal.size = 0;
@@ -934,30 +930,10 @@ void parser_parse_translation_unit(TranslationUnit * translationUnit){
     while (translationUnit->tokens != NULL && translationUnit->tokens->token.kind != EOFT){
         if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EOL){
             translationUnit->tokens = translationUnit->tokens->next; /* move over the EOL token */
-        } else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EXTERN_INS){
-            if (translationUnit->externalNodeList == NULL){
-                translationUnit->externalNodeList = safe_malloc(sizeof(ExternalNodeList));
-                translationUnit->externalNodeList->next = NULL;
-                translationUnit->externalNodeList->node = parser_parse_external_sentence(translationUnit);
-                externalNodeListLast = &translationUnit->externalNodeList;
-            }else{
-                (*externalNodeListLast)->next = safe_malloc(sizeof(ExternalNodeList));
-                externalNodeListLast = &(*externalNodeListLast)->next;
-                (*externalNodeListLast)->next = NULL;
-                (*externalNodeListLast)->node = parser_parse_external_sentence(translationUnit);
-            }
-        } else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == ENTRY_INS){
-            if (translationUnit->entryNodeList == NULL){
-                translationUnit->entryNodeList = safe_malloc(sizeof(EntryNodeList));
-                translationUnit->entryNodeList->next = NULL;
-                translationUnit->entryNodeList->node = parser_parse_entry_sentence(translationUnit);
-                entryNodeListLast = &translationUnit->entryNodeList;
-            }else{
-                (*entryNodeListLast)->next = safe_malloc(sizeof(EntryNodeList));
-                entryNodeListLast = &(*entryNodeListLast)->next;
-                (*entryNodeListLast)->next = NULL;
-                (*entryNodeListLast)->node = parser_parse_entry_sentence(translationUnit);
-            }
+        } 
+        
+        else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EXTERN_INS || translationUnit->tokens->token.kind == ENTRY_INS){
+            parser_parse_sentence(translationUnit); /* this would automatically parser the external\entry node and add it to the list of all */
         }
 
         else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == IDENTIFIER){
@@ -979,43 +955,26 @@ void parser_parse_translation_unit(TranslationUnit * translationUnit){
 
         /* add the labal to the coresponding list */
         if (wasLabalFound == true){
-            if (labal.instructionNodeList != NULL){
-                if (instructionLabalList == NULL){ 
-                    instructionLabalList = safe_malloc(sizeof(LabalNodeList));
-                    instructionLabalList->next = NULL;
-                    instructionLabalList->labal = labal;
-                    instructionLabalListLast = &instructionLabalList;
-                } else {
-                    (*instructionLabalListLast)->next = safe_malloc(sizeof(LabalNodeList));
-                    instructionLabalListLast = &(*instructionLabalListLast)->next;
-                    (*instructionLabalListLast)->next = NULL;
-                    (*instructionLabalListLast)->labal = labal;
-                }
+            if (labalList != NULL){
+                labalList = safe_malloc(sizeof(LabalNodeList));
+                labalList->next = NULL;
+                labalList->labal = labal;
+                labalListLast = &labalList;
+            } else {
+                (*labalListLast)->next = safe_malloc(sizeof(LabalNodeList));
+                labalListLast = &(*labalListLast)->next;
+                (*labalListLast)->next = NULL;
+                (*labalListLast)->labal = labal;
             }
-
-            if (labal.guidanceNodeList != NULL){
-                if (guidanceLabalList == NULL){ 
-                    guidanceLabalList = safe_malloc(sizeof(LabalNodeList));
-                    guidanceLabalList->next = NULL;
-                    guidanceLabalList->labal = labal;
-                    guidanceLabalListLast = &guidanceLabalList;
-                } else {
-                    (*guidanceLabalListLast)->next = safe_malloc(sizeof(LabalNodeList));
-                    guidanceLabalListLast = &(*guidanceLabalListLast)->next;
-                    (*guidanceLabalListLast)->next = NULL;
-                    (*guidanceLabalListLast)->labal = labal;
-                }
-            }
-
-            wasLabalFound = false;
-            labal.guidanceNodeList = NULL;
-            labal.instructionNodeList = NULL;
-            labal.labal = NULL;
-            labal.position = 0;
-            labal.size = 0;
         }
+
+        /* reset variables for next iteration */
+        wasLabalFound = false;
+        labal.nodes = NULL;
+        labal.labal = NULL;
+        labal.position = 0;
+        labal.size = 0;
     }
 
-    translationUnit->guidanceLabalList = guidanceLabalList;
-    translationUnit->instructionLabalList = instructionLabalList;
+    translationUnit->labals = labalList;
 }
