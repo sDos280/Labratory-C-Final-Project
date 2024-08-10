@@ -359,7 +359,6 @@ InstructionNode parser_parse_instruction_sentence(TranslationUnit * translationU
     secondOperand.Operand = NULL;
     secondOperand.isOperandDerefrenced = false;
     instruction.hasParserError = false;
-    bool wasError = false;
     
 
     if (translationUnit->tokens != NULL && 
