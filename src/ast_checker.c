@@ -384,8 +384,10 @@ void ast_checker_check_instruction_sentence(AstChecker * astChecker, Instruction
 
 void ast_checker_check_labal(AstChecker * astChecker, LabalNode node){
     TokenError error;
-    InstructionNodeList * copyI = node.instructionNodeList;
-    GuidanceNodeList * copyG = node.guidanceNodeList;
+    void * copy = NULL;
+    bool wasInstructionFound = false;
+
+    /* check for instruction node */
     
     /* check if a labal with instructions have a labal identifier */
     if (node.instructionNodeList != NULL && node.labal == NULL){
