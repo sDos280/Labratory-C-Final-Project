@@ -412,48 +412,27 @@ void ast_checker_check_labal(AstChecker * astChecker, LabalNode node){
 void ast_checker_check_duplicate_identifiers(AstChecker * astChecker, TranslationUnit * translationUnit){
     ExternalNodeList * externalNodeList = translationUnit->externalNodeList;
     EntryNodeList * entryNodeList = translationUnit->entryNodeList;
-    LabalNodeList * instructionLabalList = translationUnit->instructionLabalList;
-    LabalNodeList * guidanceLabalList = translationUnit->guidanceLabalList;
+    LabalNodeList * labalList = translationUnit->labals;
     IdentifierHashCell * cellPointerTemp = NULL;
     IdentifierHashCell cell;
     bool temp = false;
     TokenError error;
 
-    while (instructionLabalList != NULL){
-        cell.key = &instructionLabalList->labal.labal->string;
+    while (labalList != NULL){
+        cell.key = &labalList->labal.labal->string;
         cell.kind = LabalCellKind;
-        cell.value.labal = &instructionLabalList->labal;
+        cell.value.labal = &labalList->labal;
 
         temp = ast_checker_set_hash_cell_by_string(astChecker, cell);
 
         if (temp == false){
             error.message = string_init_with_data("A Duplicate of this labal was found");
-            error.token = *instructionLabalList->labal.labal;
+            error.token = *labalList->labal.labal;
 
             error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
         }
 
-        instructionLabalList = instructionLabalList->next;
-    }
-
-    while (guidanceLabalList != NULL){
-        if (guidanceLabalList->labal.labal != NULL){
-            cell.key = &guidanceLabalList->labal.labal->string;
-            cell.kind = LabalCellKind;
-            cell.value.labal = &guidanceLabalList->labal;
-
-            temp = ast_checker_set_hash_cell_by_string(astChecker, cell);
-
-            if (temp == false){
-                error.message = string_init_with_data("A Duplicate of this labal was found");
-                error.token = *guidanceLabalList->labal.labal;
-
-                error_handler_push_token_error(&astChecker->errorHandler, AstCheckerErrorKind, error);
-            }
-        }
-        
-
-        guidanceLabalList = guidanceLabalList->next;
+        labalList = labalList->next;
     }
 
     while (externalNodeList != NULL){
