@@ -669,6 +669,8 @@ ExternalNode parser_parse_external_sentence(TranslationUnit * translationUnit){
 }
 
 Sentence parser_parse_sentence(TranslationUnit * translationUnit){
+    ExternalNodeList ** externalNodeListLast = &translationUnit->externalNodeList;
+    EntryNodeList ** entryNodeListLast = &translationUnit->entryNodeList;
     TokenError error;
     Sentence out;
     out.kind = 0;
@@ -714,12 +716,38 @@ Sentence parser_parse_sentence(TranslationUnit * translationUnit){
         out.kind = EntryNodeKind;
         out.node.entryNode = parser_parse_entry_sentence(translationUnit);
         out.hasParserError = out.node.entryNode.hasParserError;
+
+        if (translationUnit->entryNodeList == NULL){
+                translationUnit->entryNodeList = safe_malloc(sizeof(EntryNodeList));
+                translationUnit->entryNodeList->next = NULL;
+                translationUnit->entryNodeList->node = out.node.entryNode;
+                entryNodeListLast = &translationUnit->entryNodeList;
+            }else{
+                (*entryNodeListLast)->next = safe_malloc(sizeof(EntryNodeList));
+                entryNodeListLast = &(*entryNodeListLast)->next;
+                (*entryNodeListLast)->next = NULL;
+                (*entryNodeListLast)->node = out.node.entryNode;
+            }
     }
 
     else if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == EXTERN_INS) {
         out.kind = ExternalNodeKind;
         out.node.externalNode = parser_parse_external_sentence(translationUnit);
         out.hasParserError = out.node.externalNode.hasParserError;
+
+        if (out.hasParserError == false) {
+            if (translationUnit->externalNodeList == NULL){
+                translationUnit->externalNodeList = safe_malloc(sizeof(ExternalNodeList));
+                translationUnit->externalNodeList->next = NULL;
+                translationUnit->externalNodeList->node = out.node.externalNode;
+                externalNodeListLast = &translationUnit->externalNodeList;
+            }else{
+                (*externalNodeListLast)->next = safe_malloc(sizeof(ExternalNodeList));
+                externalNodeListLast = &(*externalNodeListLast)->next;
+                (*externalNodeListLast)->next = NULL;
+                (*externalNodeListLast)->node = out.node.externalNode;
+            }
+        }
     } 
 
     else {
@@ -786,11 +814,10 @@ LabalNode parser_parse_labal(TranslationUnit * translationUnit){
     LabalNode labal;
     TokenError error;
     bool wasLabalIdentifierFound = false;
-    labal.guidanceNodeList = NULL;
-    labal.instructionNodeList = NULL;
     labal.labal = NULL;
-    labal.position = 0;
-    labal.size = 0;
+    labal.nodes = NULL;
+    labal.position = 0; /* not yet initialized */
+    labal.size = 0; /* not yet initialized */
 
     if (translationUnit->tokens != NULL && translationUnit->tokens->token.kind == IDENTIFIER){
         labal.labal = &translationUnit->tokens->token;
@@ -855,20 +882,21 @@ LabalNode parser_parse_labal(TranslationUnit * translationUnit){
             return labal;
         }
 
-        labal.instructionNodeList = parser_parse_instruction_sentences(translationUnit);
-        labal.guidanceNodeList = NULL;
-        labal.size = 0; /* not yet initialized */
-        labal.position = 0; /* not yet initialized */
+        labal.nodes = parser_parse_sentences(translationUnit);
         return labal;
     }
 
     else if (translationUnit->tokens != NULL && 
        (translationUnit->tokens->token.kind == STRING_INS ||
         translationUnit->tokens->token.kind == DATA_INS)){
-        labal.guidanceNodeList = parser_parse_guidance_sentences(translationUnit);
-        labal.instructionNodeList = NULL;
-        labal.size = 0; /* not yet initialized */
-        labal.position = 0; /* not yet initialized */
+        labal.nodes = parser_parse_sentences(translationUnit);
+        return labal;
+    } 
+
+    else if (translationUnit->tokens != NULL && 
+       (translationUnit->tokens->token.kind == ENTRY_INS ||
+        translationUnit->tokens->token.kind == EXTERN_INS)){
+        labal.nodes = parser_parse_sentences(translationUnit);
         return labal;
     } 
 

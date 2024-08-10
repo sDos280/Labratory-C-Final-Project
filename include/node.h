@@ -100,8 +100,7 @@ typedef struct Sentences {
 
 typedef struct LabalNode {
     Token * labal; /* the labal identifier, for guidence node list that doesn't have a labal, that would be NULL */
-    InstructionNodeList * instructionNodeList; /* the list of instruction sentences, null if guidance sentences labal */
-    GuidanceNodeList * guidanceNodeList; /* the list of guidance sentences, null if instruction sentences labal  */
+    Sentences * nodes; /* the list of sentences, null doesn't have one */
     unsigned int size; /* the size of the labal in the memory */
     unsigned int position; /* the position of the labal in the memory (with out the 100 offset)*/
 }LabalNode;
