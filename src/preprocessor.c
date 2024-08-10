@@ -104,6 +104,8 @@ void preprocessor_generate_macro(Preprocessor * preprocessor, String source){
             error.token = macro.identifier;
 
             error_handler_push_token_error(&preprocessor->errorHandler, PreprocessorErrorKind, error);
+
+            break; /* there isn't a need to find any other matches*/
         }
 
         macroList = macroList->next;
