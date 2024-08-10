@@ -27,3 +27,20 @@ guidance_sentence:
     : IDENTIFIER ':' data_guidance_sentece
     : IDENTIFIER ':' string_guidance_sentece
     ;
+
+sentence:
+    : data_guidance_sentece
+    | string_guidance_sentece
+    | instruction_sentence
+    | entry_guidance_sentece
+    | extern_guidance_sentece
+    ; empty_sentence
+
+sentences:
+    : sentence
+    ; sentences, sentence
+    
+    :
+labal:
+    : IDENTIFIER ':' sentences
+    ; sentences
