@@ -7,8 +7,9 @@ funcTwoLocal: clr r5
     inc r1
 
 
-
+                                                    
               mov r7, funcTwo
+              .extern funcTwo
 
 
 
@@ -17,4 +18,3 @@ funcTwoLocal: clr r5
 labelOne:     .data 256, -512, 1024, -2048
 
 stringThree:  .string "String inside the data section."
-.extern funcTwo
