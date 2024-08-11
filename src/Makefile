@@ -2,7 +2,7 @@ CC = gcc
 CXXFLAGS = -Wall -ansi -pedantic -g -I ../../../include
 LDFLAGS = 
 
-APPNAME = ac # ac = AsemblyCompiler
+APPNAME = assembler # ac = AsemblyCompiler
 
 .PHONY: clean main valgrind
 

@@ -3,12 +3,12 @@ funcTwoLocal: clr r5
               add r2, *r3
               sub r4, r5
                   sub *r4, r5
-funcTwo:
+
     inc r1
 
 
 
-              mov r7, r6
+              mov r7, funcTwo
 
 
 
