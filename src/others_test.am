@@ -7,8 +7,7 @@
 .extern externalLabel1
 .entry loopLabel
 
-startLabel: 
-mov r1, *r2
+startLabel:  mov r1, *r2
             prn stringOne
             lea labelOne, r3
 
